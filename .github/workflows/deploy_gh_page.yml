@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: notebooks
-          path: static
+          path: converter/static
   docs:
     runs-on: ubuntu-latest
     steps:
