@@ -1,0 +1,48 @@
+{
+  "name": "website",
+  "private": true,
+  "description": "Project of my website",
+  "main": "index.js",
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "dev": "vuepress dev docs",
+    "build": "vuepress build docs",
+    "postinstall": "patch-package"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucienZhang/website.git"
+  },
+  "author": "Lucien Zhang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LucienZhang/website/issues"
+  },
+  "homepage": "https://github.com/LucienZhang/website#readme",
+  "devDependencies": {
+    "@snippetors/vuepress-plugin-code-copy": "^1.2.3",
+    "@snippetors/vuepress-plugin-tabs": "^1.2.3",
+    "@vuepress/plugin-register-components": "^2.0.0-beta.60",
+    "@vuepress/plugin-shiki": "^2.0.0-beta.60",
+    "ant-design-vue": "^3.2.15",
+    "axios": "^1.2.3",
+    "bootstrap": "^4.6.2",
+    "breakpoints-js": "^1.0.6",
+    "cheerio": "^1.0.0-rc.12",
+    "highcharts": "^10.3.3",
+    "highcharts-vue": "^1.4.0",
+    "markdown-it-footnote": "^3.0.3",
+    "markdown-it-multimd-table": "^4.2.0",
+    "markdown-it-pangu": "^1.0.0",
+    "patch-package": "^6.5.1",
+    "signature_pad": "^4.1.4",
+    "three": "^0.135.0",
+    "typed.js": "^2.0.12",
+    "unplugin-vue-components": "^0.22.12",
+    "vuepress-plugin-md-enhance": "^2.0.0-beta.168",
+    "vuepress-vite": "^2.0.0-beta.60",
+    "web-ifc-three": "0.0.102"
+  }
+}
