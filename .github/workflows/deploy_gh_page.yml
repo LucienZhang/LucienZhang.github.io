@@ -11,8 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: "3.9"
-    working-directory: converter
+        python-version: 3.9
+    defaults:
+      run:
+        working-directory: converter
     steps:
       - name: Checkout website-binder repository
         uses: actions/checkout@v3
@@ -36,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: "18"
+        node-version: 18
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
