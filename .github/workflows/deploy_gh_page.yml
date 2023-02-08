@@ -56,7 +56,11 @@ jobs:
     needs: [notebooks, docs]
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download docs artifact
         uses: actions/download-artifact@v3
@@ -68,12 +72,12 @@ jobs:
         with:
           name: notebooks
           path: notebooks
-      - run: ls -R docs
-      - run: ls -R notebooks
-      # - name: Deploy to GitHub Pages
-      #   uses: crazy-max/ghaction-github-pages@v3
-      #   with:
-      #     target_branch: gh-pages
-      #     build_dir: docs
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge aritifacts
+        run: cp -r notebooks/jupyter docs/static/
+      - name: Upload Page Artifacts
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
