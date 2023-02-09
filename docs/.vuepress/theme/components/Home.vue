@@ -97,14 +97,14 @@
           <div class="row">
             <article class="col-6 col-12-xsmall work-item">
               <a :href="rootPath + 'programming/prog-lang/overview.html'" class="image fit thumb">
-                <img :src="getImageUrl('./assets/images/recent_work/programming.png')" />
+                <img src="./assets/images/recent_work/programming.png" />
               </a>
               <h3>Programming</h3>
               <p>Here I wrote some notes about programming languages and algorithms.</p>
             </article>
             <article class="col-6 col-12-xsmall work-item">
               <a :href="rootPath + 'ml/overview.html'" class="image fit thumb">
-                <img :src="getImageUrl('./assets/images/recent_work/ml.jpg')" />
+                <img src="./assets/images/recent_work/ml.jpg" />
               </a>
               <h3>ML &amp; DL</h3>
               <p>Here I wrote some notes about machine learning and deep learning.</p>
@@ -204,7 +204,7 @@
     </body>
     <a-modal :visible="qrcode" :centered="true" :closable="false" :footer="null" @cancel="qrcode = false">
       <div class="square">
-        <img :src="getImageUrl('./assets/images/wechat.jpg')" alt="QR Code" style="width: 100%; height: 100%;" />
+        <img src="./assets/images/wechat.jpg" alt="QR Code" style="width: 100%; height: 100%;" />
       </div>
     </a-modal>
   </main>
@@ -238,9 +238,6 @@ export default {
     }
   },
   methods: {
-    getImageUrl(path) {
-      return new URL(path, import.meta.url).href;
-    },
     restartTyped() {
       let strings = this.isEnglishSite ? [
         "coding",

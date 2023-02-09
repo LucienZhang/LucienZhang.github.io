@@ -59,6 +59,15 @@ export default defineUserConfig({
         ],
       },
     },
+    vuePluginOptions: {
+      template: {
+        compilerOptions: {
+          isCustomElement(tag) {
+            return ["highcharts"].includes(tag);
+          },
+        },
+      },
+    },
   }),
 
   // site-level locales config
