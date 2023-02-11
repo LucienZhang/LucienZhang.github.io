@@ -34,4 +34,7 @@ jobs:
           echo "------------"
           ls -R .. && python main.py
       - name: Test
-        run: pwd && ls -R static
+        run: |
+          pwd && ls -R static
+          echo "--------------"
+          ls -R ..
