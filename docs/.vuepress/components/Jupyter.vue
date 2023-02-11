@@ -7,7 +7,7 @@
       </a>
     </p>
     <a-spin size="large" tip="Loading..." :spinning="spinning">
-      <iframe frameborder="no" scrolling="no" :src="'/static/jupyter/nb/' + filePath" @load="resizeIframe"></iframe>
+      <iframe frameborder="no" scrolling="no" :src="'/static/jupyter/nb/' + htmlFilePath" @load="resizeIframe"></iframe>
     </a-spin>
   </div>
 </template>
@@ -23,6 +23,7 @@ export default {
   data() {
     return {
       spinning: true,
+      htmlFilePath: filePath.replace(/\.ipynb$/, ".html")
     };
   },
   methods: {
