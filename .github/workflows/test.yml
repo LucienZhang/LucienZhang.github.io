@@ -1,0 +1,31 @@
+name: Test
+
+on:
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.9"
+  NODE_VERSION: "18"
+
+jobs:
+  notebooks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: converter
+    steps:
+      - name: Checkout website-binder repository
+        uses: actions/checkout@v3
+        with:
+          repository: LucienZhang/website-binder
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Convert notebooks to HTML
+        run: python main.py
+      - name: Test
+        run: ls -R converter/static
