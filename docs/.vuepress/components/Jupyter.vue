@@ -23,7 +23,7 @@ export default {
   data() {
     return {
       spinning: true,
-      htmlFilePath: filePath.replace(/\.ipynb$/, ".html")
+      htmlFilePath: this.filePath.replace(/\.ipynb$/, ".html")
     };
   },
   methods: {
