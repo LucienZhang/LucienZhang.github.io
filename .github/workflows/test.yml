@@ -31,4 +31,4 @@ jobs:
       - name: Convert notebooks to HTML
         run: python main.py
       - name: Test
-        run: ls -R converter/static
+        run: pwd && ls -R static
