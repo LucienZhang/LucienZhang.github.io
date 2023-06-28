@@ -33,8 +33,7 @@
 </template>
 
 <script>
-import highchartsVuePackage from 'highcharts-vue';
-const { Chart } = highchartsVuePackage;
+import { Chart } from 'highcharts-vue';
 import { axiosCorsProxy } from '../axios-instances';
 import * as cheerio from 'cheerio';
 
