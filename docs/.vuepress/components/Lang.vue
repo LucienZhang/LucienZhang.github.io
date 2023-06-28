@@ -16,10 +16,10 @@
               <td>{{ row.now }}</td>
               <td>{{ row.pre }}</td>
               <td>
-                <img v-if="row.changeArrow.src" :src="toLocalAsset(row.changeArrow.src)" :alt="row.changeArrow.alt">
+                <img v-if="row.changeArrow.src" :src="getImageUrl(row.changeArrow.src)" :alt="row.changeArrow.alt">
               </td>
               <td class="td-top20">
-                <img :src="toLocalAsset(row.langIcon.src)" :alt="row.langIcon.alt" :style="row.langIcon.style">
+                <img :src="getImageUrl(row.langIcon.src)" :alt="row.langIcon.alt" :style="row.langIcon.style">
               </td>
               <td>{{ row.langName }}</td>
               <td>{{ row.rating }}</td>
@@ -35,7 +35,7 @@
 <script>
 import highchartsVuePackage from 'highcharts-vue';
 const { Chart } = highchartsVuePackage;
-import { axiosCorsProxy } from '../axios-instances'
+import { axiosCorsProxy } from '../axios-instances';
 import * as cheerio from 'cheerio';
 
 export default {
@@ -110,7 +110,8 @@ export default {
       top20: {
         thead: null,
         tbody: null
-      }
+      },
+      imageUrls: {}
     };
   },
   methods: {
@@ -118,10 +119,7 @@ export default {
       window.open("https://www.tiobe.com/tiobe-index/" + link + "/", "_blank");
     },
     getImageUrl(path) {
-      return new URL(path, import.meta.url).href;
-    },
-    toLocalAsset(path) {
-      return this.getImageUrl(`./assets/images/tiobe/${path.split('/').at(-1)}`)
+      return this.imageUrls[`./assets/images/tiobe/${path.split('/').at(-1)}`];
     }
   },
   beforeMount() {
@@ -175,6 +173,8 @@ export default {
       .catch(res => {
         console.log(res);
       });
+
+    this.imageUrls = import.meta.glob('./assets/images/tiobe/*.png', { eager: true, import: 'default' });
   },
 };
 </script>
