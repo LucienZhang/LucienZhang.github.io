@@ -23,7 +23,6 @@ export default {
 
     await import("https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-chtml.js");
     await import("/static/js/pseudocode.js");
-    import("/static/css/pseudocode.min.css");
     pseudocode.renderElement(this.$refs["pseudo-content"], {
       indentSize: "1.5em",
       lineNumber: true
@@ -31,3 +30,7 @@ export default {
   }
 };
 </script>
+
+<style>
+@import url("/static/css/pseudocode.min.css");
+</style>
