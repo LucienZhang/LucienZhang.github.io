@@ -16,14 +16,14 @@ export default {
           processEnvironments: true,
         },
         chtml: {
-          fontURL: new URL("./assets/fonts", import.meta.url).href
+          fontURL: '/static/fonts/mathjax'
         }
       };
     }
 
     await import("https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-chtml.js");
-    await import("./assets/js/pseudocode");
-    import("./assets/css/pseudocode.min.css");
+    await import("/static/js/pseudocode.js");
+    import("/static/css/pseudocode.min.css");
     pseudocode.renderElement(this.$refs["pseudo-content"], {
       indentSize: "1.5em",
       lineNumber: true

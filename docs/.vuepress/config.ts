@@ -57,6 +57,16 @@ export default defineUserConfig({
           "@ant-design/icons-svg",
         ],
       },
+      build: {
+        rollupOptions: {
+          external: [
+            "/static/js/d3.js",
+            "/static/js/nv.d3.js",
+            "/static/js/pseudocode.js",
+            "/static/css/pseudocode.min.css?used",
+          ],
+        },
+      },
     },
   }),
 
