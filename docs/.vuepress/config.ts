@@ -55,17 +55,7 @@ export default defineUserConfig({
           "ant-design-vue",
           "@ant-design/icons-vue",
           "@ant-design/icons-svg",
-          "highcharts-vue",
         ],
-      },
-    },
-    vuePluginOptions: {
-      template: {
-        compilerOptions: {
-          isCustomElement(tag) {
-            return ["highcharts"].includes(tag);
-          },
-        },
       },
     },
   }),
