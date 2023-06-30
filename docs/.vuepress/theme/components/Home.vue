@@ -53,72 +53,72 @@
           </div>
         </footer>
       </header>
+      <ClientOnly>
+        <!-- Main -->
+        <div id="main">
+          <!-- One -->
+          <section id="one">
+            <header class="major">
+              <h2 v-if="isEnglishSite">
+                If I have any hobbies,
+                <br />it is creating.
+              </h2>
+              <h2 v-else>
+                如果说我有什么爱好的话，
+                <br />那便是创造。
+              </h2>
+            </header>
+            <p v-if="isEnglishSite">
+              I am a server-side developer, and I'm also interested in machine learning and game development.
+              During the quarantine of the
+              <a href="https://en.wikipedia.org/wiki/Coronavirus_disease_2019" target="_blank">COVID-19</a>, I was
+              completely obsessed with cooking.
+              If programming and cooking have anything in common, I would say it's the fun of creating.
+            </p>
+            <p v-else>
+              我是一名服务端开发者，同时我也对机器学习和游戏开发感兴趣。
+              在
+              <a href="https://zh.wikipedia.org/wiki/2019%E5%86%A0%E7%8A%B6%E7%97%85%E6%AF%92%E7%97%85"
+                target="_blank">COVID-19</a>
+              疫情隔离期间，我学会了做菜。如果说写代码和做菜之间有什么共同点的话，那便是创造的乐趣。
+            </p>
+            <ul class="actions">
+              <li>
+                <a href="https://www.linkedin.com/in/zhang-ziliang/" class="button" target="_blank">{{
+                  isEnglishSite ? 'My LinkedIn' : '我的领英'
+                }}</a>
+              </li>
+            </ul>
+          </section>
 
-      <!-- Main -->
-      <div id="main">
-        <!-- One -->
-        <section id="one">
-          <header class="major">
-            <h2 v-if="isEnglishSite">
-              If I have any hobbies,
-              <br />it is creating.
-            </h2>
-            <h2 v-else>
-              如果说我有什么爱好的话，
-              <br />那便是创造。
-            </h2>
-          </header>
-          <p v-if="isEnglishSite">
-            I am a server-side developer, and I'm also interested in machine learning and game development.
-            During the quarantine of the
-            <a href="https://en.wikipedia.org/wiki/Coronavirus_disease_2019" target="_blank">COVID-19</a>, I was
-            completely obsessed with cooking.
-            If programming and cooking have anything in common, I would say it's the fun of creating.
-          </p>
-          <p v-else>
-            我是一名服务端开发者，同时我也对机器学习和游戏开发感兴趣。
-            在
-            <a href="https://zh.wikipedia.org/wiki/2019%E5%86%A0%E7%8A%B6%E7%97%85%E6%AF%92%E7%97%85"
-              target="_blank">COVID-19</a>
-            疫情隔离期间，我学会了做菜。如果说写代码和做菜之间有什么共同点的话，那便是创造的乐趣。
-          </p>
-          <ul class="actions">
-            <li>
-              <a href="https://www.linkedin.com/in/zhang-ziliang/" class="button" target="_blank">{{
-                isEnglishSite? 'My LinkedIn': '我的领英'
-              }}</a>
-            </li>
-          </ul>
-        </section>
-
-        <!-- Two -->
-        <section id="two">
-          <h2>Recent Work</h2>
-          <div class="row">
-            <article class="col-6 col-12-xsmall work-item">
-              <a :href="rootPath + 'programming/prog-lang/overview.html'" class="image fit thumb">
-                <img src="./assets/images/recent_work/programming.png" />
-              </a>
-              <h3>Programming</h3>
-              <p>Here I wrote some notes about programming languages and algorithms.</p>
-            </article>
-            <article class="col-6 col-12-xsmall work-item">
-              <a :href="rootPath + 'ml/overview.html'" class="image fit thumb">
-                <img src="./assets/images/recent_work/ml.jpg" />
-              </a>
-              <h3>ML &amp; DL</h3>
-              <p>Here I wrote some notes about machine learning and deep learning.</p>
-            </article>
-          </div>
-          <!-- <ul class="actions">
+          <!-- Two -->
+          <section id="two">
+            <h2>Recent Work</h2>
+            <div class="row">
+              <article class="col-6 col-12-xsmall work-item">
+                <a :href="rootPath + 'programming/prog-lang/overview.html'" class="image fit thumb">
+                  <img src="./assets/images/recent_work/programming.png" />
+                </a>
+                <h3>Programming</h3>
+                <p>Here I wrote some notes about programming languages and algorithms.</p>
+              </article>
+              <article class="col-6 col-12-xsmall work-item">
+                <a :href="rootPath + 'ml/overview.html'" class="image fit thumb">
+                  <img src="./assets/images/recent_work/ml.jpg" />
+                </a>
+                <h3>ML &amp; DL</h3>
+                <p>Here I wrote some notes about machine learning and deep learning.</p>
+              </article>
+            </div>
+            <!-- <ul class="actions">
           <li>
             <a href="#" class="button">Full Portfolio</a>
           </li>
         </ul>-->
-        </section>
+          </section>
 
-        <!-- Three -->
-        <!-- <section id="three">
+          <!-- Three -->
+          <!-- <section id="three">
         <h2>Get In Touch</h2>
         <p>Accumsan pellentesque commodo blandit enim arcu non at amet id arcu magna. Accumsan orci faucibus id eu lorem semper nunc nisi lorem vulputate lorem neque lorem ipsum dolor.</p>
         <div class="row">
@@ -166,41 +166,42 @@
           </div>
         </div>
       </section>-->
-      </div>
-      <footer v-if="!largeScreen" id="footer">
-        <div class="inner">
-          <ul class="icons">
-            <li>
-              <a href="https://github.com/LucienZhang" target="_blank" class="icon brands fa-github">
-                <span class="label">Github</span>
-              </a>
-            </li>
-            <li>
-              <a href="https://www.linkedin.com/in/zhang-ziliang/" target="_blank" class="icon brands fa-linkedin">
-                <span class="label">LinkedIn</span>
-              </a>
-            </li>
-            <li>
-              <a class="icon brands fa-weixin" @click="qrcode = true">
-                <span class="label">WeChat</span>
-              </a>
-            </li>
-            <li>
-              <a href="mailto:lucienzhangzl@outlook.com" class="icon solid fa-envelope">
-                <span class="label">Email</span>
-              </a>
-            </li>
-          </ul>
-          <ul class="copyright">
-            <li>&copy; ZHANG Ziliang</li>
-            <li>
-              Inspired by:
-              <a href="http://html5up.net">HTML5 UP</a>
-            </li>
-            <li><a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备20008417号</a></li>
-          </ul>
         </div>
-      </footer>
+        <footer v-if="!largeScreen" id="footer">
+          <div class="inner">
+            <ul class="icons">
+              <li>
+                <a href="https://github.com/LucienZhang" target="_blank" class="icon brands fa-github">
+                  <span class="label">Github</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.linkedin.com/in/zhang-ziliang/" target="_blank" class="icon brands fa-linkedin">
+                  <span class="label">LinkedIn</span>
+                </a>
+              </li>
+              <li>
+                <a class="icon brands fa-weixin" @click="qrcode = true">
+                  <span class="label">WeChat</span>
+                </a>
+              </li>
+              <li>
+                <a href="mailto:lucienzhangzl@outlook.com" class="icon solid fa-envelope">
+                  <span class="label">Email</span>
+                </a>
+              </li>
+            </ul>
+            <ul class="copyright">
+              <li>&copy; ZHANG Ziliang</li>
+              <li>
+                Inspired by:
+                <a href="http://html5up.net">HTML5 UP</a>
+              </li>
+              <li><a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备20008417号</a></li>
+            </ul>
+          </div>
+        </footer>
+      </ClientOnly>
     </body>
     <a-modal :visible="qrcode" :centered="true" :closable="false" :footer="null" @cancel="qrcode = false">
       <div class="square">
