@@ -87,7 +87,7 @@ export default defineUserConfig({
   // configure default theme
   theme: lucienTheme({
     logo: "/logo.png",
-    repo: "LucienZhang/website",
+    repo: "LucienZhang/LucienZhang.github.io",
     docsDir: "docs",
 
     locales: {
