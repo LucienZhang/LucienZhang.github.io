@@ -4,7 +4,7 @@
   "description": "Project of my website",
   "main": "index.js",
   "engines": {
-    "node": ">=16"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "dev": "vuepress dev docs",

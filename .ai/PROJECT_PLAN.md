@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 0 已完成，等待进入 Phase 1 前审阅
+> 状态：Phase 1 本地实施与验证完成，等待 GitHub Pages 线上验收
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -325,11 +325,11 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 
 目标：让旧代码先在目标 Node 和现代 GitHub Actions 上稳定运行。
 
-- [ ] 将 `package.json.engines.node` 调整为与目标 VuePress 一致。
-- [ ] 增加 `.nvmrc` 或 `.node-version`，固定 Node 22 的满足版本。
-- [ ] 将 CI Node 从 18 升到满足 VuePress engine 的 22.x。
-- [ ] 更新 checkout/setup-python/setup-node/artifact/Pages actions。
-- [ ] 验证两个 artifact 下载后仍能正确合并到最终 Pages artifact。
+- [x] 将 `package.json.engines.node` 调整为与目标 VuePress 一致。
+- [x] 增加 `.nvmrc` 或 `.node-version`，固定 Node 22 的满足版本。
+- [x] 将 CI Node 从 18 升到满足 VuePress engine 的 22.x。
+- [x] 更新 checkout/setup-python/setup-node/artifact/Pages actions。
+- [x] 验证两个 artifact 下载后仍能正确合并到最终 Pages artifact。
 - [ ] 在实际 Pages 环境验证 custom domain、base path、静态 WASM、IFC 和 notebook 路径。
 
 完成条件：仍使用旧 VuePress，但新 CI 能成功发布；这样可将 CI 问题和框架升级问题分离。
