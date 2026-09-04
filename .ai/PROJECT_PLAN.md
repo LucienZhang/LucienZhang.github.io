@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 2 本地实施与验证完成，等待审阅（未提交、未推送、未部署）
+> 状态：Phase 2 已完成并通过用户本地验收；Phase 3 待实施
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -352,6 +352,8 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 
 完成条件：50 个页面构建成功；所有关键组件至少能够加载；依赖树一致；没有新 hydration 错误。
 
+验收状态：已于 2026-09-04 由用户完成本地验证并确认通过。Phase 2 已作为独立提交保存；线上部署验收仍应在 push 后补充记录。
+
 ### Phase 3：UI 依赖收敛
 
 目标：形成“自定义主页 + Ant Design Vue 工具控件”的清晰边界。
@@ -364,6 +366,19 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 - [ ] 引入少量 design tokens：颜色、字体、间距、圆角、阴影、动效时长。
 
 完成条件：UI 行为无回归；首页不被 Ant Design 默认视觉接管；Bootstrap 完全移除。
+
+### Phase 3.5：升级后兼容收尾
+
+目标：在核心链和 UI 依赖升级稳定后，删除 Phase 2 的临时内容兼容层，并解决已确认的首页 HTML/hydration 问题。该阶段不进行主页视觉重做。
+
+- [ ] 将现有 21 个 Markdown 文件中的 43 组 `:::: tabs` / `::: tab` 旧语法迁移为官方 `:::: tabs` / `@tab` 语法。
+- [ ] 删除 `docs/.vuepress/markdown/legacyTabs.ts` 及其配置注册，不再在编译时改写文章源码。
+- [ ] 确认生产输出仍包含恰好 43 个 `.vp-tabs`，并验证 tab 切换、copy 和代码高亮。
+- [ ] 将自定义 `Home.vue` 中嵌套于主题 `<main>` 下的 `<body>` 改为合法组件根节点，并迁移依赖该元素的 class、CSS 和生命周期行为。
+- [ ] 消除 `/` 与 `/zh/` 已知的 hydration mismatch，同时回归 Typed 动画、二维码 Modal 和移动端布局。
+- [ ] 保持现有视觉与业务行为，不顺带开始 Phase 5 的主页设计。
+
+完成条件：50 个页面构建成功；文章中不再存在 snippetors tab 语法；`legacyTabs` 兼容层完全删除；开发环境不再报告 `<body> cannot be child of <main>`；两个首页不再出现已知 hydration mismatch；tabs 与首页交互无回归。
 
 ### Phase 4：安全与稳定性清理
 
@@ -432,7 +447,8 @@ git diff --check
 4. `chore: replace legacy markdown plugins`
 5. `refactor: remove bootstrap from mnist demo`
 6. `chore: upgrade ant design vue`
-7. `fix: remove remote script evaluation`
+7. `refactor: migrate tabs and repair home hydration`
+8. `fix: remove remote script evaluation`
 
 任一阶段失败时回退该阶段，而不是通过继续升级更多无关包来碰运气。
 
