@@ -1,3 +1,4 @@
 docs/* -linguist-documentation
 README.md -linguist-documentation
 *.md linguist-detectable
+docs/.vuepress/theme/components/Home.vue whitespace=cr-at-eol
