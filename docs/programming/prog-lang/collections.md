@@ -2,13 +2,12 @@
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <Jupyter filePath="collections/python.ipynb" />
 
-:::
 
-::: tab java
+@tab java
 
 I always feel that the Collections Framework of Java is designed to be confusing, not only because of the naming of classes and methods, but also because of the result of Java's religious obsessoin with object-oriented programming.
 
@@ -39,14 +38,12 @@ There are two base interfaces in Java's Collections Framework, **Collection** (`
 
 <Jupyter filePath="collections/java.ipynb" />
 
-:::
 
-::: tab scala
+@tab scala
 
 <https://docs.scala-lang.org/overviews/collections/overview.html>
 
 <Jupyter filePath="collections/scala.ipynb" />
 
-:::
 
 ::::

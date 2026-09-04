@@ -4,7 +4,7 @@
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 def kmp(string, pattern):
@@ -40,15 +40,13 @@ def kmp(string, pattern):
         return -1
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
 ::::
 
@@ -56,14 +54,12 @@ def kmp(string, pattern):
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/string?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab java
+@tab java
 
-:::
 
 ::::

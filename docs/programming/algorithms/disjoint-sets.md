@@ -21,7 +21,7 @@ $α(⋅)$ is [inverse Ackermann function](https://en.wikipedia.org/wiki/Ackerman
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 class UnionFind(object):
@@ -53,9 +53,8 @@ class UnionFind(object):
             self.parent[x_root] = y_root
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 class UnionFind {
@@ -97,7 +96,6 @@ class UnionFind {
 }
 ```
 
-:::
 
 ::::
 
@@ -105,16 +103,14 @@ class UnionFind {
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/disjoint-sets?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab java
+@tab java
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/disjoint-sets-java?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
 ::::

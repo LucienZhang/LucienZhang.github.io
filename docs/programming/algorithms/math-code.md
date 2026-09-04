@@ -6,7 +6,7 @@
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 import math
@@ -233,15 +233,13 @@ class Bitset():
         return self.b == other.b
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
 ::::
 
@@ -249,16 +247,14 @@ class Bitset():
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/math?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab java
+@tab java
 
 <!-- <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/math-java?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe> -->
 
-:::
 
 ::::

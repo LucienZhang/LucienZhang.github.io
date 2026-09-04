@@ -22,7 +22,6 @@ import markdownItFootnotePlugin from "markdown-it-footnote";
 import markdownItMultimdTablePlugin from "markdown-it-multimd-table";
 import markdownItPanguPlugin from "markdown-it-pangu";
 import { isProd } from "./common";
-import { legacyTabsPlugin } from "./markdown/legacyTabs";
 
 const __dirname = getDirname(import.meta.url);
 
@@ -149,7 +148,6 @@ export default defineUserConfig({
 
   // configure markdown
   extendsMarkdown: (md) => {
-    legacyTabsPlugin(md);
     md.use(markdownItFootnotePlugin);
     md.use(markdownItPanguPlugin);
     md.use(markdownItMultimdTablePlugin, { headerless: true });

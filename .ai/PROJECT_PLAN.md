@@ -378,14 +378,16 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 1. **Phase 3.5A — 官方 tabs 语法迁移：** 完成前 3 项，只修改 tabs 源码、兼容层、验证记录和必要配置。
 2. **Phase 3.5B — 首页 HTML/hydration 修复：** 在 3.5A 验收并提交后完成后 3 项，不改变现有主页视觉。
 
-- [ ] 将现有 21 个 Markdown 文件中的 43 组 `:::: tabs` / `::: tab` 旧语法迁移为官方 `:::: tabs` / `@tab` 语法。
-- [ ] 删除 `docs/.vuepress/markdown/legacyTabs.ts` 及其配置注册，不再在编译时改写文章源码。
-- [ ] 确认生产输出仍包含恰好 43 个 `.vp-tabs`，并验证 tab 切换、copy 和代码高亮。
+- [x] 将现有 21 个 Markdown 文件中的 43 组 `:::: tabs` / `::: tab` 旧语法迁移为官方 `:::: tabs` / `@tab` 语法。
+- [x] 删除 `docs/.vuepress/markdown/legacyTabs.ts` 及其配置注册，不再在编译时改写文章源码。
+- [x] 确认生产输出仍包含恰好 43 个 `.vp-tabs`，并验证 tab 切换、copy 和代码高亮。
 - [ ] 将自定义 `Home.vue` 中嵌套于主题 `<main>` 下的 `<body>` 改为合法组件根节点，并迁移依赖该元素的 class、CSS 和生命周期行为。
 - [ ] 消除 `/` 与 `/zh/` 已知的 hydration mismatch，同时回归 Typed 动画、二维码 Modal 和移动端布局。
 - [ ] 保持现有视觉与业务行为，不顺带开始 Phase 5 的主页设计。
 
 完成条件：50 个页面构建成功；文章中不再存在 snippetors tab 语法；`legacyTabs` 兼容层完全删除；开发环境不再报告 `<body> cannot be child of <main>`；两个首页不再出现已知 hydration mismatch；tabs 与首页交互无回归。
+
+Phase 3.5A 实施与验证记录：[`phase3.5/2026-09-04-tabs.md`](./phase3.5/2026-09-04-tabs.md)。21 个文件 / 43 组 / 111 个 tab item 已完成官方语法迁移，兼容层已删除，50 页构建及生产 Shiki、开发 Prism、tabs/copy/Jupyter 浏览器回归均通过；等待独立提交后立即进入 Phase 3.5B。
 
 ### Phase 4：安全与稳定性清理
 

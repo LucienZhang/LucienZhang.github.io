@@ -16,7 +16,7 @@ Tree Node definition
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 class TreeNode:
@@ -26,9 +26,8 @@ class TreeNode:
         self.right = right
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 class TreeNode {
@@ -42,9 +41,8 @@ class TreeNode {
 }
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 class TreeNode {
@@ -55,7 +53,6 @@ class TreeNode {
 };
 ```
 
-:::
 
 ::::
 
@@ -63,7 +60,7 @@ class TreeNode {
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 def dfs(root: TreeNode):
@@ -77,9 +74,8 @@ def dfs(root: TreeNode):
             stack.append(node.right)
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 void dfs(TreeNode root) {
@@ -98,9 +94,8 @@ void dfs(TreeNode root) {
 }
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 void dfs(TreeNode* root) {
@@ -119,7 +114,6 @@ void dfs(TreeNode* root) {
 }
 ```
 
-:::
 
 ::::
 
@@ -127,7 +121,7 @@ void dfs(TreeNode* root) {
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 from collections import deque
@@ -143,9 +137,8 @@ def bfs(root: TreeNode):
             q.append(node.right)
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 void bfs(TreeNode root) {
@@ -164,9 +157,8 @@ void bfs(TreeNode root) {
 }
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 void bfs(TreeNode* root) {
@@ -185,7 +177,6 @@ void bfs(TreeNode* root) {
 }
 ```
 
-:::
 
 ::::
 
@@ -193,7 +184,7 @@ void bfs(TreeNode* root) {
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 from collections import deque
@@ -214,9 +205,8 @@ def lot(root: TreeNode) -> int:
     return lv
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 int lot(TreeNode root) {
@@ -242,9 +232,8 @@ int lot(TreeNode root) {
 }
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 int lot(TreeNode* root) {
@@ -269,7 +258,6 @@ int lot(TreeNode* root) {
 }
 ```
 
-:::
 
 ::::
 
@@ -277,7 +265,7 @@ int lot(TreeNode* root) {
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 def preorder(root: TreeNode):
@@ -304,9 +292,8 @@ def preorder_without_recursion(root: TreeNode) -> List[int]:
     return ans
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 void preorder(TreeNode root) {
@@ -337,9 +324,8 @@ List<Integer> preorderWithoutRecursion(TreeNode root) {
 }
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 void preorder(TreeNode* root) {
@@ -370,7 +356,6 @@ vector<int> preorder_without_recursion(TreeNode* root) {
 }
 ```
 
-:::
 
 ::::
 
@@ -378,7 +363,7 @@ vector<int> preorder_without_recursion(TreeNode* root) {
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 def inorder(root: TreeNode):
@@ -409,9 +394,8 @@ def inorder_without_recursion(root: TreeNode) -> List[int]:
     return ans
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 void inorder(TreeNode root) {
@@ -444,9 +428,8 @@ List<Integer> inorderWithoutRecursion(TreeNode root) {
 }
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 void inorder(TreeNode* root) {
@@ -480,7 +463,6 @@ vector<int> inorder_without_recursion(TreeNode* root) {
 }
 ```
 
-:::
 
 ::::
 
@@ -488,7 +470,7 @@ vector<int> inorder_without_recursion(TreeNode* root) {
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 def postorder(root: TreeNode):
@@ -529,9 +511,8 @@ def postorder_without_recursion(root: TreeNode) -> List[int]:
     return ans
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 void postorder(TreeNode root) {
@@ -577,9 +558,8 @@ List<Integer> postorderWithoutRecursion(TreeNode root) {
 }
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 void postorder(TreeNode* root) {
@@ -626,7 +606,6 @@ vector<int> postorder_without_recursion(TreeNode* root) {
 }
 ```
 
-:::
 
 ::::
 
@@ -634,22 +613,19 @@ vector<int> postorder_without_recursion(TreeNode* root) {
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/binary-tree-traversal?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab java
+@tab java
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/binary-tree-traversal-java?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab cpp
+@tab cpp
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/binary-tree-traversal-cpp?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
 ::::

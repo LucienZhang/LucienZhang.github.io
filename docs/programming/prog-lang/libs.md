@@ -2,22 +2,19 @@
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <Jupyter filePath="libs/python.ipynb" />
 
-:::
 
-::: tab java
+@tab java
 
 <Jupyter filePath="libs/java.ipynb" />
 
-:::
 
-::: tab scala
+@tab scala
 
 <Jupyter filePath="libs/scala.ipynb" />
 
-:::
 
 ::::
