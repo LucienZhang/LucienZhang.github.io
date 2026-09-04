@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 1 本地实施与验证完成，等待 GitHub Pages 线上验收
+> 状态：Phase 2 本地实施与验证完成，等待审阅（未提交、未推送、未部署）
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -330,7 +330,7 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 - [x] 将 CI Node 从 18 升到满足 VuePress engine 的 22.x。
 - [x] 更新 checkout/setup-python/setup-node/artifact/Pages actions。
 - [x] 验证两个 artifact 下载后仍能正确合并到最终 Pages artifact。
-- [ ] 在实际 Pages 环境验证 custom domain、base path、静态 WASM、IFC 和 notebook 路径。
+- [x] 在实际 Pages 环境验证 custom domain、base path、静态 WASM、IFC 和 notebook 路径。
 
 完成条件：仍使用旧 VuePress，但新 CI 能成功发布；这样可将 CI 问题和框架升级问题分离。
 
@@ -338,17 +338,17 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 
 目标：证明新版核心链可承载现有站点，不在该阶段改视觉或业务行为。
 
-- [ ] 实施当天重新查询所有目标包的 dist-tag、peerDependencies、engines。
-- [ ] 选择一致矩阵；若生态仍 peer `rc.30`，使用上文 `rc.30` 方案。
-- [ ] 移除 `vuepress-vite`，显式安装 `vuepress`、`@vuepress/bundler-vite`、`@vuepress/theme-default`。
-- [ ] 所有 RC 根依赖使用精确版本。
-- [ ] 用 `vuepress` 导入 `defineUserConfig`。
-- [ ] 替换旧 code-copy、tabs 和 md-enhance 插件。
-- [ ] 处理 Sass peer dependency。
-- [ ] 重新生成 `package-lock.json`，不手工编辑 lockfile。
-- [ ] 检查和删除已失效的 Babel runtime patch。
-- [ ] 执行 `npm ls`，确认没有混合 VuePress core/client。
-- [ ] 修复 Vite 8/Rolldown 下的 SSR、external、CJS interop 问题。
+- [x] 实施当天重新查询所有目标包的 dist-tag、peerDependencies、engines。
+- [x] 选择一致矩阵；生态仍 peer `rc.30`，因此采用 core/bundler `rc.30` 方案。
+- [x] 移除 `vuepress-vite`，显式安装 `vuepress`、`@vuepress/bundler-vite`、`@vuepress/theme-default`。
+- [x] 所有 RC 根依赖使用精确版本。
+- [x] 用 `vuepress` 导入 `defineUserConfig`。
+- [x] 替换旧 code-copy、tabs 和 md-enhance 插件。
+- [x] 处理 Sass peer dependency。
+- [x] 重新生成 `package-lock.json`，不手工编辑 lockfile。
+- [x] 检查并删除已证明不再需要的 Babel runtime patch。
+- [x] 执行 `npm ls`，确认没有混合 VuePress core/client。
+- [x] 验证 Vite 8/Rolldown 下的 SSR、external、CJS interop 与关键组件加载。
 
 完成条件：50 个页面构建成功；所有关键组件至少能够加载；依赖树一致；没有新 hydration 错误。
 

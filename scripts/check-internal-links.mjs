@@ -6,7 +6,7 @@ const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const distDir = join(rootDir, "docs/.vuepress/dist");
 // The Pages workflow generates notebook HTML from LucienZhang/website-binder
 // and merges it into this path after the local VuePress build.
-const deploymentProvidedPaths = new Set(["/static/jupyter/nb/test.html"]);
+const deploymentProvidedPrefixes = ["/static/jupyter/"];
 
 if (!existsSync(distDir)) {
   console.error("Build output is missing. Run `npm run build` first.");
@@ -27,7 +27,7 @@ for (const htmlFile of htmlFiles) {
 
     checkedLinks += 1;
     const [rawPath] = rawReference.split(/[?#]/, 1);
-    if (deploymentProvidedPaths.has(rawPath)) continue;
+    if (deploymentProvidedPrefixes.some((prefix) => rawPath.startsWith(prefix))) continue;
     let decodedPath;
     try {
       decodedPath = decodeURIComponent(rawPath);

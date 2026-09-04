@@ -1,16 +1,14 @@
 import { viteBundler } from "@vuepress/bundler-vite";
 // import { webpackBundler } from '@vuepress/bundler-webpack'
-import { defineUserConfig } from "@vuepress/cli";
+import { defineUserConfig } from "vuepress";
 // import { docsearchPlugin } from '@vuepress/plugin-docsearch'
 // import { googleAnalyticsPlugin } from '@vuepress/plugin-google-analytics'
-import codeCopyPlugin from "@snippetors/vuepress-plugin-code-copy";
-import tabsPlugin from "@snippetors/vuepress-plugin-tabs";
+import { markdownMathPlugin } from "@vuepress/plugin-markdown-math";
 import { registerComponentsPlugin } from "@vuepress/plugin-register-components";
 import { shikiPlugin } from "@vuepress/plugin-shiki";
-import { getDirname, path } from "@vuepress/utils";
+import { getDirname, path } from "vuepress/utils";
 import { AntDesignVueResolver } from "unplugin-vue-components/resolvers";
 import Components from "unplugin-vue-components/vite";
-import { mdEnhancePlugin } from "vuepress-plugin-md-enhance";
 import {
   // head,
   navbarEn,
@@ -24,6 +22,7 @@ import markdownItFootnotePlugin from "markdown-it-footnote";
 import markdownItMultimdTablePlugin from "markdown-it-multimd-table";
 import markdownItPanguPlugin from "markdown-it-pangu";
 import { isProd } from "./common";
+import { legacyTabsPlugin } from "./markdown/legacyTabs";
 
 const __dirname = getDirname(import.meta.url);
 
@@ -139,11 +138,18 @@ export default defineUserConfig({
       git: isProd,
       // use shiki plugin in production mode instead
       prismjs: !isProd,
+      // The default theme owns copy-code and the official tab renderer.
+      copyCode: true,
+      tab: {
+        codeTabs: true,
+        tabs: true,
+      },
     },
   }),
 
   // configure markdown
   extendsMarkdown: (md) => {
+    legacyTabsPlugin(md);
     md.use(markdownItFootnotePlugin);
     md.use(markdownItPanguPlugin);
     md.use(markdownItMultimdTablePlugin, { headerless: true });
@@ -215,18 +221,8 @@ export default defineUserConfig({
     registerComponentsPlugin({
       componentsDir: path.resolve(__dirname, "./components"),
     }),
-    mdEnhancePlugin({
-      mathjax: true,
-    }),
+    markdownMathPlugin({ type: "mathjax" }),
     // only enable shiki plugin in production mode
     isProd ? shikiPlugin({ theme: "light-plus" }) : [],
-    tabsPlugin({
-      events: ["snippetors-vuepress-plugin-code-copy-update-event"],
-    }),
-    codeCopyPlugin({
-      color: "#757575",
-      staticIcon: true,
-      backgroundTransition: false,
-    }),
   ],
 });
