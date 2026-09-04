@@ -31,7 +31,7 @@
   /* Medium */
   /* Small */
   /* XSmall */ }
-  .home html, .home body, .home div, .home span, .home applet, .home object,
+  .home html, .home .home-shell, .home div, .home span, .home applet, .home object,
   .home iframe, .home h1, .home h2, .home h3, .home h4, .home h5, .home h6, .home p, .home blockquote,
   .home pre, .home a, .home abbr, .home acronym, .home address, .home big, .home cite,
   .home code, .home del, .home dfn, .home em, .home img, .home ins, .home kbd, .home q, .home s, .home samp,
@@ -51,7 +51,7 @@
   .home article, .home aside, .home details, .home figcaption, .home figure,
   .home footer, .home header, .home hgroup, .home menu, .home nav, .home section {
     display: block; }
-  .home body {
+  .home .home-shell {
     line-height: 1; }
   .home ol, .home ul {
     list-style: none; }
@@ -63,7 +63,7 @@
   .home table {
     border-collapse: collapse;
     border-spacing: 0; }
-  .home body {
+  .home .home-shell {
     -webkit-text-size-adjust: none; }
   .home mark {
     background-color: transparent;
@@ -80,9 +80,9 @@
     box-sizing: border-box; }
   .home *, .home *:before, .home *:after {
     box-sizing: inherit; }
-  .home body {
+  .home .home-shell {
     background: #fff; }
-    .home body.is-preload *, .home body.is-preload *:before, .home body.is-preload *:after {
+    .home .home-shell.is-preload *, .home .home-shell.is-preload *:before, .home .home-shell.is-preload *:after {
       -moz-animation: none !important;
       -webkit-animation: none !important;
       -ms-animation: none !important;
@@ -91,7 +91,7 @@
       -webkit-transition: none !important;
       -ms-transition: none !important;
       transition: none !important; }
-  .home body, .home input, .home select, .home textarea {
+  .home .home-shell, .home input, .home select, .home textarea {
     color: #a2a2a2;
     font-family: "Source Sans Pro", Helvetica, sans-serif;
     font-size: 16pt;
@@ -1801,21 +1801,21 @@
       opacity: 0.5; }
       .home .poptrox-popup:hover .closer:hover {
         opacity: 1.0; }
-  .home body.is-touch .image.thumb:before {
+  .home .home-shell.is-touch .image.thumb:before {
     opacity: 0.5 !important; }
-  .home body.is-touch .image.thumb:after {
+  .home .home-shell.is-touch .image.thumb:after {
     display: none !important; }
-  .home body.is-touch #header {
+  .home .home-shell.is-touch #header {
     background-attachment: scroll;
     background-size: auto, cover; }
-  .home body.is-touch .poptrox-popup .nav-next,
-  .home body.is-touch .poptrox-popup .nav-previous,
-  .home body.is-touch .poptrox-popup .closer {
+  .home .home-shell.is-touch .poptrox-popup .nav-next,
+  .home .home-shell.is-touch .poptrox-popup .nav-previous,
+  .home .home-shell.is-touch .poptrox-popup .closer {
     opacity: 1.0 !important; }
   @media screen and (max-width: 1800px) {
     .home {
       /* Basic */ }
-      .home body, .home input, .home select, .home textarea {
+      .home .home-shell, .home input, .home select, .home textarea {
         font-size: 12pt; } }
   @media screen and (max-width: 1280px) {
     .home {
