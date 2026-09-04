@@ -13,8 +13,19 @@
           </div>
         </div>
         <div class="mnist-controls__action mnist-controls__action--end">
-          <button type="button" class="mnist-button mnist-button--recognize" @click="recognize">{{ recognizeBtnName }}</button>
+          <button
+            type="button"
+            class="mnist-button mnist-button--recognize"
+            :disabled="isRecognizing"
+            @click="recognize"
+          >
+            {{ isRecognizing ? recognizingBtnName : recognizeBtnName }}
+          </button>
         </div>
+      </div>
+      <div v-if="requestError" class="mnist-error" role="status">
+        <span>{{ requestError }}</span>
+        <button type="button" class="mnist-retry" @click="retry">{{ retryBtnName }}</button>
       </div>
     </div>
   </div>
@@ -51,27 +62,54 @@ export default {
       type: String,
       required: false,
       default: "Please write down a digit!"
+    },
+    recognizingBtnName: {
+      type: String,
+      default: "Recognizing..."
+    },
+    retryBtnName: {
+      type: String,
+      default: "Retry"
+    },
+    errorMsg: {
+      type: String,
+      default: "Recognition is temporarily unavailable."
     }
   },
   data() {
     return {
       result: "",
       prob: "",
-      mnistPad: null
+      mnistPad: null,
+      isRecognizing: false,
+      requestError: "",
+      lastImage: "",
+      requestController: null,
+      resizeHandler: null,
+      previewTimer: null,
+      isUnmounted: false
     };
   },
   methods: {
     clear() {
       this.result = "";
       this.prob = "";
-      this.mnistPad.clear();
+      this.requestError = "";
+      this.lastImage = "";
+      this.requestController?.abort();
+      this.isRecognizing = false;
+      this.mnistPad?.clear();
     },
     recognize() {
       if (this.mnistPad.isEmpty()) {
         message.warning(this.warningMsg);
       } else {
+        this.requestError = "";
         this.getMNISTGridBySize(__APP_DEBUG__, 28, this.img2text);
       }
+    },
+    retry() {
+      if (this.lastImage) this.img2text(this.lastImage);
     },
     getArea() {
       let xs = [];
@@ -149,9 +187,10 @@ export default {
 
       let img = new Image();
 
-      img.onload = function () {
+      img.onload = () => {
+        if (this.isUnmounted) return;
         ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, grid.w, grid.h);
+        ctx.fillRect(0, 0, size, size);
 
         ctx.drawImage(img, grid.x, grid.y, grid.w, grid.h, 0, 0, size, size);
 
@@ -170,7 +209,7 @@ export default {
 
         if (isDev) {
           document.body.append(canvas);
-          setTimeout(function () {
+          this.previewTimer = window.setTimeout(() => {
             canvas.remove();
           }, 2000);
         }
@@ -178,23 +217,36 @@ export default {
 
       img.src = this.mnistPad.toDataURL();
     },
-    img2text(b64img) {
-      b64img = b64img.split(",")[1]
-      axiosMl
-        .post("/mnist", { "img": b64img })
-        .then(res => {
-          if (res.status != 200) {
-            message.error("未知错误");
-            console.log(res);
-          } else {
-            this.result = res.data.result;
-            this.prob = res.data.prob;
-          }
-        })
-        .catch(res => {
-          message.error("未知错误");
-          console.log(res);
-        });
+    async img2text(dataUrl) {
+      this.requestController?.abort();
+      const controller = new AbortController();
+      this.requestController = controller;
+      this.lastImage = dataUrl;
+      this.isRecognizing = true;
+      this.requestError = "";
+
+      try {
+        const response = await axiosMl.post(
+          "/mnist",
+          { img: dataUrl.split(",")[1] },
+          { signal: controller.signal },
+        );
+        if (this.isUnmounted || controller !== this.requestController) return;
+        if (response.data?.result == null || response.data?.prob == null) {
+          throw new Error("MNIST response is missing recognition data.");
+        }
+        this.result = response.data.result;
+        this.prob = response.data.prob;
+      } catch (error) {
+        if (controller.signal.aborted || this.isUnmounted) return;
+        console.warn("Failed to recognize MNIST image:", error);
+        this.requestError = this.errorMsg;
+        message.error(this.errorMsg);
+      } finally {
+        if (!this.isUnmounted && controller === this.requestController) {
+          this.isRecognizing = false;
+        }
+      }
     }
   },
   mounted() {
@@ -207,14 +259,21 @@ export default {
 
     this.mnistPad = mnistPad;
 
-    function resizeCanvas() {
+    this.resizeHandler = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
       canvas.getContext("2d").scale(1, 1);
       mnistPad.clear(); // otherwise isEmpty() might return incorrect value
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+    };
+    window.addEventListener("resize", this.resizeHandler);
+    this.resizeHandler();
+  },
+  beforeUnmount() {
+    this.isUnmounted = true;
+    this.requestController?.abort();
+    if (this.resizeHandler) window.removeEventListener("resize", this.resizeHandler);
+    if (this.previewTimer) window.clearTimeout(this.previewTimer);
+    this.mnistPad?.off();
   }
 };
 </script>
@@ -308,5 +367,26 @@ export default {
 .mnist-button--recognize:hover {
   border-color: #1e7e34;
   background-color: #218838;
+}
+
+.mnist-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.mnist-error {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  color: #c0392b;
+}
+
+.mnist-retry {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
 </style>

@@ -11,7 +11,9 @@
     "build": "vuepress build docs",
     "check:links": "node scripts/check-internal-links.mjs",
     "check:artifacts": "node scripts/check-build-output.mjs",
-    "verify": "npm run build && npm run check:links && npm run check:artifacts"
+    "check:security": "node scripts/check-phase4-security.mjs",
+    "check:smoke": "node scripts/check-browser-smoke.mjs",
+    "verify": "npm run build && npm run check:links && npm run check:artifacts && npm run check:security && npm run check:smoke"
   },
   "repository": {
     "type": "git",

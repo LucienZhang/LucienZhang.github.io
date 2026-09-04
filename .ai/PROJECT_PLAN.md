@@ -395,14 +395,16 @@ Phase 3.5B 实施与验证记录：[`phase3.5/2026-09-04-home.md`](./phase3.5/20
 
 目标：在新增工具和 chatbot 前清除已知高风险实现。
 
-- [ ] 删除 `Lang.vue` 中的 `eval`。
-- [ ] 为所有远程请求增加 timeout、loading、empty、error、retry 状态。
-- [ ] 检查 CORS proxy 的 allowlist、请求方法、header/cookie 转发边界。
-- [ ] 为 LeetCode/TIOBE 等第三方集成设计可接受的失效表现。
-- [ ] 为组件补充 unmount 资源清理。
-- [ ] 增加内部链接检查和最小浏览器 smoke test。
+- [x] 删除 `Lang.vue` 中的 `eval`，同时删除远程 table header 的 `v-html`。
+- [x] 为组件主动发起的远程请求增加 timeout、loading、empty、error、retry 状态。
+- [x] 检查 CORS proxy 的 allowlist、请求方法、header/cookie 转发边界；前端已收敛为固定业务函数，后端强制策略需在其独立仓库复核。
+- [x] 为 LeetCode/TIOBE 等第三方集成设计可接受的失效表现。
+- [x] 为组件补充 unmount 资源清理。
+- [x] 保留内部链接检查，并增加不引入新依赖的最小浏览器 smoke test。
 
 完成条件：第三方服务失效不会造成无限 loading；浏览器不执行代理返回的远程脚本。
+
+实施与验证记录：[`phase4/2026-09-04.md`](./phase4/2026-09-04.md)。TIOBE 已迁移到有限 grammar parser，LeetCode 远程字段已校验/转义，所有组件主动请求均有 12 秒 timeout、明确失败态、Retry 和卸载清理；7 路由 Chromium smoke 会主动屏蔽代理域名并验证失败收敛。前端 CORS proxy 调用面已固定，但真正的 SSRF、redirect、DNS、header/cookie 和大小限制仍必须由不在本仓库内的 proxy 后端强制执行。Phase 4 已由独立提交 `fix: remove remote script evaluation` 保存。
 
 ### Phase 5：产品工作
 
