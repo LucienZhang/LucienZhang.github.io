@@ -31,9 +31,8 @@
     "@vuepress/plugin-register-components": "2.0.0-rc.132",
     "@vuepress/plugin-shiki": "2.0.0-rc.132",
     "@vuepress/theme-default": "2.0.0-rc.132",
-    "ant-design-vue": "^3.2.15",
+    "ant-design-vue": "4.2.6",
     "axios": "^1.2.3",
-    "bootstrap": "^4.6.2",
     "breakpoints-js": "^1.0.6",
     "cheerio": "^1.0.0-rc.12",
     "highcharts": "^10.3.3",
@@ -45,7 +44,7 @@
     "signature_pad": "^4.1.4",
     "three": "^0.135.0",
     "typed.js": "^2.0.12",
-    "unplugin-vue-components": "^0.22.12",
+    "unplugin-vue-components": "32.1.0",
     "vuepress": "2.0.0-rc.30",
     "web-ifc-three": "0.0.102"
   }

@@ -203,7 +203,7 @@
         </footer>
       </ClientOnly>
     </body>
-    <a-modal :visible="qrcode" :centered="true" :closable="false" :footer="null" @cancel="qrcode = false">
+    <a-modal :open="qrcode" :centered="true" :closable="false" :footer="null" @cancel="qrcode = false">
       <div class="square">
         <img src="./assets/images/wechat.jpg" alt="QR Code" style="width: 100%; height: 100%;" />
       </div>

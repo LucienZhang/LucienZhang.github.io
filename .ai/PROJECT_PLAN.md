@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 2 已完成并通过用户本地验收；Phase 3 待实施
+> 状态：Phase 3 已实施并完成本地验证，等待用户审阅
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -352,20 +352,22 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 
 完成条件：50 个页面构建成功；所有关键组件至少能够加载；依赖树一致；没有新 hydration 错误。
 
-验收状态：已于 2026-09-04 由用户完成本地验证并确认通过。Phase 2 已作为独立提交保存；线上部署验收仍应在 push 后补充记录。
+验收状态：已于 2026-09-04 由用户完成本地验证并确认通过。Phase 2 已作为独立提交保存，并在 push、部署后通过线上验收。
 
 ### Phase 3：UI 依赖收敛
 
 目标：形成“自定义主页 + Ant Design Vue 工具控件”的清晰边界。
 
-- [ ] 将 Bootstrap 布局从 `DemoMnist.vue` 改为局部 CSS，并删除 Bootstrap。
-- [ ] 升级 Ant Design Vue v4。
-- [ ] 调整 Modal `visible -> open`、message 样式和 SSR 注入。
-- [ ] 升级与 Vite 8 兼容的 `unplugin-vue-components`。
-- [ ] 验证 Modal、Spin、message、中文和英文页面。
-- [ ] 引入少量 design tokens：颜色、字体、间距、圆角、阴影、动效时长。
+- [x] 将 Bootstrap 布局从 `DemoMnist.vue` 改为局部 CSS，并删除 Bootstrap。
+- [x] 升级 Ant Design Vue v4。
+- [x] 调整 Modal `visible -> open`、message 样式和 SSR 注入。
+- [x] 升级与 Vite 8/Rolldown 兼容的 `unplugin-vue-components`。
+- [x] 验证 Modal、Spin、message、中文和英文页面。
+- [x] 明确样式边界：本阶段局部保留现有视觉值，不提前建立全站 design tokens；全站 tokens 随 Phase 5 视觉设计确定。
 
 完成条件：UI 行为无回归；首页不被 Ant Design 默认视觉接管；Bootstrap 完全移除。
+
+实施与验证记录：[`phase3/2026-09-04.md`](./phase3/2026-09-04.md)。当前改动停留在本地未提交状态，等待用户审阅。
 
 ### Phase 3.5：升级后兼容收尾
 

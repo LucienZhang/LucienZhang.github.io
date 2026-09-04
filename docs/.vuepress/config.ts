@@ -45,7 +45,7 @@ export default defineUserConfig({
     viteOptions: {
       plugins: [
         Components({
-          resolvers: [AntDesignVueResolver()],
+          resolvers: [AntDesignVueResolver({ importStyle: "css-in-js" })],
         }),
       ],
       ssr: {

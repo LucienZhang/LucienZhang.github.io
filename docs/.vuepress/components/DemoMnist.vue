@@ -1,19 +1,19 @@
 <template>
   <div class="mnist">
     <canvas ref="mnist-canvas" id="mnist-canvas"></canvas>
-    <div class="container-fluid">
-      <div class="row text-center">
-        <div class="col-2 col-btn">
-          <button class="btn btn-info float-left" @click="clear">{{ clearBtnName }}</button>
+    <div class="mnist-controls">
+      <div class="mnist-controls__row">
+        <div class="mnist-controls__action mnist-controls__action--start">
+          <button type="button" class="mnist-button mnist-button--clear" @click="clear">{{ clearBtnName }}</button>
         </div>
-        <div class="col-8">
+        <div class="mnist-controls__result">
           <div v-if="result !== ''">
             <p>{{ resultTag }}: {{ result }}</p>
             <p>{{ probTag }}: {{ prob }}</p>
           </div>
         </div>
-        <div class="col-2 col-btn">
-          <button class="btn btn-success float-right" @click="recognize">{{ recognizeBtnName }}</button>
+        <div class="mnist-controls__action mnist-controls__action--end">
+          <button type="button" class="mnist-button mnist-button--recognize" @click="recognize">{{ recognizeBtnName }}</button>
         </div>
       </div>
     </div>
@@ -24,7 +24,6 @@
 import SignaturePad from "signature_pad";
 import { axiosMl } from "../axios-instances";
 import { message } from "ant-design-vue";
-import "ant-design-vue/lib/message/style/css";
 
 export default {
   props: {
@@ -220,33 +219,94 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/grid";
-@import "bootstrap/scss/buttons";
-@import "bootstrap/scss/utilities";
-
+<style scoped>
 .mnist {
-  #mnist-canvas {
-    width: 100%;
-    height: 400px;
-    max-width: 100%;
-    max-height: 100%;
-    border: 1px solid #d3d3d3;
-  }
+  width: 100%;
+}
 
-  .row {
-    height: 55px;
-  }
+#mnist-canvas {
+  width: 100%;
+  height: 400px;
+  max-width: 100%;
+  max-height: 100%;
+  border: 1px solid #d3d3d3;
+}
 
-  p {
-    margin: 0;
-  }
+.mnist-controls {
+  width: 100%;
+}
 
-  .col-btn {
-    padding: 0;
-  }
+.mnist-controls__row {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 55px;
+  text-align: center;
+}
+
+.mnist-controls__action {
+  display: flex;
+  flex: 0 0 16.666667%;
+  max-width: 16.666667%;
+}
+
+.mnist-controls__action--start {
+  justify-content: flex-start;
+}
+
+.mnist-controls__action--end {
+  justify-content: flex-end;
+}
+
+.mnist-controls__result {
+  flex: 0 0 66.666667%;
+  max-width: 66.666667%;
+}
+
+.mnist-controls__result p {
+  margin: 0;
+}
+
+.mnist-button {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.mnist-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.mnist-button--clear {
+  border-color: #17a2b8;
+  background-color: #17a2b8;
+}
+
+.mnist-button--clear:hover {
+  border-color: #117a8b;
+  background-color: #138496;
+}
+
+.mnist-button--recognize {
+  border-color: #28a745;
+  background-color: #28a745;
+}
+
+.mnist-button--recognize:hover {
+  border-color: #1e7e34;
+  background-color: #218838;
 }
 </style>
