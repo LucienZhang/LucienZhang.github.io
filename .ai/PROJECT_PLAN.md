@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 3 已实施并完成本地验证，等待用户审阅
+> 状态：Phase 3 已完成、通过用户审阅并提交；push、部署与线上验收待完成
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -367,11 +367,16 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 
 完成条件：UI 行为无回归；首页不被 Ant Design 默认视觉接管；Bootstrap 完全移除。
 
-实施与验证记录：[`phase3/2026-09-04.md`](./phase3/2026-09-04.md)。当前改动停留在本地未提交状态，等待用户审阅。
+实施与验证记录：[`phase3/2026-09-04.md`](./phase3/2026-09-04.md)。用户已确认本地验证结果，Phase 3 已提交为 `660d116 chore: converge ui dependencies`；尚未 push 或部署。
 
 ### Phase 3.5：升级后兼容收尾
 
 目标：在核心链和 UI 依赖升级稳定后，删除 Phase 2 的临时内容兼容层，并解决已确认的首页 HTML/hydration 问题。该阶段不进行主页视觉重做。
+
+为避免把 21 个 Markdown 文件的机械迁移和自定义首页结构修复混入同一审阅单元，Phase 3.5 按两个 goal、两个独立提交执行：
+
+1. **Phase 3.5A — 官方 tabs 语法迁移：** 完成前 3 项，只修改 tabs 源码、兼容层、验证记录和必要配置。
+2. **Phase 3.5B — 首页 HTML/hydration 修复：** 在 3.5A 验收并提交后完成后 3 项，不改变现有主页视觉。
 
 - [ ] 将现有 21 个 Markdown 文件中的 43 组 `:::: tabs` / `::: tab` 旧语法迁移为官方 `:::: tabs` / `@tab` 语法。
 - [ ] 删除 `docs/.vuepress/markdown/legacyTabs.ts` 及其配置注册，不再在编译时改写文章源码。
