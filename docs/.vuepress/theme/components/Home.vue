@@ -95,7 +95,7 @@
             <h2>Recent Work</h2>
             <div class="row">
               <article class="col-6 col-12-xsmall work-item">
-                <a :href="rootPath + 'programming/prog-lang/overview.html'" class="image fit thumb">
+                <a :href="programmingPath" class="image fit thumb">
                   <img src="./assets/images/recent_work/programming.png" />
                 </a>
                 <h3>Programming</h3>
@@ -234,6 +234,11 @@ export default {
     },
     rootPath() {
       return this.isEnglishSite ? "/" : "/zh/";
+    },
+    programmingPath() {
+      // Programming content is currently English-only. Avoid linking the
+      // Chinese homepage to a route that does not exist.
+      return "/programming/prog-lang/overview.html";
     }
   },
   methods: {

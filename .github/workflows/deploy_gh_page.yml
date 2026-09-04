@@ -8,7 +8,9 @@ on:
 
 env:
   PYTHON_VERSION: "3.9"
-  NODE_VERSION: "18"
+
+permissions:
+  contents: read
 
 jobs:
   notebooks:
@@ -18,44 +20,51 @@ jobs:
         working-directory: converter
     steps:
       - name: Checkout website-binder repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           repository: LucienZhang/website-binder
+          ref: master
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
+          cache-dependency-path: converter/requirements.txt
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Convert notebooks to HTML
         run: python main.py
-      - name: Update notebooks artifacts
-        uses: actions/upload-artifact@v3
+      - name: Verify notebook output
+        run: test -f static/jupyter/nb/algorithms/misc/python.html
+      - name: Upload notebooks artifact
+        uses: actions/upload-artifact@v7
         with:
           name: notebooks
-          path: converter/static
+          path: converter/static/jupyter
+          if-no-files-found: error
   docs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Set up Node ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/checkout@v7
+      - name: Set up Node from .nvmrc
+        uses: actions/setup-node@v7
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm run build
-      - name: Update notebooks artifacts
-        uses: actions/upload-artifact@v3
+      - run: npm run verify
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v7
         with:
           name: docs
           path: docs/.vuepress/dist
+          if-no-files-found: error
   deploy:
     needs: [notebooks, docs]
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       pages: write
       id-token: write
     environment:
@@ -63,21 +72,25 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download docs artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v8
         with:
           name: docs
-          path: docs
-      - name: Download notebooks aritifact
-        uses: actions/download-artifact@v3
+          path: site
+      - name: Download notebooks artifact
+        uses: actions/download-artifact@v8
         with:
           name: notebooks
-          path: notebooks
-      - name: Merge aritifacts
-        run: cp -r notebooks/jupyter docs/static/
-      - name: Upload Page Artifacts
-        uses: actions/upload-pages-artifact@v1
+          path: site/static/jupyter
+      - name: Verify merged Pages artifact
+        run: |
+          test -f site/index.html
+          test -f site/static/IFCwasm/web-ifc.wasm
+          test -f site/static/bim/building.ifc
+          test -f site/static/jupyter/nb/algorithms/misc/python.html
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
         with:
-          path: docs
+          path: site
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v5
