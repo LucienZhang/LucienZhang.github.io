@@ -1,6 +1,8 @@
+> 最新决策（2026-09-05）：A v2 已获确认；以 [设计规格](./homepage-design-spec.md)、[验收清单](./homepage-acceptance.md) 和 [实现交接](./homepage-implementation-handoff.md) 为当前执行依据。下文早期停止点保留为阶段历史。
+
 # Phase 5A 主页设计与实现交接计划
 
-> 状态：待在独立 Codex Worktree 任务中开始设计探索
+> 状态：用户已确认 A v2 完整设计，并授权提交设计成果、另开任务制作隔离 Vue 原型。Phase 5A.3 交接规格已整理，正式主页替换仍未授权。入口：[实现交接](./homepage-implementation-handoff.md)。
 > 编写日期：2026-09-05
 > 起点：`main` 已完成 Phase 0–4.5 维护升级；commit `740de38` 已部署并通过 GitHub Actions run `33945849908`
 
@@ -326,5 +328,7 @@ Chatbot 应是“交互式作品导航员”，而不是孤立客服窗口。可
 
 - 维护升级和部署验证已经完成。
 - 本文件是 Phase 5A 的流程与约束来源，不代表创意方向已经选定。
-- 下一步仅执行 Phase 5A.0，完成审计后等待用户确认。
+- [Phase 5A.0 审计](./homepage-audit.md) 已记录用户决策：AI 应用优先，贷款比较为首个体验，筛股器为后续重点作品，Gmail 为联系入口。
+- [Phase 5A.1 信息架构](./homepage-ia.md) 已获用户确认。
+- [Phase 5A.2 三套视觉方向](./homepage-visual-directions.md) 已生成，含英文桌面、中文移动与解释状态；待用户选择后继续细化。
 - 当前没有批准修改正式主页、引入新依赖或实现真实 chatbot。
