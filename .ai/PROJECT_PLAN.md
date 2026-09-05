@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 3 已完成、通过用户审阅并提交；push、部署与线上验收待完成
+> 状态：Phase 0–4（含 Phase 3.5）已通过 PR #8 合并到 `main`。合并后的首次 Pages run 因浏览器 smoke 清理临时目录的竞态失败；所有功能断言与 notebooks job 均已通过，Phase 4.5 正在修复该 CI 收尾问题并等待重新部署验收。
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -277,34 +277,34 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 
 ### P0：影响发布或依赖确定性
 
-1. **GitHub Actions 已过期。** workflow 使用 `upload-artifact@v3`、`download-artifact@v3`、`upload-pages-artifact@v1`、`deploy-pages@v1` 和 Node 18。`upload-artifact@v3` 已被官方弃用。升级时需整体更新 artifact/Pages actions，并验证 artifact 合并语义。
-2. **VuePress 依赖树混合多个 beta 版本。** 必须改成精确兼容矩阵并重新生成 lockfile。
-3. **CI Node 与目标 VuePress engine 不符。** 目标 `rc.30`/`rc.31` package 要求 Node `>=22.18.0`。
-4. **部署依赖另一个仓库。** `website-binder` 任一安装或转换失败会阻塞本站部署；应为 docs 与 notebooks 分别提供清晰失败信息和可复现输入。
+1. **已解决（Phase 1）：GitHub Actions 与 Node 基线。** workflow 已升级 artifact/Pages actions，并通过 `.nvmrc` 使用 Node 22.18.0。
+2. **已解决（Phase 2）：VuePress 依赖树混用 beta。** core、client、bundler、theme 和插件已锁定经过验证的 RC 兼容矩阵。
+3. **已解决（Phase 2）：CI Node 与 VuePress engine 不符。** 本地声明、CI 和目标 package engine 已一致。
+4. **已控制但长期存在：跨仓库 notebook 部署。** workflow 已拆分 docs/notebooks job、分别上传 artifact，并在合并后检查 notebook、WASM 和 IFC；`website-binder` 仍是发布链的外部输入，需要保留失败可观测性。
 
 ### P1：用户可见问题
 
-1. 中文 navbar 的“编程”和“杂项”指向不存在的页面。
-2. VuePress theme 的 `repo` 仍为 `LucienZhang/website`，但当前 remote 是 `LucienZhang/LucienZhang.github.io`，编辑链接可能错误。
-3. `package.json` 中 repository、bugs、homepage 仍指向旧仓库。
-4. `/misc/werewolf` 和部分中文 project 内容存在但没有进入正式导航，需要决定保留、归档还是暴露。
-5. README 与真实部署/开发要求过于简略，没有 Node 版本、安装、构建、跨仓库 notebook 说明。
+1. **已解决（Phase 0）：无效中文 navbar。** 未翻译的 Programming/Misc 不再出现在中文导航，英文内容仍可通过 locale 切换访问。
+2. **已解决（Phase 0）：主题仓库地址。** `repo` 已指向 `LucienZhang/LucienZhang.github.io`。
+3. **已解决（Phase 0）：package metadata。** repository、bugs 与 homepage 已指向当前仓库和站点。
+4. **待产品决策：projects/werewolf。** 内容仍可直接访问但不进入正式导航；这不是技术故障，不在维护阶段擅自公开或归档。
+5. **有意保持简洁：README。** 该仓库是公开个人站点，README 只介绍站点用途、技术栈和公开域名；Node、验证和跨仓库 notebook 等维护细节保留在 `.ai/`，不扩展到公开入口。
 
 ### P1：安全与运行时稳定性
 
-1. `Lang.vue` 对通过 CORS proxy 获取的 TIOBE 页面脚本使用 `eval`。这是远程代码执行面，应改为解析结构化数据或受控文本，不能继续执行第三方页面脚本。
-2. `api.ziliang.ninja` 是多个工具的单点依赖，缺少显式超时、用户可见错误态和降级。
-3. LeetCode/TIOBE 页面依赖第三方未公开稳定的页面结构或 GraphQL 行为，失败时当前主要写 console。
-4. chatbot 不能把模型 API key 放入 GitHub Pages 的浏览器 bundle；必须使用独立后端/serverless endpoint，并实现限流。
+1. **已解决（Phase 4）：远程脚本执行。** TIOBE 数据改由有限 grammar parser 解析，`eval` 和远程表头 `v-html` 已删除。
+2. **前端已解决、后端待独立审计：API 单点依赖。** 组件已有 timeout、失败态、Retry 和取消；proxy 的 SSRF、redirect、DNS、header/cookie 与大小限制必须在后端仓库强制执行。
+3. **已缓解（Phase 4）：第三方接口漂移。** LeetCode/TIOBE 有校验、明确失败态和 smoke 覆盖，但第三方未公开接口仍是不可消除的外部风险。
+4. **Phase 5 架构约束：chatbot 凭据。** 模型密钥不得进入 GitHub Pages bundle，必须使用独立后端并实现限流和观测。
 
 ### P2：质量与性能
 
-1. 没有 lint、typecheck、单元测试或浏览器测试。
-2. 没有自动链接检查，现有构建不会因无效 navbar 路径失败。
-3. BIM 和 Lang chunk 较大，需要路由级/组件级延迟加载与 bundle 分析。
-4. 首页包含大量旧模板 CSS、Font Awesome 字体和注释代码，可在视觉重做时清理。
-5. `Jupyter.vue` 使用 `event.path` fallback 和同源 iframe DOM 访问，需要覆盖 Chromium、Firefox、Safari 的测试。
-6. 交互组件普遍没有在卸载时清理 resize listener、chart callback、Typed 或 Three.js renderer 资源。
+1. **部分解决：测试基线。** 已有链接、产物、安全 fixture 和 7 路由 Chromium smoke；lint、typecheck、单元测试及 Firefox/Safari 覆盖仍未建立，应随产品组件增长按收益补充。
+2. **已解决（Phase 0）：自动链接检查。** `npm run verify` 已包含内部链接和固定路由/产物检查。
+3. **仍待独立性能 goal：大 chunk。** 当前主要对象是 MathJax、BIM、Font Awesome 和 Lang；不能仅提高 warning 阈值，应先做按路由使用和压缩体积分析。
+4. **延期至 Phase 5A：首页旧视觉资产。** 旧模板 CSS、Font Awesome 与字体策略应随主页视觉重做统一处理。
+5. **部分解决（Phase 4）：Jupyter iframe。** 已使用标准 `currentTarget`，增加 HTTP/HTML 预检、超时、Retry 和 Chromium 回归；Firefox/Safari 仍需人工或跨浏览器测试。
+6. **已解决（Phase 3.5/4）：组件卸载清理。** Typed、resize、chart、请求、timer、Three.js/IFC/WebGL 等资源已有对应清理。
 
 ## 6. 分阶段实施计划
 
@@ -405,6 +405,19 @@ Phase 3.5B 实施与验证记录：[`phase3.5/2026-09-04-home.md`](./phase3.5/20
 完成条件：第三方服务失效不会造成无限 loading；浏览器不执行代理返回的远程脚本。
 
 实施与验证记录：[`phase4/2026-09-04.md`](./phase4/2026-09-04.md)。TIOBE 已迁移到有限 grammar parser，LeetCode 远程字段已校验/转义，所有组件主动请求均有 12 秒 timeout、明确失败态、Retry 和卸载清理；7 路由 Chromium smoke 会主动屏蔽代理域名并验证失败收敛。前端 CORS proxy 调用面已固定，但真正的 SSRF、redirect、DNS、header/cookie 和大小限制仍必须由不在本仓库内的 proxy 后端强制执行。Phase 4 已由独立提交 `fix: remove remote script evaluation` 保存。
+
+### Phase 4.5：合并后收尾与既有问题复盘
+
+目标：在进入产品工作前，以合并后的 `main` 为权威状态完成部署验收、修正已过期维护文档，并重新分类既有问题。
+
+- [x] 从 PR #8 merge commit 建立独立收尾分支。
+- [x] 检查合并后的 Actions run，定位 docs job 在全部 smoke 断言通过后的 Chrome profile 清理竞态。
+- [x] 修复浏览器进程回收，并连续运行三次 smoke 验证清理稳定性。
+- [x] 复核 README 的公开定位，并将技术维护细节保留在 `.ai/`；更新本计划的阶段状态、已解决事项与延期边界。
+- [x] 记录当前线上首页、中文首页、notebook、WASM、IFC 与 404 响应基线。
+- [ ] 将修复合入 `main` 后重新运行 Pages workflow，并完成新部署的线上验收。
+
+实施与验证记录：[`phase4.5/2026-09-05.md`](./phase4.5/2026-09-05.md)。本阶段不修改主页视觉、文章内容、业务组件、依赖版本或 API。
 
 ### Phase 5：产品工作
 
