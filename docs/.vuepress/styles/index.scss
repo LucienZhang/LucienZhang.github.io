@@ -38,21 +38,21 @@
 }
 
 html[lang="en-US"] {
-  .navbar {
-    .site-name {
+  .vp-navbar {
+    .vp-site-name {
       font-family: Sacramento, cursive;
       font-size: 1.8rem;
-      font-weight: 1000;
+      font-weight: 400;
     }
   }
 }
 
 html[lang="zh-CN"] {
-  .navbar {
-    .site-name {
+  .vp-navbar {
+    .vp-site-name {
       font-family: Slidefu;
       font-size: 2rem;
-      font-weight: 500;
+      font-weight: 400;
     }
   }
 }
