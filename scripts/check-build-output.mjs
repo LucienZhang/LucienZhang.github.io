@@ -39,6 +39,15 @@ if (!existsSync(distDir)) {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
+  // Preserve the route baseline (including tool shells); add exactly two noindex homepage previews.
+  const previewRoutes = ['/preview/home.html', '/zh/preview/home.html'];
+  expectedRoutes.push(...previewRoutes);
+  for (const route of previewRoutes) {
+    const file = join(distDir, route.slice(1));
+    if (!existsSync(file) || !readFileSync(file, 'utf8').includes('noindex, nofollow')) {
+      failures.push(`isolated preview missing or indexable: ${route}`);
+    }
+  }
   const actualRoutes = walk(distDir)
     .filter((file) => extname(file) === ".html")
     .map((file) => `/${relative(distDir, file).replaceAll("\\", "/")}`)
@@ -59,7 +68,7 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verified ${requiredArtifacts.length} critical artifacts and the route baseline.`);
+console.log(`Verified ${requiredArtifacts.length} critical artifacts, the route baseline and 2 noindex homepage previews.`);
 
 function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
