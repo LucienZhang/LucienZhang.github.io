@@ -27,7 +27,7 @@ const __dirname = getDirname(import.meta.url);
 
 export default defineUserConfig({
   extendsPage(page) {
-    if (page.frontmatter.layout === 'HomepagePrototype') {
+    if (['Homepage', 'HomepagePrototype'].includes(String(page.frontmatter.layout))) {
       page.frontmatter.copyrightYear = new Date().getFullYear();
     }
   },

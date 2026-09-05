@@ -6,6 +6,9 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+const production = process.argv.includes('--production');
+const ci = process.argv.includes('--ci') && process.env.HOMEPAGE_CAPTURE !== '1';
+const homeRoute = language => production ? (language === 'en' ? '/' : '/zh/') : (language === 'en' ? '/preview/home.html' : '/zh/preview/home.html');
 let dist;
 let serveNotebookFixture = false;
 
@@ -62,7 +65,7 @@ async function main() {
       }
     });
 
-    const output = path.join(root, '.ai/phase5/prototype-evidence');
+    const output = path.join(root, production ? '.ai/phase5/migration-evidence' : '.ai/phase5/prototype-evidence');
     fs.mkdirSync(output, { recursive: true });
     const evaluate = async expression => {
       const response = await cdp.send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
@@ -72,6 +75,7 @@ async function main() {
     const click = async selector => { await evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`); await delay(80); };
     const input = async (selector, value) => { await evaluate(`(() => {const el = document.querySelector(${JSON.stringify(selector)}); el.value = ${JSON.stringify(value)}; el.dispatchEvent(new Event('input', {bubbles:true})); el.dispatchEvent(new Event('change', {bubbles:true}));})()`); await delay(80); };
     const screenshot = async name => {
+      if (ci) return;
       const metrics = await cdp.send('Page.getLayoutMetrics');
       const capture = await cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: {x:0,y:0,width:metrics.cssContentSize.width,height:metrics.cssContentSize.height,scale:1} });
       fs.writeFileSync(path.join(output, name + '.png'), Buffer.from(capture.data, 'base64'));
@@ -79,7 +83,7 @@ async function main() {
     const assertFit = async () => assert.ok(await evaluate('document.documentElement.scrollWidth <= innerWidth'), 'horizontal page overflow');
     const records = [];
     for (const language of ['en', 'zh']) {
-      const route = language === 'en' ? '/preview/home.html' : '/zh/preview/home.html';
+      const route = homeRoute(language);
       for (const [width, height] of [[1440,900],[1280,720],[768,1024],[390,844],[320,844]]) {
         await cdp.send('Emulation.setDeviceMetricsOverride', {width,height,deviceScaleFactor:1,mobile:false});
         await navigate(cdp, origin + route);
@@ -88,6 +92,9 @@ async function main() {
         await assertFit();
         assert.equal(await evaluate("document.querySelectorAll('main').length"), 1);
         assert.equal(await evaluate("document.querySelectorAll('h1').length"), 1);
+        assert.equal(await evaluate("document.querySelector('[data-homepage]').dataset.homepage"), production ? 'production' : 'preview');
+        assert.equal(await evaluate("Boolean(document.querySelector('meta[name=robots]')?.content.includes('noindex'))"), !production);
+        assert.equal(await evaluate("document.querySelector('.language').getAttribute('href')"), homeRoute(language === 'en' ? 'zh' : 'en'));
         const geometry = await evaluate(`({termBottom:document.querySelector('.term-controls').getBoundingClientRect().bottom, explainBottom:document.querySelector('.primary').getBoundingClientRect().bottom, font:getComputedStyle(document.querySelector('.brand')).fontFamily})`);
         records.push({language,width,height,...geometry});
         if (width >= 1280) assert.ok(geometry.explainBottom <= height, 'desktop explanation CTA below fold');
@@ -118,6 +125,7 @@ async function main() {
       await click('.questions button');
       await click('.explanation > button');
       assert.ok(await evaluate("document.querySelector('.explanation [role=status]').textContent.match(/Cancelled|已取消/) !== null"));
+      if (!production) {
       for (const state of ['error', 'timeout', 'limited']) {
         await input('#mock-fixture', state);
         await click('.questions button');
@@ -127,6 +135,9 @@ async function main() {
       await input('#mock-fixture', 'success');
       await click('.explanation > button');
       await delay(800);
+      } else {
+        assert.equal(await evaluate("document.querySelector('.review-controls')"), null);
+      }
       await input('#mock-question', 'Tell me a stock to buy');
       await click('.question-input button');
       assert.ok(await evaluate("document.querySelector('.explanation [role=status]').textContent.match(/three suggested|三个推荐/) !== null"));
@@ -157,7 +168,7 @@ async function main() {
       await screenshot(`${language}-nojs`);
       await cdp.send('Emulation.setScriptExecutionDisabled', {value:false});
     }
-    await navigate(cdp, origin + '/preview/home.html');
+    await navigate(cdp, origin + homeRoute('en'));
     await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 10000);
     await click('.parameters summary');
     await input('#loan-amount', '10000000'); await input('#loan-rate', '20'); await input('#loan-years', '40');
@@ -174,7 +185,7 @@ async function main() {
     // Use Vue Router directly to exercise unmount/remount (ordinary links remain usable without JS).
     await evaluate("document.querySelector('#app').__vue_app__.config.globalProperties.$router.push('/misc/apis.html')");
     await waitFor(cdp, "!document.querySelector('.prototype')", 10000);
-    await evaluate("document.querySelector('#app').__vue_app__.config.globalProperties.$router.push('/zh/preview/home.html')");
+    await evaluate(`document.querySelector('#app').__vue_app__.config.globalProperties.$router.push(${JSON.stringify(homeRoute('zh'))})`);
     await waitFor(cdp, "document.querySelector('.prototype.chinese') && !document.querySelector('.term-controls').disabled", 10000);
     assert.equal(await evaluate("document.querySelectorAll('main').length"), 1);
     assert.equal(await evaluate("document.querySelector('#loan-years').value"), '25');
@@ -184,17 +195,21 @@ async function main() {
     await cdp.send('Network.emulateNetworkConditions', {offline:false,latency:40,downloadThroughput:1250000,uploadThroughput:625000});
     await cdp.send('Page.addScriptToEvaluateOnNewDocument', {source:"window.__lcp=0;window.__cls=0;new PerformanceObserver(l=>{window.__lcp=l.getEntries().at(-1).startTime}).observe({type:'largest-contentful-paint',buffered:true});new PerformanceObserver(l=>{for(const e of l.getEntries())if(!e.hadRecentInput)window.__cls+=e.value}).observe({type:'layout-shift',buffered:true});"});
     const performanceRuns = [];
-    for(let i=0;i<3;i++) {
+    for(let i=0;i<(ci ? 0 : 3);i++) {
       await cdp.send('Network.clearBrowserCache');
-      await navigate(cdp, origin + '/preview/home.html');
+      await navigate(cdp, origin + homeRoute('en'));
       await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 15000);
       await delay(2500);
       performanceRuns.push(await evaluate(`(() => {const n=performance.getEntriesByType('navigation')[0];return {lcp:window.__lcp || null,cls:window.__cls,domContentLoaded:n.domContentLoadedEventEnd,load:n.loadEventEnd,responseEnd:n.responseEnd,visibility:document.visibilityState,paints:performance.getEntriesByType('paint').map(p=>({name:p.name,time:p.startTime}))}})()`));
     }
+    if (ci) {
+      await navigate(cdp, origin + homeRoute('en'));
+      await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 10000);
+    }
     const version = await cdp.send('Browser.getVersion');
     const ax = await cdp.send('Accessibility.getFullAXTree');
     assert.ok(ax.nodes.some(n => n.role?.value === 'slider' && n.name?.value === 'Term'));
-    fs.writeFileSync(path.join(output, 'checks.json'), JSON.stringify({version,records,performanceRuns,errors:runtimeErrors}, null, 2));
+    if (!ci) fs.writeFileSync(path.join(output, 'checks.json'), JSON.stringify({version,records,performanceRuns,errors:runtimeErrors}, null, 2));
     assert.deepEqual(runtimeErrors, [], `Browser runtime errors:\n${runtimeErrors.join("\n")}`);
     assert.deepEqual(
       forbiddenRemoteRequests,
@@ -202,7 +217,7 @@ async function main() {
       `Unexpected runtime CDN requests:\n${forbiddenRemoteRequests.join("\n")}`,
     );
     await cdp.close();
-    console.log('Prototype browser checks passed; evidence in .ai/phase5/prototype-evidence.');
+    console.log(`${production ? 'Production homepage' : 'Prototype'} browser checks passed${ci ? ' (CI assertions only)' : '; evidence in ' + output}.`);
   } finally {
     await stopBrowser(browser);
     await new Promise((resolve) => server.close(resolve));

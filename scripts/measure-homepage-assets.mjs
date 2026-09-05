@@ -1,13 +1,14 @@
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { resolve } from 'node:path';
+const production = process.argv.includes('--production');
 const dist = resolve('docs/.vuepress/dist');
 const measure = path => {
   const bytes = readFileSync(`${dist}/${path.replace(/^\//, '')}`);
   return { path, bytes: bytes.length, gzip: gzipSync(bytes, { level: 9 }).length };
 };
 const report = {};
-for (const route of ['index.html', 'preview/home.html', 'zh/preview/home.html']) {
+for (const route of (production ? ['index.html', 'zh/index.html'] : ['index.html', 'preview/home.html', 'zh/preview/home.html'])) {
   const html = readFileSync(`${dist}/${route}`, 'utf8');
   const paths = new Set();
   for (const [tag] of html.matchAll(/<(?:script|link)\b[^>]*>/g)) {
@@ -18,6 +19,6 @@ for (const route of ['index.html', 'preview/home.html', 'zh/preview/home.html'])
   }
   report[route] = [...paths].sort().map(measure);
 }
-for (const file of readdirSync(`${dist}/assets`).filter(name => name.startsWith('HomepagePrototype'))) report[file] = measure(`assets/${file}`);
-writeFileSync('.ai/phase5/prototype-evidence/assets.json', JSON.stringify(report, null, 2) + '\n');
+for (const file of readdirSync(`${dist}/assets`).filter(name => name.startsWith('Home-') || name.startsWith('HomepagePrototype'))) report[file] = measure(`assets/${file}`);
+writeFileSync(production ? '.ai/phase5/migration-evidence/assets.json' : '.ai/phase5/prototype-evidence/assets.json', JSON.stringify(report, null, 2) + '\n');
 console.log('Initial script/modulepreload + stylesheet assets deduplicated; async layout listed separately. gzip level 9, bytes (not observed transfer size).');

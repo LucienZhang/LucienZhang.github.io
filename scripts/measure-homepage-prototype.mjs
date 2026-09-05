@@ -6,6 +6,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+const production = process.argv.includes('--production');
 let dist;
 let serveNotebookFixture = false;
 
@@ -62,7 +63,7 @@ async function main() {
       }
     });
 
-    const output = path.join(root, '.ai/phase5/prototype-evidence');
+    const output = path.join(root, production ? '.ai/phase5/migration-evidence' : '.ai/phase5/prototype-evidence');
     fs.mkdirSync(output, { recursive: true });
     const evaluate = async expression => {
       const response = await cdp.send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
@@ -86,7 +87,7 @@ async function main() {
     const performanceRuns = [];
     for(let i=0;i<3;i++) {
       await cdp.send('Network.clearBrowserCache');
-      await navigate(cdp, origin + '/preview/home.html');
+      await navigate(cdp, origin + (production ? '/' : '/preview/home.html'));
       await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 15000);
       await delay(2500);
       performanceRuns.push(await evaluate(`(() => {const n=performance.getEntriesByType('navigation')[0];return {lcp:window.__lcp || null,cls:window.__cls,domContentLoaded:n.domContentLoadedEventEnd,load:n.loadEventEnd,responseEnd:n.responseEnd,visibility:document.visibilityState,paints:performance.getEntriesByType('paint').map(p=>({name:p.name,time:p.startTime}))}})()`));

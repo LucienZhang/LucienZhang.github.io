@@ -1,3 +1,5 @@
+> 最新执行状态（2026-09-05）：用户授权的正式主页迁移已在当前工作区实现；见 [迁移报告](./homepage-migration-report.md)。历史阶段停止点不覆盖该最新授权。
+
 > 最新决策（2026-09-05）：A v2 已获确认；以 [设计规格](./homepage-design-spec.md)、[验收清单](./homepage-acceptance.md) 和 [实现交接](./homepage-implementation-handoff.md) 为当前执行依据。下文早期停止点保留为阶段历史。
 
 # Phase 5A 主页设计与实现交接计划

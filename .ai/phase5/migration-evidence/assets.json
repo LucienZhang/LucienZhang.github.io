@@ -1,0 +1,81 @@
+{
+  "index.html": [
+    {
+      "path": "/assets/README-BY2hjGfW.js",
+      "bytes": 804,
+      "gzip": 528
+    },
+    {
+      "path": "/assets/app-5dBi1WV7.js",
+      "bytes": 108152,
+      "gzip": 36086
+    },
+    {
+      "path": "/assets/dist-BaPeUwoC.js",
+      "bytes": 16597,
+      "gzip": 5440
+    },
+    {
+      "path": "/assets/plugin-vue_export-helper-BxPXQkBs.js",
+      "bytes": 124136,
+      "gzip": 48179
+    },
+    {
+      "path": "/assets/preload-helper-Czpn1I53.js",
+      "bytes": 1196,
+      "gzip": 676
+    },
+    {
+      "path": "/assets/rolldown-runtime-C0FnF6B9.js",
+      "bytes": 1291,
+      "gzip": 712
+    },
+    {
+      "path": "/assets/style-CnVQPmzP.css",
+      "bytes": 101798,
+      "gzip": 20021
+    }
+  ],
+  "zh/index.html": [
+    {
+      "path": "/assets/README-0qpVZ4lY.js",
+      "bytes": 802,
+      "gzip": 599
+    },
+    {
+      "path": "/assets/app-5dBi1WV7.js",
+      "bytes": 108152,
+      "gzip": 36086
+    },
+    {
+      "path": "/assets/dist-BaPeUwoC.js",
+      "bytes": 16597,
+      "gzip": 5440
+    },
+    {
+      "path": "/assets/plugin-vue_export-helper-BxPXQkBs.js",
+      "bytes": 124136,
+      "gzip": 48179
+    },
+    {
+      "path": "/assets/preload-helper-Czpn1I53.js",
+      "bytes": 1196,
+      "gzip": 676
+    },
+    {
+      "path": "/assets/rolldown-runtime-C0FnF6B9.js",
+      "bytes": 1291,
+      "gzip": 712
+    },
+    {
+      "path": "/assets/style-CnVQPmzP.css",
+      "bytes": 101798,
+      "gzip": 20021
+    }
+  ],
+  "Home-Cqrklsbp.js": {
+    "path": "assets/Home-Cqrklsbp.js",
+    "bytes": 25523,
+    "gzip": 10398
+  }
+}

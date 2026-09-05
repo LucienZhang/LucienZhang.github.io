@@ -1,8 +1,11 @@
 import { defineClientConfig } from 'vuepress/client';
 import { defineAsyncComponent } from 'vue';
 
+const Homepage = defineAsyncComponent(() => import('./theme/components/Home.vue'));
+
 export default defineClientConfig({
   layouts: {
-    HomepagePrototype: defineAsyncComponent(() => import('./prototype/HomepagePrototype.vue')),
+    Homepage,
+    HomepagePrototype: Homepage,
   },
 });

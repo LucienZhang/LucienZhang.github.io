@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { load } from "cheerio";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const distDir = join(rootDir, "docs/.vuepress/dist");
@@ -47,6 +48,18 @@ if (!existsSync(distDir)) {
     if (!existsSync(file) || !readFileSync(file, 'utf8').includes('noindex, nofollow')) {
       failures.push(`isolated preview missing or indexable: ${route}`);
     }
+  }
+  for (const [route, other] of [['/index.html', '/zh/'], ['/zh/index.html', '/']]) {
+    const file = join(distDir, route.slice(1));
+    if (!existsSync(file)) continue;
+    const $ = load(readFileSync(file, 'utf8'));
+    if ($('[data-homepage="production"]').length !== 1 || $('main').length !== 1 || $('h1').length !== 1) {
+      failures.push(`production homepage layout/semantics missing: ${route}`);
+    }
+    if (($('meta[name="robots"]').attr('content') || '').includes('noindex')) failures.push(`production homepage is noindex: ${route}`);
+    if ($('.language').attr('href') !== other) failures.push(`homepage locale points to preview: ${route}`);
+    if ($('.home-shell, #typed, .review-controls').length) failures.push(`legacy or review UI leaked onto homepage: ${route}`);
+    if ($('a[href="mailto:lucienzhangzl@gmail.com"]').length !== 1 || $('.chart polyline').length !== 2) failures.push(`homepage SSR content missing: ${route}`);
   }
   const actualRoutes = walk(distDir)
     .filter((file) => extname(file) === ".html")

@@ -62,7 +62,9 @@ async function main() {
     });
 
     const routes = [
-      ["/", ".home-shell"],
+      ["/", '[data-homepage="production"]'],
+      ["/tools/stock-screener.html", ".stock-shell textarea"],
+      ["/zh/tools/stock-screener.html", ".stock-shell textarea"],
       ["/ml/mnist.html", ".mnist canvas"],
       ["/misc/bim.html", ".bim-content canvas"],
       ["/programming/algorithms/knapsack.html", ".pseudo-wrapper .ps-root mjx-container[jax='SVG'] svg"],
