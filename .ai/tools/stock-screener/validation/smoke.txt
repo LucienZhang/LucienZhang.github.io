@@ -1,0 +1,5 @@
+
+> check:smoke
+> node scripts/check-browser-smoke.mjs
+
+Browser smoke passed for 7 routes.

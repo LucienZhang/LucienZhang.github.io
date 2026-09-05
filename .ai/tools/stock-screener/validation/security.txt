@@ -1,0 +1,5 @@
+
+> check:security
+> node scripts/check-phase4-security.mjs
+
+Phase 4 security checks passed.

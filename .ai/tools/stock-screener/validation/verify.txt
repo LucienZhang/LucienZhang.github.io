@@ -1,0 +1,39 @@
+
+> verify
+> npm run build && npm run check:links && npm run check:artifacts && npm run check:security && npm run check:smoke
+
+
+> build
+> vuepress build docs
+
+- Initializing and preparing data
+✔ Initializing and preparing data - done in 2.25s
+- Compiling with vite
+[33m[PLUGIN_TIMINGS] [0mPlugin hooks ran for 2.9s of this 4.1s build (70%).
+2 hooks are listed without a time. Their calls overlapped, so the time inside one call includes work from other calls. To find their cost, profile the build with `node --cpu-prof`:
+  - vite:asset load (46 calls)
+  - vite:css transform (52 calls)
+See https://rolldown.rs/reference/InputOptions.checks#plugintimings for more details.
+
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✔ Compiling with vite - done in 4.19s
+- Rendering 52 pages
+/zh/projects/ is missing sidebar config.
+/zh/projects/werewolf.html is missing sidebar config.
+✔ Rendering 52 pages - done in 1.14s
+success VuePress build completed in 9.90s!
+
+> check:links
+> node scripts/check-internal-links.mjs
+
+Checked 5414 internal references across 52 HTML files.
+
+> check:artifacts
+> node scripts/check-build-output.mjs
+
+Build output verification failed:
+- route baseline mismatch (missing: none; unexpected: /tools/stock-screener.html, /zh/tools/stock-screener.html)
