@@ -20,6 +20,8 @@ async function main() {
   const server = http.createServer(serveDist);
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const origin = `http://127.0.0.1:${server.address().port}`;
+  const chromeLog = path.join(profile, "chrome-stderr.log");
+  const chromeLogFd = fs.openSync(chromeLog, "w");
   const browser = spawn(chrome, [
     "--headless=new",
     "--no-sandbox",
@@ -29,10 +31,11 @@ async function main() {
     "--remote-debugging-port=0",
     `--user-data-dir=${profile}`,
     "about:blank",
-  ], { stdio: "ignore" });
+  ], { stdio: ["ignore", "ignore", chromeLogFd] });
+  fs.closeSync(chromeLogFd);
 
   try {
-    const debugPort = await readDebugPort(profile);
+    const debugPort = await readDebugPort(profile, browser, chromeLog);
     const target = await fetch(`http://127.0.0.1:${debugPort}/json/new?about:blank`, {
       method: "PUT",
     }).then((response) => response.json());
@@ -178,13 +181,27 @@ function serveDist(request, response) {
   fs.createReadStream(file).pipe(response);
 }
 
-async function readDebugPort(directory) {
+async function readDebugPort(directory, browser, chromeLog) {
   const file = path.join(directory, "DevToolsActivePort");
-  for (let attempt = 0; attempt < 100; attempt += 1) {
+  let stderr = "";
+
+  for (let attempt = 0; attempt < 300; attempt += 1) {
+    stderr = fs.readFileSync(chromeLog, "utf8").slice(-8_000);
+    const outputMatch = stderr.match(/DevTools listening on ws:\/\/[^:]+:(\d+)\//);
+    if (outputMatch) return Number(outputMatch[1]);
     if (fs.existsSync(file)) return Number(fs.readFileSync(file, "utf8").split("\n")[0]);
+    if (browser.exitCode !== null || browser.signalCode !== null) {
+      throw new Error(`Chrome exited before exposing a DevTools port.${formatBrowserStderr(stderr)}`);
+    }
     await delay(100);
   }
-  throw new Error("Chrome did not expose a DevTools port.");
+
+  throw new Error(`Chrome did not expose a DevTools port within 30 seconds.${formatBrowserStderr(stderr)}`);
+}
+
+function formatBrowserStderr(stderr) {
+  const output = stderr.trim();
+  return output ? `\nChrome stderr:\n${output}` : "";
 }
 
 async function navigate(cdp, url) {
