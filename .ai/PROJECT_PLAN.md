@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 0–4（含 Phase 3.5）已通过 PR #8 合并到 `main`。Phase 4.5 的首次清理修复已通过 PR #9 合并，但 Ubuntu 上的 Chrome 辅助进程仍会造成暂态 `ENOTEMPTY`；所有功能断言与 notebooks job 均已通过，当前正在修正清理失败的判定边界并等待重新部署验收。
+> 状态：Phase 0–4（含 Phase 3.5）已通过 PR #8 合并到 `main`，Phase 4.5 的 CI 清理修复已通过 PR #9 和 #10 合并。Pages deployment `6277060615` 已从 merge commit `a305d6e` 成功发布，自动验证、artifact 合并和线上关键路径/交互验收均通过；维护升级阶段至此完成。
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -415,7 +415,7 @@ Phase 3.5B 实施与验证记录：[`phase3.5/2026-09-04-home.md`](./phase3.5/20
 - [x] 修复浏览器进程回收；对 Chrome 辅助进程造成的 `ENOTEMPTY`/`EBUSY` 临时 profile 清理竞态降级为 warning，其他清理错误仍会失败。
 - [x] 复核 README 的公开定位，并将技术维护细节保留在 `.ai/`；更新本计划的阶段状态、已解决事项与延期边界。
 - [x] 记录当前线上首页、中文首页、notebook、WASM、IFC 与 404 响应基线。
-- [ ] 将修复合入 `main` 后重新运行 Pages workflow，并完成新部署的线上验收。
+- [x] 将修复合入 `main` 后重新运行 Pages workflow，并完成新部署的线上验收。
 
 实施与验证记录：[`phase4.5/2026-09-05.md`](./phase4.5/2026-09-05.md)。本阶段不修改主页视觉、文章内容、业务组件、依赖版本或 API。
 
