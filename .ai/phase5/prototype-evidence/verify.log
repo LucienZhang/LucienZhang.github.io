@@ -1,0 +1,42 @@
+
+> verify
+> npm run build && npm run check:links && npm run check:artifacts && npm run check:security && npm run check:smoke
+
+
+> build
+> vuepress build docs
+
+- Initializing and preparing data
+✔ Initializing and preparing data - done in 2.31s
+- Compiling with vite
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✔ Compiling with vite - done in 3.74s
+- Rendering 52 pages
+/zh/projects/ is missing sidebar config.
+/zh/projects/werewolf.html is missing sidebar config.
+✔ Rendering 52 pages - done in 1.27s
+success VuePress build completed in 8.22s!
+
+> check:links
+> node scripts/check-internal-links.mjs
+
+Checked 2864 internal references across 52 HTML files.
+
+> check:artifacts
+> node scripts/check-build-output.mjs
+
+Verified 15 critical artifacts, the 50-route baseline and 2 noindex previews.
+
+> check:security
+> node scripts/check-phase4-security.mjs
+
+Phase 4 security checks passed.
+
+> check:smoke
+> node scripts/check-browser-smoke.mjs
+
+Browser smoke passed for 7 routes.

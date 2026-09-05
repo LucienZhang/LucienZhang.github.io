@@ -1,0 +1,121 @@
+{
+  "version": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/152.0.7977.76",
+    "revision": "@0d89dfa2dd7c1ec4b8a14b9f303f887bb63b6174",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "jsVersion": "15.2.124.19"
+  },
+  "records": [
+    {
+      "language": "en",
+      "width": 1440,
+      "height": 900,
+      "termBottom": 654.1875,
+      "explainBottom": 714.1875,
+      "font": "Sacramento, cursive"
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "height": 720,
+      "termBottom": 630.65625,
+      "explainBottom": 690.65625,
+      "font": "Sacramento, cursive"
+    },
+    {
+      "language": "en",
+      "width": 768,
+      "height": 1024,
+      "termBottom": 874.703125,
+      "explainBottom": 934.703125,
+      "font": "Sacramento, cursive"
+    },
+    {
+      "language": "en",
+      "width": 390,
+      "height": 844,
+      "termBottom": 828.84375,
+      "explainBottom": 888.84375,
+      "font": "Sacramento, cursive"
+    },
+    {
+      "language": "en",
+      "width": 320,
+      "height": 844,
+      "termBottom": 922,
+      "explainBottom": 982,
+      "font": "Sacramento, cursive"
+    },
+    {
+      "language": "zh",
+      "width": 1440,
+      "height": 900,
+      "termBottom": 654.1875,
+      "explainBottom": 714.1875,
+      "font": "Slidefu, cursive"
+    },
+    {
+      "language": "zh",
+      "width": 1280,
+      "height": 720,
+      "termBottom": 630.65625,
+      "explainBottom": 690.65625,
+      "font": "Slidefu, cursive"
+    },
+    {
+      "language": "zh",
+      "width": 768,
+      "height": 1024,
+      "termBottom": 857.109375,
+      "explainBottom": 917.109375,
+      "font": "Slidefu, cursive"
+    },
+    {
+      "language": "zh",
+      "width": 390,
+      "height": 844,
+      "termBottom": 753.875,
+      "explainBottom": 813.875,
+      "font": "Slidefu, cursive"
+    },
+    {
+      "language": "zh",
+      "width": 320,
+      "height": 844,
+      "termBottom": 816,
+      "explainBottom": 876,
+      "font": "Slidefu, cursive"
+    }
+  ],
+  "performanceRuns": [
+    {
+      "lcp": null,
+      "cls": 0,
+      "domContentLoaded": 791.1000000238419,
+      "load": 939.1999999880791,
+      "responseEnd": 317.19999998807907,
+      "visibility": "hidden",
+      "paints": []
+    },
+    {
+      "lcp": null,
+      "cls": 0,
+      "domContentLoaded": 790,
+      "load": 931.8000000119209,
+      "responseEnd": 305.5,
+      "visibility": "hidden",
+      "paints": []
+    },
+    {
+      "lcp": null,
+      "cls": 0,
+      "domContentLoaded": 788,
+      "load": 942,
+      "responseEnd": 304.10000002384186,
+      "visibility": "hidden",
+      "paints": []
+    }
+  ],
+  "errors": []
+}
