@@ -111,14 +111,22 @@ async function main() {
     await cdp.close();
     console.log(`Browser smoke passed for ${routes.length + 3} routes.`);
   } finally {
-    browser.kill("SIGTERM");
-    await Promise.race([
-      new Promise((resolve) => browser.once("exit", resolve)),
-      delay(2_000),
-    ]);
+    await stopBrowser(browser);
     await new Promise((resolve) => server.close(resolve));
-    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
   }
+}
+
+async function stopBrowser(browser) {
+  if (browser.exitCode !== null || browser.signalCode !== null) return;
+
+  const exited = new Promise((resolve) => browser.once("exit", resolve));
+  browser.kill("SIGTERM");
+  await Promise.race([exited, delay(2_000)]);
+  if (browser.exitCode !== null || browser.signalCode !== null) return;
+
+  browser.kill("SIGKILL");
+  await Promise.race([exited, delay(2_000)]);
 }
 
 function findChrome() {
