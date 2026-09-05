@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 0–4（含 Phase 3.5）已通过 PR #8 合并到 `main`；Phase 4.5 的 CI 清理、Chrome 启动稳定性和最终记录已通过 PR #9–#12 合并。Pages deployment `6277161234` 已从 merge commit `157600e` 成功发布，自动验证、artifact 合并和线上关键路径/交互验收均通过；维护升级阶段至此完成。
+> 状态：Phase 0–4（含 Phase 3.5）已通过 PR #8 合并到 `main`；Phase 4.5 的 CI 清理、Chrome 启动稳定性和最终记录已通过 PR #9–#12 合并。后续 navbar 字体选择器修复已由 commit `740de38` 发布，GitHub Actions run `33945849908` 的 docs、notebooks 和 Pages deploy 全部成功；维护升级阶段至此完成，下一步进入 Phase 5A 主页设计探索。
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -421,12 +421,16 @@ Phase 3.5B 实施与验证记录：[`phase3.5/2026-09-04-home.md`](./phase3.5/20
 
 ### Phase 5：产品工作
 
-完成前四阶段后，再按独立功能推进：
+维护升级完成后，按独立产品 goal 推进：
 
-1. 主页视觉重做；
+1. **Phase 5A：主页视觉重做。** 先完成产品/内容审计、信息架构、三个创意方向、设计规格和最小可运行原型；用户确认方案后，再用独立 `/goal` 完成生产实现。完整交接、工具选择、停止点和验收标准见 [`phase5/homepage-design-plan.md`](./phase5/homepage-design-plan.md)。
 2. 工具页面信息架构与首批工具；
 3. chatbot UI；
 4. chatbot 独立后端、流式协议、限流和观测。
+
+Phase 5A 的产品目标是将主页构建为具有原创感的 Programming × AI showcase，并将 chatbot 设计为可引用、定位和强调页面内容的增强式导航层。Phase 5A 只定义交互并使用 mock adapter；真实模型调用、检索、密钥、限流和观测仍属于后续独立后端阶段。
+
+Phase 5A 当前状态：流程与边界已完成交接，创意方向尚未选择。下一步只执行 Phase 5A.0 审计；在用户确认目标受众、内容重点、代表项目与首要行动前，不修改正式主页。
 
 ## 7. 验证矩阵
 
