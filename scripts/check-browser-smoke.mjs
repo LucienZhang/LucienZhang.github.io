@@ -113,7 +113,7 @@ async function main() {
   } finally {
     await stopBrowser(browser);
     await new Promise((resolve) => server.close(resolve));
-    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
+    removeBrowserProfile(profile);
   }
 }
 
@@ -127,6 +127,15 @@ async function stopBrowser(browser) {
 
   browser.kill("SIGKILL");
   await Promise.race([exited, delay(2_000)]);
+}
+
+function removeBrowserProfile(profile) {
+  try {
+    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+  } catch (error) {
+    if (!["EBUSY", "ENOTEMPTY"].includes(error.code)) throw error;
+    console.warn(`Chrome profile cleanup deferred (${error.code}): ${profile}`);
+  }
 }
 
 function findChrome() {
