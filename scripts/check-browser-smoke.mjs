@@ -7,6 +7,7 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 let dist;
+let serveNotebookFixture = false;
 
 async function main() {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -62,12 +63,24 @@ async function main() {
       ["/ml/mnist.html", ".mnist canvas"],
       ["/misc/bim.html", ".bim-content canvas"],
       ["/programming/algorithms/knapsack.html", ".pseudo-wrapper .ps-root mjx-container[jax='SVG'] svg"],
-      ["/programming/prog-lang/basics.html", ".jupyter-content iframe"],
     ];
     for (const [route, selector] of routes) {
       await navigate(cdp, origin + route);
       await waitFor(cdp, `document.querySelector(${JSON.stringify(selector)}) !== null`, 10_000);
     }
+
+    await navigate(cdp, origin + "/programming/prog-lang/basics.html");
+    await waitFor(cdp, "document.querySelector('.jupyter-state button') !== null", 10_000);
+    serveNotebookFixture = true;
+    await cdp.send("Runtime.evaluate", {
+      expression: "document.querySelector('.jupyter-state button').click()",
+    });
+    await waitFor(
+      cdp,
+      "document.querySelector('.jupyter-content iframe')?.contentDocument"
+        + ".querySelector('[data-notebook-fixture]') !== null",
+      10_000,
+    );
 
     await navigate(cdp, origin + "/programming/prog-lang/overview.html");
     await waitFor(cdp, "document.querySelector('.tiobe .remote-state button') !== null", 10_000);
@@ -96,7 +109,7 @@ async function main() {
       `Unexpected runtime CDN requests:\n${forbiddenRemoteRequests.join("\n")}`,
     );
     await cdp.close();
-    console.log(`Browser smoke passed for ${routes.length + 2} routes.`);
+    console.log(`Browser smoke passed for ${routes.length + 3} routes.`);
   } finally {
     browser.kill("SIGTERM");
     await Promise.race([
@@ -123,6 +136,12 @@ function findChrome() {
 
 function serveDist(request, response) {
   const url = new URL(request.url, "http://localhost");
+  if (serveNotebookFixture && url.pathname.startsWith("/static/jupyter/nb/")) {
+    const body = "<!doctype html><html><body data-notebook-fixture>Notebook fixture</body></html>";
+    response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+    response.end(request.method === "HEAD" ? undefined : body);
+    return;
+  }
   let relativePath = decodeURIComponent(url.pathname).replace(/^\/+/, "");
   if (!relativePath || relativePath.endsWith("/")) relativePath += "index.html";
   const file = path.resolve(dist, relativePath);

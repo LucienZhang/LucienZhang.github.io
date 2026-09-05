@@ -13,11 +13,11 @@
         <button type="button" @click="retry">Retry</button>
       </div>
       <iframe
-        v-else
+        v-else-if="previewReady"
         :key="frameKey"
         frameborder="no"
         scrolling="no"
-        :src="'/static/jupyter/nb/' + htmlFilePath"
+        :src="previewUrl"
         @load="resizeIframe"
       ></iframe>
     </a-spin>
@@ -38,8 +38,15 @@ export default {
       htmlFilePath: this.filePath.replace(/\.ipynb$/, ".html"),
       frameKey: 0,
       loadTimer: null,
+      previewReady: false,
+      previewRequest: null,
       showBinderBadge: true,
     };
+  },
+  computed: {
+    previewUrl() {
+      return "/static/jupyter/nb/" + this.htmlFilePath;
+    },
   },
   methods: {
     resizeIframe(event) {
@@ -56,15 +63,50 @@ export default {
         this.clearLoadTimer();
       }
     },
-    retry() {
+    async preparePreview() {
       this.status = "loading";
-      this.frameKey += 1;
+      this.previewReady = false;
+      this.previewRequest?.abort();
+      const request = new AbortController();
+      this.previewRequest = request;
       this.startLoadTimer();
+
+      try {
+        const response = await window.fetch(this.previewUrl, {
+          method: "HEAD",
+          cache: "no-store",
+          signal: request.signal,
+        });
+        if (!response.ok) throw new Error(`Notebook preview returned HTTP ${response.status}.`);
+
+        const contentType = response.headers.get("content-type") ?? "";
+        if (contentType && !contentType.includes("text/html") && !contentType.includes("application/xhtml+xml")) {
+          throw new Error(`Notebook preview returned unexpected content type: ${contentType}.`);
+        }
+        if (this.previewRequest !== request) return;
+
+        this.previewRequest = null;
+        this.frameKey += 1;
+        this.previewReady = true;
+      } catch (error) {
+        if (error.name === "AbortError" || this.previewRequest !== request) return;
+        this.previewRequest = null;
+        console.warn("Failed to verify notebook preview:", error);
+        this.status = "error";
+        this.clearLoadTimer();
+      }
+    },
+    retry() {
+      this.preparePreview();
     },
     startLoadTimer() {
       this.clearLoadTimer();
       this.loadTimer = window.setTimeout(() => {
-        if (this.status === "loading") this.status = "error";
+        if (this.status === "loading") {
+          this.status = "error";
+          this.previewRequest?.abort();
+          this.previewRequest = null;
+        }
       }, 12_000);
     },
     clearLoadTimer() {
@@ -73,9 +115,10 @@ export default {
     },
   },
   mounted() {
-    this.startLoadTimer();
+    this.preparePreview();
   },
   beforeUnmount() {
+    this.previewRequest?.abort();
     this.clearLoadTimer();
   },
 };
