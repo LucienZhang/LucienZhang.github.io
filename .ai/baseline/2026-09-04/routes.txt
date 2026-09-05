@@ -43,8 +43,10 @@
 /programming/prog-lang/ood.html
 /programming/prog-lang/overview.html
 /programming/prog-lang/scope.html
+/tools/stock-screener.html
 /zh/index.html
 /zh/ml/mnist.html
 /zh/ml/overview.html
 /zh/projects/index.html
 /zh/projects/werewolf.html
+/zh/tools/stock-screener.html

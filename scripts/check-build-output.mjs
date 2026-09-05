@@ -59,7 +59,7 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verified ${requiredArtifacts.length} critical artifacts and the 50-route baseline.`);
+console.log(`Verified ${requiredArtifacts.length} critical artifacts and the route baseline.`);
 
 function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
