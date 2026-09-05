@@ -12,7 +12,7 @@
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 from typing import List
@@ -44,23 +44,20 @@ def quicksort(nums: List[int]) -> None:
     randomized_quicksort(nums, 0, len(nums) - 1)
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 
 ```
 
-:::
 
 ::::
 
@@ -80,7 +77,7 @@ Instead of recursing into both sides, as in quicksort, quickselect only recurses
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 from typing import List
@@ -117,23 +114,20 @@ def quickselect(nums: List[int], index: int) -> int:
     return randomized_quickselect(nums, 0, len(nums) - 1, index)
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 
 ```
 
-:::
 
 ::::
 
@@ -141,22 +135,19 @@ def quickselect(nums: List[int], index: int) -> int:
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/quicksort?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab java
+@tab java
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/quicksort-java?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab cpp
+@tab cpp
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/quicksort-cpp?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
 ::::

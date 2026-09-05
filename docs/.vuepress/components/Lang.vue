@@ -1,41 +1,53 @@
 <template>
   <div class="tiobe">
-    <p>The chart below shows the changes in the popularity of the top 10 programming languages in the last 20 years.</p>
-    <a-spin size="large" tip="Loading..." :spinning="chartOptions.series.length <= 0">
-      <div>
-        <highcharts v-if="chartOptions.series.length > 0" :options="chartOptions"></highcharts>
-      </div>
-    </a-spin>
-    <p>The table below shows the current top 20 most popular programming languages.</p>
-    <a-spin size="large" tip="Loading..." :spinning="!top20.tbody">
-      <div class="table-wrapper">
-        <table v-if="top20.tbody" class="table-top20">
-          <thead v-html="top20.thead"></thead>
-          <tbody>
-            <tr v-for="(row, index) in top20.tbody" :key="index" @click="onClickTableRow(row.link)">
-              <td>{{ row.now }}</td>
-              <td>{{ row.pre }}</td>
-              <td>
-                <img v-if="row.changeArrow.src" :src="getImageUrl(row.changeArrow.src)" :alt="row.changeArrow.alt">
-              </td>
-              <td class="td-top20">
-                <img :src="getImageUrl(row.langIcon.src)" :alt="row.langIcon.alt" :style="row.langIcon.style">
-              </td>
-              <td>{{ row.langName }}</td>
-              <td>{{ row.rating }}</td>
-              <td>{{ row.changePercentage }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </a-spin>
+    <div v-if="status === 'error' || status === 'empty'" class="remote-state" role="status">
+      <p>{{ errorMessage }}</p>
+      <button type="button" @click="loadData">Retry</button>
+    </div>
+    <template v-else>
+      <p>The chart below shows the changes in the popularity of the top 10 programming languages in the last 20 years.</p>
+      <a-spin size="large" tip="Loading..." :spinning="status === 'loading'">
+        <div>
+          <highcharts v-if="status === 'success'" :options="chartOptions"></highcharts>
+        </div>
+      </a-spin>
+      <p>The table below shows the current top 20 most popular programming languages.</p>
+      <a-spin size="large" tip="Loading..." :spinning="status === 'loading'">
+        <div class="table-wrapper">
+          <table v-if="status === 'success'" class="table-top20">
+            <thead>
+              <tr>
+                <th v-for="(heading, index) in top20.thead" :key="index" :colspan="heading.colspan">
+                  {{ heading.text }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, index) in top20.tbody" :key="index" @click="onClickTableRow(row.link)">
+                <td>{{ row.now }}</td>
+                <td>{{ row.pre }}</td>
+                <td>
+                  <img v-if="row.changeArrow.src" :src="getImageUrl(row.changeArrow.src)" :alt="row.changeArrow.alt">
+                </td>
+                <td class="td-top20">
+                  <img :src="getImageUrl(row.langIcon.src)" :alt="row.langIcon.alt">
+                </td>
+                <td>{{ row.langName }}</td>
+                <td>{{ row.rating }}</td>
+                <td>{{ row.changePercentage }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </a-spin>
+    </template>
   </div>
 </template>
 
 <script>
 import { Chart } from 'highcharts-vue';
-import { axiosCorsProxy } from '../axios-instances';
-import * as cheerio from 'cheerio';
+import { requestTiobeIndex } from '../remote-data.mjs';
+import { parseTiobeHtml } from '../tiobe-parser.mjs';
 
 export default {
   components: {
@@ -107,73 +119,66 @@ export default {
         series: []
       },
       top20: {
-        thead: null,
-        tbody: null
+        thead: [],
+        tbody: []
       },
-      imageUrls: {}
+      imageUrls: {},
+      status: "loading",
+      errorMessage: "",
+      requestController: null,
+      isUnmounted: false
     };
   },
   methods: {
     onClickTableRow(link) {
-      window.open("https://www.tiobe.com/tiobe-index/" + link + "/", "_blank");
+      window.open(
+        "https://www.tiobe.com/tiobe-index/" + link + "/",
+        "_blank",
+        "noopener,noreferrer",
+      );
     },
     getImageUrl(path) {
       return this.imageUrls[`./assets/images/tiobe/${path.split('/').at(-1)}`];
+    },
+    async loadData() {
+      this.requestController?.abort();
+      const controller = new AbortController();
+      this.requestController = controller;
+      this.status = "loading";
+      this.errorMessage = "";
+      this.chartOptions.series = [];
+      this.top20 = { thead: [], tbody: [] };
+
+      try {
+        const response = await requestTiobeIndex(controller.signal);
+        if (this.isUnmounted || controller !== this.requestController) return;
+
+        const html = response?.data?.text;
+        if (typeof html !== "string" || html.trim() === "") {
+          this.status = "empty";
+          this.errorMessage = "TIOBE returned no data. Please try again later.";
+          return;
+        }
+
+        const parsed = parseTiobeHtml(html);
+        this.chartOptions.series = parsed.series;
+        this.top20 = parsed.top20;
+        this.status = "success";
+      } catch (error) {
+        if (controller.signal.aborted || this.isUnmounted) return;
+        console.warn("Failed to load TIOBE data:", error);
+        this.status = "error";
+        this.errorMessage = "TIOBE data is temporarily unavailable.";
+      }
     }
   },
   beforeMount() {
-    axiosCorsProxy
-      .post("", { url: "https://www.tiobe.com/tiobe-index/", method: "GET" }) // To get rid of CORS error
-      .then(res => {
-        let $ = cheerio.load(res.data.text);
-        // highcharts
-        let scripts = $("script").get();
-        let testRe = /\$\('#container'\)\.highcharts/;
-        let matchRe = /series: (\[\n\s*.*\n\s*\])/;
-        for (const script of scripts) {
-          if (
-            script.children.length === 1 &&
-            testRe.test(script.children[0].data)
-          ) {
-            this.chartOptions.series = eval(
-              script.children[0].data.match(matchRe)[1]
-            );
-            break;
-          }
-        }
-
-        // table top 20
-        let table = $("#top20");
-        this.top20.thead = table.find("thead").html();
-        let tbody = [];
-        for (const tr of table.find("tbody > tr").get()) {
-          let row = {
-            now: tr.children[0].children[0].data,
-            pre: tr.children[1].children[0].data,
-            changeArrow: tr.children[2].children.length === 1 ? tr.children[2].children[0].attribs : {},
-            langIcon: tr.children[3].children[0].attribs,
-            langName: tr.children[4].children[0].data,
-            rating: tr.children[5].children[0].data,
-            changePercentage: tr.children[6].children[0].data,
-            link: encodeURIComponent(
-              tr.children[4].children[0].data
-                .replace("/", "-")
-                .replace(".", "dot")
-                .replace(/\s/g, "-")
-                .toLowerCase()
-                .replace("#", "sharp")
-                .replace(/[+]/g, "plus")
-            )
-          };
-          tbody.push(row);
-        }
-        this.top20.tbody = tbody;
-      })
-      .catch(res => {
-        console.log(res);
-      });
-
     this.imageUrls = import.meta.glob('./assets/images/tiobe/*.png', { eager: true, import: 'default' });
+    this.loadData();
+  },
+  beforeUnmount() {
+    this.isUnmounted = true;
+    this.requestController?.abort();
   },
 };
 </script>
@@ -192,6 +197,22 @@ export default {
     }
 
     -ms-overflow-style: none;
+  }
+
+  .remote-state {
+    padding: 1rem;
+    border: 1px solid #d8dee4;
+    border-radius: 4px;
+    text-align: center;
+
+    button {
+      padding: 0.4rem 0.9rem;
+      border: 1px solid #3eaf7c;
+      border-radius: 4px;
+      background: transparent;
+      color: #2c8f68;
+      cursor: pointer;
+    }
   }
 
   table.table-top20 {

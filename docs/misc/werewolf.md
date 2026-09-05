@@ -24,11 +24,10 @@ class Item(BaseModel):
 
 :::: tabs
 
-::: tab title
+@tab title
 **markdown content**
-:::
 
-::: tab javascript
+@tab javascript
 
 ```javascript
 () => {
@@ -36,7 +35,6 @@ class Item(BaseModel):
 };
 ```
 
-:::
 
 ::::
 

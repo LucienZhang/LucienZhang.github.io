@@ -1,20 +1,31 @@
 <template>
   <div class="mnist">
     <canvas ref="mnist-canvas" id="mnist-canvas"></canvas>
-    <div class="container-fluid">
-      <div class="row text-center">
-        <div class="col-2 col-btn">
-          <button class="btn btn-info float-left" @click="clear">{{ clearBtnName }}</button>
+    <div class="mnist-controls">
+      <div class="mnist-controls__row">
+        <div class="mnist-controls__action mnist-controls__action--start">
+          <button type="button" class="mnist-button mnist-button--clear" @click="clear">{{ clearBtnName }}</button>
         </div>
-        <div class="col-8">
+        <div class="mnist-controls__result">
           <div v-if="result !== ''">
             <p>{{ resultTag }}: {{ result }}</p>
             <p>{{ probTag }}: {{ prob }}</p>
           </div>
         </div>
-        <div class="col-2 col-btn">
-          <button class="btn btn-success float-right" @click="recognize">{{ recognizeBtnName }}</button>
+        <div class="mnist-controls__action mnist-controls__action--end">
+          <button
+            type="button"
+            class="mnist-button mnist-button--recognize"
+            :disabled="isRecognizing"
+            @click="recognize"
+          >
+            {{ isRecognizing ? recognizingBtnName : recognizeBtnName }}
+          </button>
         </div>
+      </div>
+      <div v-if="requestError" class="mnist-error" role="status">
+        <span>{{ requestError }}</span>
+        <button type="button" class="mnist-retry" @click="retry">{{ retryBtnName }}</button>
       </div>
     </div>
   </div>
@@ -24,7 +35,6 @@
 import SignaturePad from "signature_pad";
 import { axiosMl } from "../axios-instances";
 import { message } from "ant-design-vue";
-import "ant-design-vue/lib/message/style/css";
 
 export default {
   props: {
@@ -52,27 +62,54 @@ export default {
       type: String,
       required: false,
       default: "Please write down a digit!"
+    },
+    recognizingBtnName: {
+      type: String,
+      default: "Recognizing..."
+    },
+    retryBtnName: {
+      type: String,
+      default: "Retry"
+    },
+    errorMsg: {
+      type: String,
+      default: "Recognition is temporarily unavailable."
     }
   },
   data() {
     return {
       result: "",
       prob: "",
-      mnistPad: null
+      mnistPad: null,
+      isRecognizing: false,
+      requestError: "",
+      lastImage: "",
+      requestController: null,
+      resizeHandler: null,
+      previewTimer: null,
+      isUnmounted: false
     };
   },
   methods: {
     clear() {
       this.result = "";
       this.prob = "";
-      this.mnistPad.clear();
+      this.requestError = "";
+      this.lastImage = "";
+      this.requestController?.abort();
+      this.isRecognizing = false;
+      this.mnistPad?.clear();
     },
     recognize() {
       if (this.mnistPad.isEmpty()) {
         message.warning(this.warningMsg);
       } else {
+        this.requestError = "";
         this.getMNISTGridBySize(__APP_DEBUG__, 28, this.img2text);
       }
+    },
+    retry() {
+      if (this.lastImage) this.img2text(this.lastImage);
     },
     getArea() {
       let xs = [];
@@ -150,9 +187,10 @@ export default {
 
       let img = new Image();
 
-      img.onload = function () {
+      img.onload = () => {
+        if (this.isUnmounted) return;
         ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, grid.w, grid.h);
+        ctx.fillRect(0, 0, size, size);
 
         ctx.drawImage(img, grid.x, grid.y, grid.w, grid.h, 0, 0, size, size);
 
@@ -171,7 +209,7 @@ export default {
 
         if (isDev) {
           document.body.append(canvas);
-          setTimeout(function () {
+          this.previewTimer = window.setTimeout(() => {
             canvas.remove();
           }, 2000);
         }
@@ -179,23 +217,36 @@ export default {
 
       img.src = this.mnistPad.toDataURL();
     },
-    img2text(b64img) {
-      b64img = b64img.split(",")[1]
-      axiosMl
-        .post("/mnist", { "img": b64img })
-        .then(res => {
-          if (res.status != 200) {
-            message.error("未知错误");
-            console.log(res);
-          } else {
-            this.result = res.data.result;
-            this.prob = res.data.prob;
-          }
-        })
-        .catch(res => {
-          message.error("未知错误");
-          console.log(res);
-        });
+    async img2text(dataUrl) {
+      this.requestController?.abort();
+      const controller = new AbortController();
+      this.requestController = controller;
+      this.lastImage = dataUrl;
+      this.isRecognizing = true;
+      this.requestError = "";
+
+      try {
+        const response = await axiosMl.post(
+          "/mnist",
+          { img: dataUrl.split(",")[1] },
+          { signal: controller.signal },
+        );
+        if (this.isUnmounted || controller !== this.requestController) return;
+        if (response.data?.result == null || response.data?.prob == null) {
+          throw new Error("MNIST response is missing recognition data.");
+        }
+        this.result = response.data.result;
+        this.prob = response.data.prob;
+      } catch (error) {
+        if (controller.signal.aborted || this.isUnmounted) return;
+        console.warn("Failed to recognize MNIST image:", error);
+        this.requestError = this.errorMsg;
+        message.error(this.errorMsg);
+      } finally {
+        if (!this.isUnmounted && controller === this.requestController) {
+          this.isRecognizing = false;
+        }
+      }
     }
   },
   mounted() {
@@ -208,45 +259,134 @@ export default {
 
     this.mnistPad = mnistPad;
 
-    function resizeCanvas() {
+    this.resizeHandler = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
       canvas.getContext("2d").scale(1, 1);
       mnistPad.clear(); // otherwise isEmpty() might return incorrect value
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+    };
+    window.addEventListener("resize", this.resizeHandler);
+    this.resizeHandler();
+  },
+  beforeUnmount() {
+    this.isUnmounted = true;
+    this.requestController?.abort();
+    if (this.resizeHandler) window.removeEventListener("resize", this.resizeHandler);
+    if (this.previewTimer) window.clearTimeout(this.previewTimer);
+    this.mnistPad?.off();
   }
 };
 </script>
 
-<style lang="scss" scoped>
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/mixins";
-@import "bootstrap/scss/grid";
-@import "bootstrap/scss/buttons";
-@import "bootstrap/scss/utilities";
-
+<style scoped>
 .mnist {
-  #mnist-canvas {
-    width: 100%;
-    height: 400px;
-    max-width: 100%;
-    max-height: 100%;
-    border: 1px solid #d3d3d3;
-  }
+  width: 100%;
+}
 
-  .row {
-    height: 55px;
-  }
+#mnist-canvas {
+  width: 100%;
+  height: 400px;
+  max-width: 100%;
+  max-height: 100%;
+  border: 1px solid #d3d3d3;
+}
 
-  p {
-    margin: 0;
-  }
+.mnist-controls {
+  width: 100%;
+}
 
-  .col-btn {
-    padding: 0;
-  }
+.mnist-controls__row {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 55px;
+  text-align: center;
+}
+
+.mnist-controls__action {
+  display: flex;
+  flex: 0 0 16.666667%;
+  max-width: 16.666667%;
+}
+
+.mnist-controls__action--start {
+  justify-content: flex-start;
+}
+
+.mnist-controls__action--end {
+  justify-content: flex-end;
+}
+
+.mnist-controls__result {
+  flex: 0 0 66.666667%;
+  max-width: 66.666667%;
+}
+
+.mnist-controls__result p {
+  margin: 0;
+}
+
+.mnist-button {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.mnist-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.mnist-button--clear {
+  border-color: #17a2b8;
+  background-color: #17a2b8;
+}
+
+.mnist-button--clear:hover {
+  border-color: #117a8b;
+  background-color: #138496;
+}
+
+.mnist-button--recognize {
+  border-color: #28a745;
+  background-color: #28a745;
+}
+
+.mnist-button--recognize:hover {
+  border-color: #1e7e34;
+  background-color: #218838;
+}
+
+.mnist-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.mnist-error {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  color: #c0392b;
+}
+
+.mnist-retry {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
 </style>

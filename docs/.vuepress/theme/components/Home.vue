@@ -1,7 +1,7 @@
 <template>
   <main class="home" aria-labelledby="main-title">
 
-    <body :class="{ 'is-preload': isPreload, 'is-touch': isTouchDevice }">
+    <div class="home-shell" :class="{ 'is-preload': isPreload, 'is-touch': isTouchDevice }">
       <!-- Header -->
       <header id="header">
         <div class="inner">
@@ -200,8 +200,8 @@
           </div>
         </footer>
       </ClientOnly>
-    </body>
-    <a-modal :visible="qrcode" :centered="true" :closable="false" :footer="null" @cancel="qrcode = false">
+    </div>
+    <a-modal :open="qrcode" :centered="true" :closable="false" :footer="null" @cancel="qrcode = false">
       <div class="square">
         <img src="./assets/images/wechat.jpg" alt="QR Code" style="width: 100%; height: 100%;" />
       </div>
@@ -222,7 +222,10 @@ export default {
       isPreload: true,
       largeScreen: false,
       bp: false,
-      isTouchDevice: false
+      breakpointHandlers: null,
+      preloadTimer: null,
+      isTouchDevice: false,
+      isUnmounted: false
     };
   },
   computed: {
@@ -270,11 +273,14 @@ export default {
 
     that.restartTyped();
 
-    setTimeout(() => {
+    this.preloadTimer = setTimeout(() => {
       that.isPreload = false;
     }, 100);
 
     import("breakpoints-js").then(Breakpoints => {
+      if (that.isUnmounted) {
+        return;
+      }
       that.bp = Breakpoints = Breakpoints.default;
       Breakpoints({
         small: {
@@ -287,16 +293,16 @@ export default {
         }
       });
 
-      Breakpoints.get("medium").on({
-        enter: function () {
+      that.breakpointHandlers = {
+        mediumEnter: function () {
           that.largeScreen = true;
-        }
-      });
-      Breakpoints.get("small").on({
-        enter: function () {
+        },
+        smallEnter: function () {
           that.largeScreen = false;
         }
-      });
+      };
+      Breakpoints.get("medium").on("enter", that.breakpointHandlers.mediumEnter);
+      Breakpoints.get("small").on("enter", that.breakpointHandlers.smallEnter);
     });
     //    $window.on("load", function() {
     //   $("#two").poptrox({
@@ -321,10 +327,18 @@ export default {
       this.restartTyped();
     }
   },
-  beforeDestroy() {
-    this.typed.destroy();
-    this.bp.off("medium");
-    this.bp.off("small"); // this may affect other usage
+  beforeUnmount() {
+    this.isUnmounted = true;
+    if (this.preloadTimer) {
+      clearTimeout(this.preloadTimer);
+    }
+    if (this.typed) {
+      this.typed.destroy();
+    }
+    if (this.bp && this.breakpointHandlers) {
+      this.bp.off("medium", "enter", this.breakpointHandlers.mediumEnter);
+      this.bp.off("small", "enter", this.breakpointHandlers.smallEnter);
+    }
   }
 };
 </script>

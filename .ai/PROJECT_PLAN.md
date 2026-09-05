@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 1 本地实施与验证完成，等待 GitHub Pages 线上验收
+> 状态：Phase 3 已完成、通过用户审阅并提交；push、部署与线上验收待完成
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -330,7 +330,7 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 - [x] 将 CI Node 从 18 升到满足 VuePress engine 的 22.x。
 - [x] 更新 checkout/setup-python/setup-node/artifact/Pages actions。
 - [x] 验证两个 artifact 下载后仍能正确合并到最终 Pages artifact。
-- [ ] 在实际 Pages 环境验证 custom domain、base path、静态 WASM、IFC 和 notebook 路径。
+- [x] 在实际 Pages 环境验证 custom domain、base path、静态 WASM、IFC 和 notebook 路径。
 
 完成条件：仍使用旧 VuePress，但新 CI 能成功发布；这样可将 CI 问题和框架升级问题分离。
 
@@ -338,45 +338,73 @@ Bootstrap 4 只在 `DemoMnist.vue` 引入 grid、buttons 和 utilities。迁移 
 
 目标：证明新版核心链可承载现有站点，不在该阶段改视觉或业务行为。
 
-- [ ] 实施当天重新查询所有目标包的 dist-tag、peerDependencies、engines。
-- [ ] 选择一致矩阵；若生态仍 peer `rc.30`，使用上文 `rc.30` 方案。
-- [ ] 移除 `vuepress-vite`，显式安装 `vuepress`、`@vuepress/bundler-vite`、`@vuepress/theme-default`。
-- [ ] 所有 RC 根依赖使用精确版本。
-- [ ] 用 `vuepress` 导入 `defineUserConfig`。
-- [ ] 替换旧 code-copy、tabs 和 md-enhance 插件。
-- [ ] 处理 Sass peer dependency。
-- [ ] 重新生成 `package-lock.json`，不手工编辑 lockfile。
-- [ ] 检查和删除已失效的 Babel runtime patch。
-- [ ] 执行 `npm ls`，确认没有混合 VuePress core/client。
-- [ ] 修复 Vite 8/Rolldown 下的 SSR、external、CJS interop 问题。
+- [x] 实施当天重新查询所有目标包的 dist-tag、peerDependencies、engines。
+- [x] 选择一致矩阵；生态仍 peer `rc.30`，因此采用 core/bundler `rc.30` 方案。
+- [x] 移除 `vuepress-vite`，显式安装 `vuepress`、`@vuepress/bundler-vite`、`@vuepress/theme-default`。
+- [x] 所有 RC 根依赖使用精确版本。
+- [x] 用 `vuepress` 导入 `defineUserConfig`。
+- [x] 替换旧 code-copy、tabs 和 md-enhance 插件。
+- [x] 处理 Sass peer dependency。
+- [x] 重新生成 `package-lock.json`，不手工编辑 lockfile。
+- [x] 检查并删除已证明不再需要的 Babel runtime patch。
+- [x] 执行 `npm ls`，确认没有混合 VuePress core/client。
+- [x] 验证 Vite 8/Rolldown 下的 SSR、external、CJS interop 与关键组件加载。
 
 完成条件：50 个页面构建成功；所有关键组件至少能够加载；依赖树一致；没有新 hydration 错误。
+
+验收状态：已于 2026-09-04 由用户完成本地验证并确认通过。Phase 2 已作为独立提交保存，并在 push、部署后通过线上验收。
 
 ### Phase 3：UI 依赖收敛
 
 目标：形成“自定义主页 + Ant Design Vue 工具控件”的清晰边界。
 
-- [ ] 将 Bootstrap 布局从 `DemoMnist.vue` 改为局部 CSS，并删除 Bootstrap。
-- [ ] 升级 Ant Design Vue v4。
-- [ ] 调整 Modal `visible -> open`、message 样式和 SSR 注入。
-- [ ] 升级与 Vite 8 兼容的 `unplugin-vue-components`。
-- [ ] 验证 Modal、Spin、message、中文和英文页面。
-- [ ] 引入少量 design tokens：颜色、字体、间距、圆角、阴影、动效时长。
+- [x] 将 Bootstrap 布局从 `DemoMnist.vue` 改为局部 CSS，并删除 Bootstrap。
+- [x] 升级 Ant Design Vue v4。
+- [x] 调整 Modal `visible -> open`、message 样式和 SSR 注入。
+- [x] 升级与 Vite 8/Rolldown 兼容的 `unplugin-vue-components`。
+- [x] 验证 Modal、Spin、message、中文和英文页面。
+- [x] 明确样式边界：本阶段局部保留现有视觉值，不提前建立全站 design tokens；全站 tokens 随 Phase 5 视觉设计确定。
 
 完成条件：UI 行为无回归；首页不被 Ant Design 默认视觉接管；Bootstrap 完全移除。
+
+实施与验证记录：[`phase3/2026-09-04.md`](./phase3/2026-09-04.md)。用户已确认本地验证结果，Phase 3 已提交为 `660d116 chore: converge ui dependencies`，并在后续确认已 push。
+
+### Phase 3.5：升级后兼容收尾
+
+目标：在核心链和 UI 依赖升级稳定后，删除 Phase 2 的临时内容兼容层，并解决已确认的首页 HTML/hydration 问题。该阶段不进行主页视觉重做。
+
+为避免把 21 个 Markdown 文件的机械迁移和自定义首页结构修复混入同一审阅单元，Phase 3.5 按两个 goal、两个独立提交执行：
+
+1. **Phase 3.5A — 官方 tabs 语法迁移：** 完成前 3 项，只修改 tabs 源码、兼容层、验证记录和必要配置。
+2. **Phase 3.5B — 首页 HTML/hydration 修复：** 在 3.5A 验收并提交后完成后 3 项，不改变现有主页视觉。
+
+- [x] 将现有 21 个 Markdown 文件中的 43 组 `:::: tabs` / `::: tab` 旧语法迁移为官方 `:::: tabs` / `@tab` 语法。
+- [x] 删除 `docs/.vuepress/markdown/legacyTabs.ts` 及其配置注册，不再在编译时改写文章源码。
+- [x] 确认生产输出仍包含恰好 43 个 `.vp-tabs`，并验证 tab 切换、copy 和代码高亮。
+- [x] 将自定义 `Home.vue` 中嵌套于主题 `<main>` 下的 `<body>` 改为合法组件根节点，并迁移依赖该元素的 class、CSS 和生命周期行为。
+- [x] 消除 `/` 与 `/zh/` 已知的 hydration mismatch，同时回归 Typed 动画、二维码 Modal 和移动端布局。
+- [x] 保持现有视觉与业务行为，不顺带开始 Phase 5 的主页设计。
+
+完成条件：50 个页面构建成功；文章中不再存在 snippetors tab 语法；`legacyTabs` 兼容层完全删除；开发环境不再报告 `<body> cannot be child of <main>`；两个首页不再出现已知 hydration mismatch；tabs 与首页交互无回归。
+
+Phase 3.5A 实施与验证记录：[`phase3.5/2026-09-04-tabs.md`](./phase3.5/2026-09-04-tabs.md)。21 个文件 / 43 组 / 111 个 tab item 已完成官方语法迁移，兼容层已删除，50 页构建及生产 Shiki、开发 Prism、tabs/copy/Jupyter 浏览器回归均通过；已独立提交为 `17a1120 refactor: migrate markdown tabs to official syntax`。
+
+Phase 3.5B 实施与验证记录：[`phase3.5/2026-09-04-home.md`](./phase3.5/2026-09-04-home.md)。中英文首页已改为合法 `.home-shell`，首次 hydration 捕获为零 warning/error，开发环境不再报告非法 body；桌面与 390px 视觉、Typed、Modal、locale、Phase 3 UI 和 43 组 tabs 回归均通过。Phase 3.5 的两个 goal 已完成，3.5B 由独立提交 `fix: repair home markup and hydration` 保存。
 
 ### Phase 4：安全与稳定性清理
 
 目标：在新增工具和 chatbot 前清除已知高风险实现。
 
-- [ ] 删除 `Lang.vue` 中的 `eval`。
-- [ ] 为所有远程请求增加 timeout、loading、empty、error、retry 状态。
-- [ ] 检查 CORS proxy 的 allowlist、请求方法、header/cookie 转发边界。
-- [ ] 为 LeetCode/TIOBE 等第三方集成设计可接受的失效表现。
-- [ ] 为组件补充 unmount 资源清理。
-- [ ] 增加内部链接检查和最小浏览器 smoke test。
+- [x] 删除 `Lang.vue` 中的 `eval`，同时删除远程 table header 的 `v-html`。
+- [x] 为组件主动发起的远程请求增加 timeout、loading、empty、error、retry 状态。
+- [x] 检查 CORS proxy 的 allowlist、请求方法、header/cookie 转发边界；前端已收敛为固定业务函数，后端强制策略需在其独立仓库复核。
+- [x] 为 LeetCode/TIOBE 等第三方集成设计可接受的失效表现。
+- [x] 为组件补充 unmount 资源清理。
+- [x] 保留内部链接检查，并增加不引入新依赖的最小浏览器 smoke test。
 
 完成条件：第三方服务失效不会造成无限 loading；浏览器不执行代理返回的远程脚本。
+
+实施与验证记录：[`phase4/2026-09-04.md`](./phase4/2026-09-04.md)。TIOBE 已迁移到有限 grammar parser，LeetCode 远程字段已校验/转义，所有组件主动请求均有 12 秒 timeout、明确失败态、Retry 和卸载清理；7 路由 Chromium smoke 会主动屏蔽代理域名并验证失败收敛。前端 CORS proxy 调用面已固定，但真正的 SSRF、redirect、DNS、header/cookie 和大小限制仍必须由不在本仓库内的 proxy 后端强制执行。Phase 4 已由独立提交 `fix: remove remote script evaluation` 保存。
 
 ### Phase 5：产品工作
 
@@ -432,7 +460,8 @@ git diff --check
 4. `chore: replace legacy markdown plugins`
 5. `refactor: remove bootstrap from mnist demo`
 6. `chore: upgrade ant design vue`
-7. `fix: remove remote script evaluation`
+7. `refactor: migrate tabs and repair home hydration`
+8. `fix: remove remote script evaluation`
 
 任一阶段失败时回退该阶段，而不是通过继续升级更多无关包来碰运气。
 

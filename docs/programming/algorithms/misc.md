@@ -2,18 +2,15 @@
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <Jupyter filePath="algorithms/misc/python.ipynb" />
 
-:::
 
-::: tab java
+@tab java
 
-:::
 
-::: tab scala
+@tab scala
 
-:::
 
 ::::

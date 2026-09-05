@@ -14,7 +14,7 @@ Find the index of $x$ in $nums$, where all elements are unique.
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 def binary_search_unique(nums: List[int], x: int, left=None,
@@ -35,17 +35,15 @@ def binary_search_unique(nums: List[int], x: int, left=None,
     return -1
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 int binary_search_unique(vector<int> nums, int x, int left = -1, int right = -1) {
@@ -69,7 +67,6 @@ int binary_search_unique(vector<int> nums, int x, int left = -1, int right = -1)
 }
 ```
 
-:::
 
 ::::
 
@@ -79,7 +76,7 @@ Locate the insertion point for $x$ in $nums$ to maintain sorted order. If $x$ is
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 def binary_search_left(nums: List[int], x: int, left=None, right=None) -> int:
@@ -99,17 +96,15 @@ def binary_search_left(nums: List[int], x: int, left=None, right=None) -> int:
     return left
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 int binary_search_left(vector<int> nums, int x, int left = -1, int right = -1) {
@@ -131,7 +126,6 @@ int binary_search_left(vector<int> nums, int x, int left = -1, int right = -1) {
 }
 ```
 
-:::
 
 ::::
 
@@ -141,7 +135,7 @@ Locate the insertion point for $x$ in $nums$ to maintain sorted order. If $x$ is
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 def binary_search_right(nums: List[int], x: int, left=None, right=None) -> int:
@@ -161,17 +155,15 @@ def binary_search_right(nums: List[int], x: int, left=None, right=None) -> int:
     return left
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 ```cpp
 int binary_search_right(vector<int> nums, int x, int left = -1, int right = -1) {
@@ -193,7 +185,6 @@ int binary_search_right(vector<int> nums, int x, int left = -1, int right = -1) 
 }
 ```
 
-:::
 
 ::::
 
@@ -201,24 +192,21 @@ int binary_search_right(vector<int> nums, int x, int left = -1, int right = -1) 
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/binary-search?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
-::: tab cpp
+@tab cpp
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/binary-search-cpp?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
 ::::

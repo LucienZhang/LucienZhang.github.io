@@ -2,19 +2,17 @@
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <Jupyter filePath="basics/python.ipynb" />
 
-:::
 
-::: tab java
+@tab java
 
 <Jupyter filePath="basics/java.ipynb" />
 
-:::
 
-::: tab scala
+@tab scala
 
 | ![Unified Types Diagram of Scala](@assets/img/scala/unified-types-diagram.svg) |
 | :----------------------------------------------------------------------------: |
@@ -24,6 +22,5 @@
 
 <Jupyter filePath="basics/scala.ipynb" />
 
-:::
 
 ::::

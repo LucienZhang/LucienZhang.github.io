@@ -2,22 +2,19 @@
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <Jupyter filePath="exceptions/python.ipynb" />
 
-:::
 
-::: tab java
+@tab java
 
 <Jupyter filePath="exceptions/java.ipynb" />
 
-:::
 
-::: tab scala
+@tab scala
 
 <Jupyter filePath="exceptions/scala.ipynb" />
 
-:::
 
 ::::

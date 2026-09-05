@@ -28,7 +28,7 @@ for an array of length n, we need 2n space to store the segment tree, which cont
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 from typing import List
@@ -79,9 +79,8 @@ class SegmentTree(object):
         return res
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 class SegmentTree {
@@ -130,7 +129,6 @@ class SegmentTree {
 }
 ```
 
-:::
 
 ::::
 
@@ -149,7 +147,7 @@ for an array of length n, we need 2n space to store the segment tree, which cont
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 from typing import List
@@ -266,9 +264,8 @@ class SegmentTreeTopDown(object):
         return node_query(1)
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 class SegmentTreeTopDown {
@@ -405,7 +402,6 @@ class SegmentTreeTopDown {
 }
 ```
 
-:::
 
 ::::
 
@@ -413,16 +409,14 @@ class SegmentTreeTopDown {
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/segment-tree?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab java
+@tab java
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/segment-tree-java?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
 ::::

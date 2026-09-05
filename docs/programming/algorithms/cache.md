@@ -14,7 +14,7 @@ Least Recently Used
 
 :::: tabs
 
-::: tab python
+@tab python
 
 Implemented by OrderedDict
 
@@ -40,9 +40,8 @@ class LRUCache(OrderedDict):
             self.popitem(last=False)
 ```
 
-:::
 
-::: tab java
+@tab java
 
 Implemented by LinkedHashMap
 
@@ -50,7 +49,6 @@ Implemented by LinkedHashMap
 
 ```
 
-:::
 
 ::::
 
@@ -58,7 +56,7 @@ Implemented by LinkedHashMap
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 class LRUNode(object):
@@ -125,15 +123,13 @@ class LRUCache2(object):
                 self.pop_first()
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
 ::::
 
@@ -149,7 +145,7 @@ Least Frequently Used
 
 :::: tabs
 
-::: tab python
+@tab python
 
 ```py
 class LFUNode(object):
@@ -229,15 +225,13 @@ class LFUCache(object):
             self.lists[1].append(node)
 ```
 
-:::
 
-::: tab java
+@tab java
 
 ```java
 
 ```
 
-:::
 
 ::::
 
@@ -245,14 +239,12 @@ class LFUCache(object):
 
 :::: tabs
 
-::: tab python
+@tab python
 
 <iframe height="600px" width="100%" src="https://repl.it/@LucienZhang/cache?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals" loading="lazy"></iframe>
 
-:::
 
-::: tab java
+@tab java
 
-:::
 
 ::::
