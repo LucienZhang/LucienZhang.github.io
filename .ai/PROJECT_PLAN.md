@@ -1,6 +1,6 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 0–4（含 Phase 3.5）已通过 PR #8 合并到 `main`。合并后的首次 Pages run 因浏览器 smoke 清理临时目录的竞态失败；所有功能断言与 notebooks job 均已通过，Phase 4.5 正在修复该 CI 收尾问题并等待重新部署验收。
+> 状态：Phase 0–4（含 Phase 3.5）已通过 PR #8 合并到 `main`。Phase 4.5 的首次清理修复已通过 PR #9 合并，但 Ubuntu 上的 Chrome 辅助进程仍会造成暂态 `ENOTEMPTY`；所有功能断言与 notebooks job 均已通过，当前正在修正清理失败的判定边界并等待重新部署验收。
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -412,7 +412,7 @@ Phase 3.5B 实施与验证记录：[`phase3.5/2026-09-04-home.md`](./phase3.5/20
 
 - [x] 从 PR #8 merge commit 建立独立收尾分支。
 - [x] 检查合并后的 Actions run，定位 docs job 在全部 smoke 断言通过后的 Chrome profile 清理竞态。
-- [x] 修复浏览器进程回收，并连续运行三次 smoke 验证清理稳定性。
+- [x] 修复浏览器进程回收；对 Chrome 辅助进程造成的 `ENOTEMPTY`/`EBUSY` 临时 profile 清理竞态降级为 warning，其他清理错误仍会失败。
 - [x] 复核 README 的公开定位，并将技术维护细节保留在 `.ai/`；更新本计划的阶段状态、已解决事项与延期边界。
 - [x] 记录当前线上首页、中文首页、notebook、WASM、IFC 与 404 响应基线。
 - [ ] 将修复合入 `main` 后重新运行 Pages workflow，并完成新部署的线上验收。
