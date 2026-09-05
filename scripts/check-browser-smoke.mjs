@@ -69,13 +69,25 @@ async function main() {
       await waitFor(cdp, `document.querySelector(${JSON.stringify(selector)}) !== null`, 10_000);
     }
 
-    for (const [route, selector] of [
-      ["/programming/prog-lang/overview.html", ".tiobe .remote-state button"],
-      ["/programming/algorithms/overview.html", ".leetcode .remote-state button"],
-    ]) {
-      await navigate(cdp, origin + route);
-      await waitFor(cdp, `document.querySelector(${JSON.stringify(selector)}) !== null`, 10_000);
-    }
+    await navigate(cdp, origin + "/programming/prog-lang/overview.html");
+    await waitFor(cdp, "document.querySelector('.tiobe .remote-state button') !== null", 10_000);
+
+    await cdp.send("Network.setBlockedURLs", {
+      urls: ["*api.ziliang.ninja*", "*static/js/d3.js*", "*static/js/nv.d3.js*"],
+    });
+    await navigate(cdp, origin + "/programming/algorithms/overview.html");
+    await waitFor(cdp, "document.querySelector('.leetcode .remote-state button') !== null", 10_000);
+
+    await cdp.send("Network.setBlockedURLs", { urls: ["*api.ziliang.ninja*"] });
+    await cdp.send("Runtime.evaluate", {
+      expression: "document.querySelector('.leetcode .remote-state button').click()",
+    });
+    await waitFor(
+      cdp,
+      "typeof window.d3 !== 'undefined' && typeof window.nv !== 'undefined'"
+        + " && document.querySelector('.leetcode .remote-state button') !== null",
+      10_000,
+    );
 
     assert.deepEqual(runtimeErrors, [], `Browser runtime errors:\n${runtimeErrors.join("\n")}`);
     assert.deepEqual(

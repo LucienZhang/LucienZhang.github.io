@@ -3,7 +3,7 @@
     <a-spin size="large" :tip="isEnglishSite ? 'Loading...' : '加载中…'" :spinning="status === 'loading'">
       <div v-if="status === 'error' || status === 'empty'" class="remote-state" role="status">
         <p>{{ status === 'empty' ? emptyText : unavailableText }}</p>
-        <button type="button" @click="loadData">{{ retryText }}</button>
+        <button type="button" @click="retry">{{ retryText }}</button>
       </div>
       <template v-else>
         <p v-if="rating" class="rating">{{ isEnglishSite ? "Rating" : "竞赛积分" }}: {{ rating }}</p>
@@ -16,7 +16,7 @@
         </div>
         <div v-if="status === 'partial'" class="remote-state remote-state--warning" role="status">
           <p>{{ partialText }}</p>
-          <button type="button" @click="loadData">{{ retryText }}</button>
+          <button type="button" @click="retry">{{ retryText }}</button>
         </div>
       </template>
     </a-spin>
@@ -72,25 +72,36 @@ export default {
       resizeListener: null,
       chartInstance: null,
       assetsReady: false,
+      assetAttempt: 0,
       isUnmounted: false,
     };
   },
-  async mounted() {
-    if (typeof window === 'undefined') return;
-
-    try {
-      await import("/static/js/d3.js");
-      await import("/static/js/nv.d3.js");
-      if (this.isUnmounted) return;
-      this.assetsReady = true;
-      await this.loadData();
-    } catch (error) {
-      if (this.isUnmounted) return;
-      console.warn("Failed to initialize LeetCode chart:", error);
-      this.status = "error";
-    }
+  mounted() {
+    this.initializeAssets();
   },
   methods: {
+    async retry() {
+      if (this.assetsReady) await this.loadData();
+      else await this.initializeAssets();
+    },
+    async initializeAssets() {
+      if (typeof window === "undefined") return;
+
+      this.status = "loading";
+      this.assetAttempt += 1;
+      const cacheKey = `?attempt=${this.assetAttempt}`;
+      try {
+        await import(/* @vite-ignore */ `/static/js/d3.js${cacheKey}`);
+        await import(/* @vite-ignore */ `/static/js/nv.d3.js${cacheKey}`);
+        if (this.isUnmounted) return;
+        this.assetsReady = true;
+        await this.loadData();
+      } catch (error) {
+        if (this.isUnmounted) return;
+        console.warn("Failed to initialize LeetCode chart:", error);
+        this.status = "error";
+      }
+    },
     async loadData() {
       if (!this.assetsReady) return;
 
