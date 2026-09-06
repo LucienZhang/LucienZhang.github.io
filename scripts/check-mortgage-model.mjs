@@ -2,7 +2,7 @@ import { validStart, calendarMonth, periodAt } from '../docs/.vuepress/component
 import assert from 'node:assert/strict';
 import { compare, defaults, crossings, metricPoints } from '../docs/.vuepress/components/tools/mortgage/model.mjs';
 const near = (a,b,t=0.001) => assert.ok(Math.abs(a-b)<t, `${a} != ${b}`);
-// Independent closed-form reference; stable prototype + nonannual PV extension checked together.
+// Independent closed-form reference; shared fixed-rate core checked across homepage and tool input ranges.
 for (const amount of [1, 50000000, 1e10]) for (const rate of [0, 1e-8, 1.5, 20]) for (const months of [1, 2, 12, 13, 359, 360, 479, 480, 599, 600]) {
   const result = compare({amount,a:{method:'payment',rate,months},b:{method:'principal',rate,months}});
   const r=rate/1200;

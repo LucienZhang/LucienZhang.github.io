@@ -40,13 +40,13 @@ if (!existsSync(distDir)) {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
-  // Preserve the route baseline (including tool shells); allow the explicitly listed noindex previews and mortgage tool pages.
-  const previewRoutes = ['/preview/home.html', '/zh/preview/home.html', '/tools/mortgage.html', '/zh/tools/mortgage.html'];
-  expectedRoutes.push(...previewRoutes);
-  for (const route of previewRoutes) {
+  // Preserve the route baseline (including tool shells); allow the explicitly listed noindex mortgage tool pages.
+  const toolRoutes = ['/tools/mortgage.html', '/zh/tools/mortgage.html'];
+  expectedRoutes.push(...toolRoutes);
+  for (const route of toolRoutes) {
     const file = join(distDir, route.slice(1));
     if (!existsSync(file) || !readFileSync(file, 'utf8').includes('noindex, nofollow')) {
-      failures.push(`isolated preview missing or indexable: ${route}`);
+      failures.push(`tool page missing or indexable: ${route}`);
     }
   }
   for (const [route, other] of [['/index.html', '/zh/'], ['/zh/index.html', '/']]) {
@@ -81,7 +81,7 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verified ${requiredArtifacts.length} critical artifacts, the route baseline and 4 explicitly listed noindex pages.`);
+console.log(`Verified ${requiredArtifacts.length} critical artifacts, the route baseline and 2 explicitly listed noindex tool pages.`);
 
 function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

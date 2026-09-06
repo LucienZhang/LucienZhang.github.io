@@ -15,7 +15,7 @@
     "check:smoke": "node scripts/check-browser-smoke.mjs",
     "verify": "npm run build && npm run check:links && npm run check:artifacts && npm run check:security && npm run check:smoke && npm run check:home && npm run check:mortgage",
     "check:mortgage": "node scripts/check-mortgage-model.mjs",
-    "check:home": "node scripts/check-prototype-loan.mjs && node scripts/check-homepage-prototype.mjs --production --ci"
+    "check:home": "node scripts/check-homepage-loan.mjs && node scripts/check-homepage.mjs --ci"
   },
   "repository": {
     "type": "git",

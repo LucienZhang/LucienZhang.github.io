@@ -6,6 +6,5 @@ const Homepage = defineAsyncComponent(() => import('./theme/components/Home.vue'
 export default defineClientConfig({
   layouts: {
     Homepage,
-    HomepagePrototype: Homepage,
   },
 });

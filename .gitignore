@@ -329,3 +329,10 @@ cython_debug/
 node_modules
 .temp
 .cache
+
+# Local AI design captures and test output; durable specs stay tracked.
+.ai/artifacts/
+
+# Application source, not Python build output.
+!docs/.vuepress/lib/
+!docs/.vuepress/lib/**

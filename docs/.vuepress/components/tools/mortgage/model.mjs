@@ -1,4 +1,4 @@
-import { fixedSchedules } from '../../../prototype/fixed-schedules.mjs';
+import { fixedSchedules } from '../../../lib/loan/fixed-schedules.mjs';
 export const defaults = { amount: 50000000, a: { method: 'payment', rate: 1.5, months: 420 }, b: { method: 'principal', rate: 1.5, months: 420 } };
 export function errors(input) {
   const result = {};

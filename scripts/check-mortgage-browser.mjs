@@ -62,7 +62,7 @@ async function main() {
       }
     });
 
-    const output = path.join(root, '.ai/tools/mortgage/evidence');
+    const output = path.join(root, '.ai/artifacts/mortgage');
     fs.mkdirSync(output,{recursive:true});
     const evaluate = async expression => {
       const response=await cdp.send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});
@@ -239,7 +239,7 @@ async function main() {
     assert.deepEqual(runtimeErrors,[]);
     assert.deepEqual(forbiddenRemoteRequests,[]);
     await cdp.close();
-    console.log('Mortgage browser checks passed; evidence in .ai/tools/mortgage/evidence.');
+    console.log('Mortgage browser checks passed; evidence in .ai/artifacts/mortgage.');
   } finally {
     await stopBrowser(browser);
     await new Promise((resolve) => server.close(resolve));

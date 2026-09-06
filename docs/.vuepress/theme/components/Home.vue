@@ -1,9 +1,8 @@
 <script setup>
 import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { usePageData, useRouteLocale } from 'vuepress/client';
-import { defaults, validate, calculate } from '../../prototype/loan.mjs';
+import { defaults, validate, calculate } from '../../lib/loan/loan.mjs';
 const page = usePageData();
-const isReview = computed(() => page.value.frontmatter.layout === 'HomepagePrototype');
 const locale = useRouteLocale();
 const zh = computed(() => locale.value === '/zh/');
 const t = (en, cn) => zh.value ? cn : en;
@@ -17,9 +16,7 @@ const invalid = computed(() => Object.values(errors.value).some(Boolean));
 const money = (n) => new Intl.NumberFormat(zh.value ? 'zh-CN' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 const methods = computed(() => [{ key: 'payment', label: t('Equal payment', '等额本息') }, { key: 'principal', label: t('Equal principal', '等额本金') }]);
 const nav = computed(() => [['tools', t('Tools', '工具')], ['engineering', t('Engineering', '工程')], ['notes', t('Notes', '笔记')], ['contact', t('Contact', '联系')]]);
-const other = computed(() => isReview.value
-  ? (zh.value ? '/preview/home.html' : '/zh/preview/home.html')
-  : (zh.value ? '/' : '/zh/'));
+const other = computed(() => zh.value ? '/' : '/zh/');
 const selectedYear = ref(1);
 const selectedMonth = computed(() => Math.min(result.value.months, (selectedYear.value - 1) * 12 + 1));
 const maxY = computed(() => Math.ceil(Math.max(result.value.payment.first, result.value.principal.first) / 500) * 500);
@@ -36,7 +33,6 @@ const answer = ref(null);
 const stale = ref(false);
 const question = ref('');
 const lastIntent = ref('curves');
-const fixture = ref('success');
 let timer;
 const questions = computed(() => [
   ['curves', t('Why do the curves differ?', '为什么月供曲线不同？')],
@@ -63,10 +59,8 @@ function explain(intent) {
   lastIntent.value = intent;
   const snapshot = result.value;
   const language = zh.value;
-  const mode = isReview.value ? fixture.value : 'success';
   status.value = 'generating';
   timer = setTimeout(() => {
-    if (mode !== 'success') { status.value = mode; return; }
     const i = snapshot.input;
     const format = n => new Intl.NumberFormat(language ? 'zh-CN' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
     let text;
@@ -97,9 +91,6 @@ const statusText = computed(() => ({
   complete: t('Example explanation ready.', '示例解释已完成。'),
   cancelled: t('Cancelled. You can try again.', '已取消，可以重新生成。'),
   outside: t('This local mock supports only the three suggested questions. Select one above.', '此示例仅支持上方三个推荐问题，请选择其中一个。'),
-  error: t('Simulated network error. Retry when ready.', '模拟网络错误，可以重试。'),
-  timeout: t('Simulated timeout. Retry when ready.', '模拟超时，可以重试。'),
-  limited: t('Simulated rate limit. Switch the review fixture to success, then retry.', '模拟限流。将审阅状态改为成功后可重试。'),
 }[status.value]));
 watch(locale, () => { cancel(); reset(); menu.value = false; explanationOpen.value = false; answer.value = null; stale.value = false; status.value = 'ready'; question.value = ''; });
 onMounted(() => { ready.value = true; });
@@ -107,22 +98,22 @@ onBeforeUnmount(() => clearTimeout(timer));
 </script>
 
 <template>
-  <div id="prototype-top" class="prototype" :class="{ chinese: zh }" :data-homepage="isReview ? 'preview' : 'production'">
+  <div id="homepage-top" class="homepage" :class="{ chinese: zh }" data-homepage="production">
     <div class="page-wrap">
       <a class="skip" href="#playground">{{ t('Skip to loan comparison', '跳到贷款比较') }}</a>
       <header class="masthead">
-        <a href="#prototype-top" class="brand">{{ t('Ziliang', '张本人') }}</a>
-        <nav @keydown.esc="menu = false; menuToggle?.focus()" id="prototype-nav" :class="{ expanded: menu }" :aria-label="t('Page sections', '页面区块')">
+        <a href="#homepage-top" class="brand">{{ t('Ziliang', '张本人') }}</a>
+        <nav @keydown.esc="menu = false; menuToggle?.focus()" id="homepage-nav" :class="{ expanded: menu }" :aria-label="t('Page sections', '页面区块')">
           <a v-for="[id, label] in nav" :key="id" :href="`#${id}`" @click="menu = false">{{ label }}</a>
         </nav>
         <a class="language" :href="other" :lang="zh ? 'en' : 'zh'" :aria-label="t('Switch to Chinese', '切换到英文')">{{ t('中文', 'EN') }}</a>
-        <button ref="menuToggle" class="menu-button" :disabled="!ready" :aria-expanded="menu" aria-controls="prototype-nav" @click="menu = !menu" @keydown.esc="menu = false">{{ menu ? t('Close', '关闭') : t('Menu', '菜单') }} <span aria-hidden="true">☰</span></button>
+        <button ref="menuToggle" class="menu-button" :disabled="!ready" :aria-expanded="menu" aria-controls="homepage-nav" @click="menu = !menu" @keydown.esc="menu = false">{{ menu ? t('Close', '关闭') : t('Menu', '菜单') }} <span aria-hidden="true">☰</span></button>
       </header>
-      <main aria-labelledby="prototype-title">
+      <main aria-labelledby="homepage-title">
         <section class="hero">
           <div class="identity">
             <p class="eyebrow">{{ t('Ziliang Zhang', '张子良') }}</p>
-            <h1 id="prototype-title">{{ t('Making data explorable and AI useful.', '让数据变得可探索，让 AI 变得有用。') }}</h1>
+            <h1 id="homepage-title">{{ t('Making data explorable and AI useful.', '让数据变得可探索，让 AI 变得有用。') }}</h1>
             <p class="intro">{{ t('AI applications, data, and backend engineering. Explore my tools and experiments.', '我关注 AI 应用、数据与后端工程。这里是我的工具与实验。') }}</p>
             <button class="text-action" :disabled="!ready" @click="focusTerm">{{ t('Try changing a parameter', '试着调整一下') }} <span aria-hidden="true">↓</span></button>
             <a class="secondary-link" href="#contact">{{ t('Get in touch', '联系我') }} <span aria-hidden="true">↗</span></a>
@@ -181,9 +172,8 @@ onBeforeUnmount(() => clearTimeout(timer));
               <template v-if="answer"><p v-if="stale" class="notice">{{ t('Based on previous inputs. This answer does not describe the current result.', '基于之前的参数，此回答不代表当前结果。') }}</p><p class="fine">{{ t('Answer snapshot', '回答快照') }}: USD {{ money(answer.input.amount) }} · {{ answer.input.rate }}% · {{ answer.input.years }} {{ t('years', '年') }}</p><p>{{ answer.text }}</p>
                 <div class="actions"><button :disabled="stale || invalid" @click="cite('payment-first')">{{ t('Locate first month', '定位首月') }}</button><button :disabled="stale || invalid" @click="cite('payment-interest')">{{ t('Locate total interest', '定位总利息') }}</button><button v-if="highlight" @click="highlight = ''">{{ t('Clear highlight', '取消高亮') }}</button></div>
               </template>
-              <button v-if="stale || ['error', 'timeout', 'limited', 'cancelled'].includes(status)" :disabled="invalid || status === 'generating'" @click="explain(lastIntent)">{{ stale ? t('Update explanation', '更新解释') : t('Retry', '重试') }}</button>
+              <button v-if="stale || status === 'cancelled'" :disabled="invalid || status === 'generating'" @click="explain(lastIntent)">{{ stale ? t('Update explanation', '更新解释') : t('Retry', '重试') }}</button>
               <form @submit.prevent="send"><label for="mock-question">{{ t('Ask a suggested question', '输入推荐问题') }}</label><div class="question-input"><input id="mock-question" v-model="question" maxlength="300" :disabled="status === 'generating'" :placeholder="questions[0][1]"><button type="submit" :disabled="!question.trim() || invalid || status === 'generating'">{{ t('Send', '发送') }}</button></div></form>
-              <details v-if="isReview" class="review-controls"><summary>{{ t('Prototype review: simulated states', '原型审阅：模拟状态') }}</summary><label for="mock-fixture">{{ t('Next reply', '下一次回答') }}<select id="mock-fixture" v-model="fixture"><option value="success">{{ t('Success', '成功') }}</option><option value="error">{{ t('Network error (simulated)', '网络错误（模拟）') }}</option><option value="timeout">{{ t('Timeout (simulated)', '超时（模拟）') }}</option><option value="limited">{{ t('Rate limit (simulated)', '限流（模拟）') }}</option></select></label></details>
             </section>
             <details class="data"><summary>{{ t('View all monthly data', '查看完整月度数据') }}</summary><p class="fine">{{ t('Unrounded balances drive the calculation. Display rounding can cause small sum differences.', '使用未舍入余额计算，展示值相加可能存在分位误差。') }}</p>
               <details v-for="method in methods" :key="method.key"><summary>{{ method.label }} · {{ result.months }} {{ t('months', '期') }}</summary><div class="table-scroll" tabindex="0" role="region" :aria-label="`${method.label} ${t('monthly schedule', '月度还款表')}`"><table><caption>{{ method.label }} · USD</caption><thead><tr><th scope="col">{{ t('Month', '月份') }}</th><th scope="col">{{ t('Payment', '还款') }}</th><th scope="col">{{ t('Principal', '本金') }}</th><th scope="col">{{ t('Interest', '利息') }}</th><th scope="col">{{ t('Balance', '余额') }}</th></tr></thead><tbody><tr v-for="row in result[method.key].rows" :key="row.month"><th scope="row">{{ row.month }}</th><td v-for="key in ['payment', 'principal', 'interest', 'balance']" :key="key">{{ money(row[key]) }}</td></tr></tbody></table></div></details>
@@ -209,30 +199,30 @@ onBeforeUnmount(() => clearTimeout(timer));
 </template>
 
 <style scoped>
-.prototype { --paper: #f7f4ed; --ink: #20231f; --accent: #b63824; --muted: #64665f; --line: #cbc7bd; background: var(--paper); color: var(--ink); color-scheme: light; min-height: 100vh; font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-.prototype *, .prototype *::before, .prototype *::after { box-sizing: border-box; }
+.homepage { --paper: #f7f4ed; --ink: #20231f; --accent: #b63824; --muted: #64665f; --line: #cbc7bd; background: var(--paper); color: var(--ink); color-scheme: light; min-height: 100vh; font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.homepage *, .homepage *::before, .homepage *::after { box-sizing: border-box; }
 .page-wrap { max-width: 1360px; padding: 0 40px; margin: auto; }
-.prototype h1, .prototype h2, .prototype h3, .prototype p, .prototype figure, .prototype dl { margin: 0; }
-.prototype h1, .prototype h2, .prototype h3 { color: var(--ink); border: 0; padding: 0; font-weight: 500; }
-.prototype h2 { font-size: 26px; line-height: 1.3; }
-.prototype h3 { font-size: 21px; line-height: 1.4; }
-.prototype p { margin-top: 12px; }
-.prototype a { color: var(--accent); text-decoration: none; font-weight: 400; }
-.prototype a:hover { text-decoration: underline; }
-.prototype button, .prototype input, .prototype select { font: inherit; color: var(--ink); background: transparent; border: 1px solid #797b72; border-radius: 3px; min-height: 44px; }
-.prototype button { padding: 8px 14px; cursor: pointer; }
-.prototype button:hover:not(:disabled) { background: #eee7db; }
-.prototype button:active:not(:disabled) { background: #e2d8c9; }
-.prototype button:disabled, .prototype fieldset:disabled { opacity: .55; cursor: default; }
-.prototype input, .prototype select { padding: 8px; max-width: 100%; width: 100%; }
-.prototype :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.prototype [tabindex='-1']:focus { outline: 2px solid var(--accent); outline-offset: 3px; }
-.prototype fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
-.prototype summary { min-height: 44px; padding: 10px 0; cursor: pointer; }
-.prototype small, .fine { font-size: 14px; color: var(--muted); }
-.prototype details { margin-top: 12px; }
+.homepage h1, .homepage h2, .homepage h3, .homepage p, .homepage figure, .homepage dl { margin: 0; }
+.homepage h1, .homepage h2, .homepage h3 { color: var(--ink); border: 0; padding: 0; font-weight: 500; }
+.homepage h2 { font-size: 26px; line-height: 1.3; }
+.homepage h3 { font-size: 21px; line-height: 1.4; }
+.homepage p { margin-top: 12px; }
+.homepage a { color: var(--accent); text-decoration: none; font-weight: 400; }
+.homepage a:hover { text-decoration: underline; }
+.homepage button, .homepage input, .homepage select { font: inherit; color: var(--ink); background: transparent; border: 1px solid #797b72; border-radius: 3px; min-height: 44px; }
+.homepage button { padding: 8px 14px; cursor: pointer; }
+.homepage button:hover:not(:disabled) { background: #eee7db; }
+.homepage button:active:not(:disabled) { background: #e2d8c9; }
+.homepage button:disabled, .homepage fieldset:disabled { opacity: .55; cursor: default; }
+.homepage input, .homepage select { padding: 8px; max-width: 100%; width: 100%; }
+.homepage :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.homepage [tabindex='-1']:focus { outline: 2px solid var(--accent); outline-offset: 3px; }
+.homepage fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
+.homepage summary { min-height: 44px; padding: 10px 0; cursor: pointer; }
+.homepage small, .fine { font-size: 14px; color: var(--muted); }
+.homepage details { margin-top: 12px; }
 .masthead { display: flex; align-items: center; gap: 28px; min-height: 96px; border-bottom: 1px solid var(--line); }
-.prototype .brand { font: 400 1.8rem Sacramento, cursive; color: var(--ink); margin-right: auto; min-height: 44px; display: flex; align-items: center; }
+.homepage .brand { font: 400 1.8rem Sacramento, cursive; color: var(--ink); margin-right: auto; min-height: 44px; display: flex; align-items: center; }
 .chinese .brand { font-family: Slidefu, cursive; font-size: 2rem; }
 .masthead nav { display: flex; gap: 28px; }
 .masthead nav a, .language { display: flex; align-items: center; min-height: 44px; }
@@ -244,10 +234,10 @@ onBeforeUnmount(() => clearTimeout(timer));
 .hero { display: grid; grid-template-columns: 1fr 2fr; gap: 44px; padding: 48px 0 64px; }
 .identity { padding: 24px 0; }
 .eyebrow { font-size: 14px; color: var(--muted); margin-bottom: 16px !important; }
-.prototype h1 { font: 400 clamp(40px, 4vw, 60px)/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -.025em; }
+.homepage h1 { font: 400 clamp(40px, 4vw, 60px)/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -.025em; }
 .chinese h1 { font-family: 'Songti SC', 'Noto Serif CJK SC', serif; line-height: 1.35; }
 .intro { margin-top: 28px !important; max-width: 29ch; }
-.prototype .text-action { border: 0; color: var(--accent); padding: 8px 0; text-align: left; }
+.homepage .text-action { border: 0; color: var(--accent); padding: 8px 0; text-align: left; }
 .identity .text-action { margin-top: 28px; }
 .secondary-link { display: block; min-height: 44px; padding: 10px 0; color: var(--muted) !important; }
 .playground { min-width: 0; border-left: 1px solid var(--line); padding-left: 40px; scroll-margin-top: 24px; }
@@ -285,8 +275,8 @@ onBeforeUnmount(() => clearTimeout(timer));
 .summary-grid dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 500; }
 .summary-grid dt { color: var(--muted); }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
-.prototype .primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.prototype .primary:hover:not(:disabled) { background: #962c1b; }
+.homepage .primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.homepage .primary:hover:not(:disabled) { background: #962c1b; }
 .explanation { border-top: 3px solid var(--accent); margin-top: 24px; padding: 20px; background: #f0eade; }
 .panel-heading { display: flex; align-items: start; gap: 16px; justify-content: space-between; }
 .panel-heading h3 { font-size: 18px; }
@@ -295,16 +285,15 @@ onBeforeUnmount(() => clearTimeout(timer));
 .question-input { display: flex; gap: 8px; }
 .question-input input { min-width: 0; }
 .explanation form { margin-top: 20px; }
-.review-controls label { display: grid; gap: 8px; }
 .notice { padding: 12px; background: #e9e1c7; color: #514318; }
 .error { color: #90231e !important; }
 .notice.error { background: #f6e2db; }
 .highlighted { background: #e9e1c7; outline: 2px solid var(--accent); }
 .data { border-bottom: 1px solid var(--line); }
 .table-scroll { overflow: auto; max-height: 380px; }
-.prototype table { display: table; border-collapse: collapse; margin: 8px 0; width: 100%; font-size: 14px; }
-.prototype th, .prototype td { border: 1px solid var(--line); padding: 8px; white-space: nowrap; text-align: right; }
-.prototype tr, .prototype tr:nth-child(2n) { background: transparent; border: 0; }
+.homepage table { display: table; border-collapse: collapse; margin: 8px 0; width: 100%; font-size: 14px; }
+.homepage th, .homepage td { border: 1px solid var(--line); padding: 8px; white-space: nowrap; text-align: right; }
+.homepage tr, .homepage tr:nth-child(2n) { background: transparent; border: 0; }
 .page-section { border-top: 1px solid var(--line); padding: 36px 0 48px; scroll-margin-top: 16px; }
 .page-section > h2 { color: var(--accent); margin-bottom: 28px; }
 .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
@@ -314,7 +303,7 @@ onBeforeUnmount(() => clearTimeout(timer));
 .tools-grid p { max-width: 33ch; }
 .tools-grid button { margin-top: 16px; }
 .engineering-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 64px; }
-.prototype .serif { font: 400 34px/1.25 Georgia, 'Times New Roman', serif; }
+.homepage .serif { font: 400 34px/1.25 Georgia, 'Times New Roman', serif; }
 .chinese .serif { font-family: 'Songti SC', 'Noto Serif CJK SC', serif; }
 .experience article { display: flex; gap: 24px; padding-bottom: 24px; }
 .experience article + article { border-top: 1px solid var(--line); padding-top: 24px; }
@@ -331,7 +320,7 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 20px
 footer a { display: flex; min-height: 44px; align-items: center; }
 @media (max-width: 1100px) { .hero { gap: 28px; } .playground { padding-left: 28px; } .summary-grid { gap: 16px; } }
 @media (max-width: 1023px) { .hero { grid-template-columns: 1fr; padding-top: 32px; } .identity { padding: 0; } .intro { max-width: 52ch; margin-top: 16px !important; } .identity .text-action { margin-top: 16px; } .secondary-link { display: inline-block; margin-left: 24px; } .playground { border-left: 0; border-top: 1px solid var(--line); padding: 24px 0 0; } .chart svg { max-height: 260px; } .engineering-grid { gap: 32px; } }
-@media (max-width: 767px) { .page-wrap { padding: 0 24px; } .masthead { min-height: 76px; gap: 16px; flex-wrap: wrap; padding: 12px 0; } .masthead nav { display: none; order: 4; width: 100%; flex-wrap: wrap; gap: 8px 24px; } .masthead nav.expanded { display: flex; } .menu-button { display: block; } .prototype h1 { font-size: 36px; } .prototype h2 { font-size: 23px; } .hero { padding: 28px 0 40px; gap: 24px; } .eyebrow { margin-bottom: 8px !important; } .intro { font-size: 16px; } .secondary-link { margin-left: 12px; font-size: 14px; } .chart { margin-top: 16px !important; } .legend { justify-content: start; gap: 12px; } .chart text { font-size: 24px; } .term-controls { gap: 8px; } .term-controls output { min-width: 55px; font-size: 14px; } .page-section { padding: 28px 0 40px; } .page-section > h2 { margin-bottom: 20px; } .tools-grid, .engineering-grid { grid-template-columns: 1fr; gap: 24px; } .tools-grid article { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 24px; } .tools-grid p { max-width: none; } .tools-grid button { margin-top: 8px; } .prototype .serif { font-size: 28px; } .experience article { gap: 16px; } .flow { padding: 16px; gap: 8px 12px; } .note-row { padding: 14px 0; gap: 8px; } .explanation { padding: 16px; } .panel-heading { flex-wrap: wrap; } .input-grid { grid-template-columns: 1fr; } }
-@media (max-width: 389px) { .page-wrap { padding: 0 20px; } .prototype h1 { font-size: 32px; } .masthead { gap: 12px; } .summary-grid { grid-template-columns: 1fr; } .term-controls { grid-template-columns: auto 44px 1fr 44px; } .term-controls output { grid-column: 3 / 5; text-align: right; } .note-row { flex-wrap: wrap; } .note-row > span:first-child { max-width: 100%; } .note-row small { font-size: 12px; } .secondary-link { margin-left: 0; } }
-@media (prefers-reduced-motion: reduce) { .prototype *, .prototype *::before, .prototype *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+@media (max-width: 767px) { .page-wrap { padding: 0 24px; } .masthead { min-height: 76px; gap: 16px; flex-wrap: wrap; padding: 12px 0; } .masthead nav { display: none; order: 4; width: 100%; flex-wrap: wrap; gap: 8px 24px; } .masthead nav.expanded { display: flex; } .menu-button { display: block; } .homepage h1 { font-size: 36px; } .homepage h2 { font-size: 23px; } .hero { padding: 28px 0 40px; gap: 24px; } .eyebrow { margin-bottom: 8px !important; } .intro { font-size: 16px; } .secondary-link { margin-left: 12px; font-size: 14px; } .chart { margin-top: 16px !important; } .legend { justify-content: start; gap: 12px; } .chart text { font-size: 24px; } .term-controls { gap: 8px; } .term-controls output { min-width: 55px; font-size: 14px; } .page-section { padding: 28px 0 40px; } .page-section > h2 { margin-bottom: 20px; } .tools-grid, .engineering-grid { grid-template-columns: 1fr; gap: 24px; } .tools-grid article { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 24px; } .tools-grid p { max-width: none; } .tools-grid button { margin-top: 8px; } .homepage .serif { font-size: 28px; } .experience article { gap: 16px; } .flow { padding: 16px; gap: 8px 12px; } .note-row { padding: 14px 0; gap: 8px; } .explanation { padding: 16px; } .panel-heading { flex-wrap: wrap; } .input-grid { grid-template-columns: 1fr; } }
+@media (max-width: 389px) { .page-wrap { padding: 0 20px; } .homepage h1 { font-size: 32px; } .masthead { gap: 12px; } .summary-grid { grid-template-columns: 1fr; } .term-controls { grid-template-columns: auto 44px 1fr 44px; } .term-controls output { grid-column: 3 / 5; text-align: right; } .note-row { flex-wrap: wrap; } .note-row > span:first-child { max-width: 100%; } .note-row small { font-size: 12px; } .secondary-link { margin-left: 0; } }
+@media (prefers-reduced-motion: reduce) { .homepage *, .homepage *::before, .homepage *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
 </style>
