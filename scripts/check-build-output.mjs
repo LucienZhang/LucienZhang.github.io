@@ -40,8 +40,8 @@ if (!existsSync(distDir)) {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
-  // Preserve the route baseline (including tool shells); add exactly two noindex homepage previews.
-  const previewRoutes = ['/preview/home.html', '/zh/preview/home.html'];
+  // Preserve the route baseline (including tool shells); allow the explicitly listed noindex previews and mortgage tool pages.
+  const previewRoutes = ['/preview/home.html', '/zh/preview/home.html', '/tools/mortgage.html', '/zh/tools/mortgage.html'];
   expectedRoutes.push(...previewRoutes);
   for (const route of previewRoutes) {
     const file = join(distDir, route.slice(1));
@@ -81,7 +81,7 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verified ${requiredArtifacts.length} critical artifacts, the route baseline and 2 noindex homepage previews.`);
+console.log(`Verified ${requiredArtifacts.length} critical artifacts, the route baseline and 4 explicitly listed noindex pages.`);
 
 function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

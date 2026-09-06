@@ -1,3 +1,4 @@
+import { fixedSchedules } from './fixed-schedules.mjs';
 // Fixed nominal annual rate, monthly periods. See .ai/phase5/homepage-prototype-report.md.
 export const defaults = Object.freeze({ amount: 300000, rate: 4, years: 25 });
 
@@ -13,19 +14,5 @@ export function calculate(input) {
   if (Object.values(validate(input)).some(Boolean)) throw new RangeError('Invalid loan input');
   const { amount, rate, years } = input;
   const months = years * 12;
-  const r = rate / 1200;
-  const payment = r === 0 ? amount / months : amount * r / -Math.expm1(-months * Math.log1p(r));
-  const schedules = {};
-  for (const method of ['payment', 'principal']) {
-    let balance = amount;
-    const rows = [];
-    for (let month = 1; month <= months; month++) {
-      const interest = balance * r;
-      const principal = month === months ? balance : Math.min(balance, method === 'payment' ? payment - interest : amount / months);
-      balance = Math.max(0, balance - principal);
-      rows.push({ month, payment: principal + interest, principal, interest, balance });
-    }
-    schedules[method] = { rows, first: rows[0].payment, last: rows.at(-1).payment, interest: rows.reduce((sum, row) => sum + row.interest, 0) };
-  }
-  return { input: { ...input }, months, ...schedules };
+  return { input: { ...input }, months, ...fixedSchedules({ amount, rate, months }) };
 }
