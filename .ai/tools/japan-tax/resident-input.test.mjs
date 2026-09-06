@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { calculateResident } from '../../../docs/.vuepress/components/tools/japan-tax/tax-calculation.mjs';
+const run = (deductions, adjustment, salary='7600000') => calculateResident({ salary, deductions, adjustment });
+assert.deepEqual(run(['2040000'],'2500'), {status:'ready',taxable:3700000n,deductionTotal:2040000n,beforeCredit:370000n,adjustment:2500n,levy:367500n});
+assert.equal(run(['2040001'],'2500').taxable,3699000n);
+assert.deepEqual(run(['430000','1610000'],'2500'),run(['2040000'],'2500'));
+assert.equal(run([''],'2500').status,'deductions');
+assert.equal(run(['2040000'],'').status,'adjustment');
+assert.equal(run(['2040000'],'-1').status,'adjustment');
+assert.equal(run(['2040000'],'370001').status,'adjustmentRange');
+assert.equal(run(['9999999'],'0').levy,0n);
+assert.equal(run(['0'],'2500','30000000').status,'adjustmentRange');
+assert.equal(run(['0'],'0','30000000').status,'ready');
+assert.equal(run(['2040000'],'2500','-1').status,'salary');
+console.log('11 resident-input assertions passed');

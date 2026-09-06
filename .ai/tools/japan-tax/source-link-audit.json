@@ -1,0 +1,272 @@
+[
+  {
+    "url": "https://www.cfa.go.jp/policies/kodomokosodateshienkinseido",
+    "status": 200,
+    "type": "text/html; charset=UTF-8",
+    "finalUrl": "https://www.cfa.go.jp/policies/kodomokosodateshienkinseido"
+  },
+  {
+    "url": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/001/510/28furusatokeisan.pdf",
+    "status": 200,
+    "type": "application/pdf",
+    "finalUrl": "https://www.city.katsushika.lg.jp/_res/projects/default_project/_page_/001/001/510/28furusatokeisan.pdf"
+  },
+  {
+    "url": "https://www.city.kitami.lg.jp/detail.php?content=8271",
+    "status": 200,
+    "type": "text/html; charset=UTF-8",
+    "finalUrl": "https://www.city.kitami.lg.jp/detail.php?content=8271"
+  },
+  {
+    "url": "https://www.city.kyoto.lg.jp/gyozai/page/0000028147.html",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.city.kyoto.lg.jp/gyozai/page/0000028147.html"
+  },
+  {
+    "url": "https://www.city.kyoto.lg.jp/gyozai/page/0000054663.html",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.city.kyoto.lg.jp/gyozai/page/0000054663.html"
+  },
+  {
+    "url": "https://www.city.nishitokyo.lg.jp/kurasi/zeikin/kozinsiminzei/jyutakuron.html",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.city.nishitokyo.lg.jp/kurasi/zeikin/kozinsiminzei/jyutakuron.html"
+  },
+  {
+    "url": "https://www.city.shinjuku.lg.jp/hoken/file04_04_00001.html",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.city.shinjuku.lg.jp/hoken/file04_04_00001.html"
+  },
+  {
+    "url": "https://www.city.tokyo-nakano.lg.jp/kurashi/zeikin/jyuminzei-kazei/jyuminzei-keisanrei.html",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.city.tokyo-nakano.lg.jp/kurashi/zeikin/jyuminzei-kazei/jyuminzei-keisanrei.html"
+  },
+  {
+    "url": "https://www.city.tokyo-nakano.lg.jp/kurashi/zeikin/jyuminzei-kazei/jyuminzei-keisanshiki.html",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.city.tokyo-nakano.lg.jp/kurashi/zeikin/jyuminzei-kazei/jyuminzei-keisanshiki.html"
+  },
+  {
+    "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/zeikin/y-shizei/kojin-shiminzei-kenminzei/kojin-shiminzei-shosai/shotokukoujoR8.html",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/zeikin/y-shizei/kojin-shiminzei-kenminzei/kojin-shiminzei-shosai/shotokukoujoR8.html"
+  },
+  {
+    "url": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-0.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-0.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-18.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-18.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-3.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-3.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-5.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-5.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-6.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/publication/pamph/hotei/tebikihtml/2-2-6.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/publication/pamph/koho/kurashi/html/04_2.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/publication/pamph/koho/kurashi/html/04_2.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/publication/pamph/koho/kurashi/html/05_1.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/publication/pamph/koho/kurashi/html/05_1.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/publication/pamph/shotoku/fukko_tokubetsu/index.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/publication/pamph/shotoku/fukko_tokubetsu/index.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/shinkoku/tebiki/2025/03/order2/3-2_06.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/shinkoku/tebiki/2025/03/order2/3-2_06.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/shinkoku/tebiki/2025/03/order3/3-3_10.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/shinkoku/tebiki/2025/03/order3/3-3_10.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/shinkoku/tebiki/2025/03/order4/3-4_41.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/shinkoku/tebiki/2025/03/order4/3-4_41.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/hojin/5231.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/hojin/5231.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1100.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1100.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1110.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1110.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1120.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1120.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1130.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1130.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1135.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1135.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1140.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1140.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1145.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1145.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1150.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1150.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1155.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1155.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1160.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1160.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1170.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1170.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1171.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1171.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1175.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1175.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1177.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1177.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1180.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1180.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1191.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1191.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1199.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1199.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1411.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1411.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2030.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2030.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm"
+  },
+  {
+    "url": "https://www.nta.go.jp/users/gensen/2026kiso/index.htm",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.nta.go.jp/users/gensen/2026kiso/index.htm"
+  },
+  {
+    "url": "https://www.town.aichi-mihama.lg.jp/soshiki/zeimu/juminzei/1/2/5/25.html",
+    "status": 200,
+    "type": "text/html",
+    "finalUrl": "https://www.town.aichi-mihama.lg.jp/soshiki/zeimu/juminzei/1/2/5/25.html"
+  }
+]

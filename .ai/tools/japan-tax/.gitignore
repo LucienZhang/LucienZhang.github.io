@@ -1,0 +1,4 @@
+# Regenerated local browser captures and console logs
+*.png
+*-output.txt
+browser-results.json

@@ -1,0 +1,16 @@
+# Furusato limit research and vertical flow — 2026-09-06
+
+User requested vertical order: salary, withholding, total/itemized income deductions → income/tax breakdown → indicative donation cap → furusato amount and claim method → refund → next-year monthly resident tax. Reordered actual DOM accordingly, not CSS visual order. Theme shell remains1200px; sequential form content capped800px. Existing national-tax calculations remain; cap/refund/resident amounts still pending.
+
+Official sources:
+- NTA No1155 https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1155.htm : return donation deduction, resident basic10%, special residual limited20%income levy,2.1% reconstruction adjustment; income-tax donation ceiling40%total income. Filing a return voids one-stop and requires all applicable donations in return.
+- Higashihiroshima https://www.city.higashihiroshima.lg.jp/kurashi/zeikin/5/5532.html : L=2000+0.2*S/(0.9-1.021*r). S=resident income levy after adjustment credit BEFORE other tax credits; resident donation ceiling30%total income. Rate may differ from actual income-tax bracket. Other ceilings and tax credits can prevent full relief even below this indicative limit.
+- Kyoto https://www.city.kyoto.lg.jp/gyozai/page/0000054663.html (updated2026-05-13): same special-credit cap and rate table; rate determination uses resident taxable income minus personal-deduction difference and max(income-tax basic allowance−480000,0). Exact boundary inequalities differ from income-tax schedule. One-stop credits the income-tax-equivalent portion via resident tax.
+
+Derivation: special part=(D−2000)*(0.9−1.021*r) <=0.2*S. Solve equality for D. User formula replaces S with0.1*income-tax taxable income, omitting resident-base differences and adjustment credit. Thus algebraically an approximation only. Even resident taxable income*2% still omits adjustment credit. No universal safety direction. Do not implement as accurate cap from current income-tax deduction total.
+
+Refund: return donations can reduce income+reconstruction taxes and increase refund or reduce payment due, subject to withholding and other prepayments. One-stop does not itself produce income-tax refund; relief comes through next-year resident tax. Hence final refund belongs after donation amount/method. Donation tax saving is not equal to refund. Future implementation should recompute pre/post national tax, not multiply all deductible donations by one current marginal rate across a band boundary.
+
+Current breakdown remains based on upper deduction inputs. If total already includes donation deductions, it is not a pre-donation baseline; page now states this. Future finalized flow must normalize pre-donation deductions or prevent duplicate application. Total income-tax deduction alone cannot determine resident deductions; need item categories/resident-specific amounts or a verified applicable resident income-levy amount (previous-year notice only an estimate if income changes).
+
+No new cap/refund/resident formulas implemented this round. Existing formula module unchanged. UI adds formula/source and refund-method explanations. Build52pages passes. Dedicated browser layout mode verifies DOM order and no overflow in en/zh1440/390/320 and existing tax example; prior full behavioral checks are not repeated.

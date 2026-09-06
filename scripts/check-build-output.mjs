@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const distDir = join(rootDir, "docs/.vuepress/dist");
 const routeBaseline = join(rootDir, ".ai/baseline/2026-09-04/routes.txt");
+const routeAdditions = join(rootDir, ".ai/baseline/route-additions.txt");
 const requiredArtifacts = [
   "index.html",
   "404.html",
@@ -35,7 +36,7 @@ if (!existsSync(distDir)) {
     }
   }
 
-  const expectedRoutes = readFileSync(routeBaseline, "utf8")
+  const expectedRoutes = (readFileSync(routeBaseline, "utf8") + "\n" + readFileSync(routeAdditions, "utf8"))
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
@@ -59,7 +60,7 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verified ${requiredArtifacts.length} critical artifacts and the 50-route baseline.`);
+console.log(`Verified ${requiredArtifacts.length} critical artifacts and the historical routes plus declared additions.`);
 
 function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
