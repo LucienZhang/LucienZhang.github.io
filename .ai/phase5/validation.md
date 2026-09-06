@@ -4,7 +4,7 @@
 
 ## 可复现命令
 
-Node >=22.18，按 package-lock 安装。完整链 `npm run verify` 包含生产构建、内部链接、精确路由/关键产物、安全、9 路由 browser smoke、正式主页浏览器检查、主页独立贷款 oracle 和房贷 120 组边界场景。浏览器检查需要本地监听权限及 Chrome/Chromium，可用 CHROME_BIN 指定。
+Node >=22.18，按 package-lock 安装。完整链 `npm run verify` 包含生产构建、内部链接、精确路由/关键产物、安全、9 路由 browser smoke、正式主页浏览器检查、主页独立贷款 oracle 、房贷 120 组边界场景及税务回归。浏览器检查需要本地监听权限及 Chrome/Chromium，可用 CHROME_BIN 指定。
 
 - `npm run check:home`：默认中英主页断言，不写截图；`HOMEPAGE_CAPTURE=1 npm run check:home` 输出截图及原始数据到 `.ai/artifacts/homepage/`。
 - `npm run check:mortgage`：房贷数值、交点、日期验证。
@@ -13,7 +13,7 @@ Node >=22.18，按 package-lock 安装。完整链 `npm run verify` 包含生产
 - `node scripts/measure-homepage.mjs`：独立可见页面性能采样，写入 `.ai/artifacts/homepage/timing.json`。综合交互测试经过无 JS 模拟后页面可能 hidden，不使用其中空 LCP 作为性能结论。
 - `PLAYWRIGHT_MODULE=/absolute/path/to/playwright/index.mjs PREVIEW_ORIGIN=http://127.0.0.1:4387 node scripts/check-stock-screener-browser.mjs`：可选的筛股器专项检查，需已有 Playwright 安装及自行启动的构建目录 HTTP 服务器；不会向仓库添加依赖。产物在 `.ai/artifacts/stock-screener/`。常规 verify 的 smoke 已包含两条筛股器路由。
 
-## 当前验证结果
+## 上一轮主页清理验证
 
 清理后 `npm run verify` 退出 0：54 页构建、3018 内部引用、15 项关键产物及精确路由、安全检查、9 路由 smoke、正式主页与两套数值测试通过。`node scripts/check-mortgage-browser.mjs` 退出 0，双语桌面/移动、视图配置、月份联动、焦点/无障碍树、SSR 及页面宽度隔离通过，产物写入忽略目录。
 
@@ -32,3 +32,13 @@ cc817a8 集成时：56 页构建、3068 内部引用、9 路由 smoke、正式�
 Chrome 自动化不能替代 Safari、实际触屏和人工 VoiceOver/NVDA。200% 项为 640 CSS px / 2× raster 重排等效检查。既有大型 chunk 和中文项目 sidebar 配置提示没有通过调高阈值或删检查掩盖。真实 AI、变动利率、税务和后台不在当前验收范围。
 
 截图是人工审阅证据，不是自动图片对比测试基准；原始产物不进入源码 PR。早期报告/效果图可查 cc817a8 历史，旧结果不能当作最新构建结果。
+
+## 日本税务工具集成（2026-09-06）
+
+来源70a9aa1；适用2025工资收入/2026住民税的限定场景。集成审查重新查阅NTA2025工资精确表、所得金額調整控除及西东京/京都抵扣说明，与当前实现核对；并非完整税务认证。保留手填扣除和故乡税边际税率代用的概算边界，没有扩展为2026收入算法。
+
+`npm run verify` 退出0：56页、3246内部引用、15关键产物、严格基线及新增税务路由、安全、9路由smoke、主页浏览器、房贷和税务断言通过。税务包含283项数值、19项金额格式、104项鼠标走廊断言。Node对既有amount-format.js的ES模块自动识别给出非失败提示，未为此修改全仓模块模式。
+
+复现：`npm run check:tax`；先构建，再分别运行 `TAX_FULL_AUDIT=1 TAX_LOCALE=en node scripts/check-japan-tax-browser.mjs` 和 zh 版本。输出分别在 .ai/artifacts/japan-tax/en/、zh/，推荐顺序执行，避免多个浏览器争用前台鼠标焦点。中英文各1440/390/320px最终退出0，包含填值/清空、所得和结算、扣除开关、帮助鼠标与键盘、来源、SSR/语言及无溢出。英文首次通过；中文并行首轮悬停等待超时，未修改页面，独立重跑全部通过，尚不能确定首次超时原因。无页面异常和外部请求。人工查看英文结算桌面、中文手机截图。
+
+原测试移至 scripts/japan-tax/，有效公式和来源保留于 .ai/tools/japan-tax/；历史交接、重复审查及source-link-audit.json转本地忽略备份，不提交截图。主页demo未修改，更新提案记录于remaining-work.md，待用户批准。

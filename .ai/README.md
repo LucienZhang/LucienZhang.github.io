@@ -3,6 +3,7 @@
 - [项目计划](./PROJECT_PLAN.md)：项目各阶段与架构约束；旧阶段条目是历史记录。
 - [当前决策](./phase5/homepage-design-plan.md) / [主页规格](./phase5/homepage-design-spec.md)
 - [房贷规格及数值契约](./tools/mortgage/spec.md) / [筛股器空壳](./tools/stock-screener/spec.md)
+- [日本税务工具](./tools/japan-tax/spec.md)：2025收入 / 2026住民税，规则和来源随规格维护。
 - [验证与复现](./phase5/validation.md) / [剩余工作](./phase5/remaining-work.md)
 
 ## 保留规则
