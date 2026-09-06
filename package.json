@@ -16,7 +16,7 @@
     "verify": "npm run build && npm run check:links && npm run check:artifacts && npm run check:security && npm run check:smoke && npm run check:home && npm run check:mortgage && npm run check:tax",
     "check:tax": "node --test scripts/japan-tax/*.test.mjs",
     "check:mortgage": "node scripts/check-mortgage-model.mjs",
-    "check:home": "node scripts/check-homepage-loan.mjs && node scripts/check-homepage.mjs --ci"
+    "check:home": "node scripts/check-homepage-loan.mjs && node scripts/check-loan-handoff.mjs && node scripts/check-homepage.mjs --ci"
   },
   "repository": {
     "type": "git",

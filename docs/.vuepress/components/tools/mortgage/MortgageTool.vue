@@ -1,5 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
+import { useRoute } from 'vuepress/client';
+import { parseMortgageQuery } from '../../../lib/loan/handoff.mjs';
 import { validStart, calendarMonth, periodAt } from './calendar.mjs';
 import MonthPicker from './MonthPicker.vue';
 import MortgageChart from './MortgageChart.vue';
@@ -14,7 +16,18 @@ const input = reactive(structuredClone(defaults));
 const ready = ref(false), month = ref(168);
 const invalid = computed(() => errors(input));
 const result = ref(compare(defaults));
-onMounted(() => ready.value = true);
+const route = useRoute();
+function applyQuery() {
+  const values = parseMortgageQuery(route.query);
+  const next = structuredClone(defaults);
+  if (values) {
+    next.amount = values.amount;
+    for (const id of ['a', 'b']) Object.assign(next[id], { rate: values.rate, months: values.months });
+  }
+  Object.assign(input, next);
+}
+onMounted(() => { applyQuery(); ready.value = true; });
+watch(() => route.query, () => { if (ready.value) applyQuery(); });
 watch(input, () => { if (!Object.keys(invalid.value).length) { result.value = compare(input); month.value = Math.min(month.value, result.value.months); } });
 const amountText = computed(() => Number.isInteger(input.amount) ? input.amount.toLocaleString('en-US') : String(input.amount));
 const magnitude = computed(() => {

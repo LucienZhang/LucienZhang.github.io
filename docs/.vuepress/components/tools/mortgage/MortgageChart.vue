@@ -1,16 +1,16 @@
 <script setup>
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { calendarMonth } from './calendar.mjs';
-const props = defineProps({ id: String, title: String, description: String, series: Array, month: Number, start: Number, end: Number, markers: Array, payoffs: Array, zh: Boolean, calendarStart: String });
+const props = defineProps({ id: String, title: String, description: String, series: Array, month: Number, start: Number, end: Number, markers: Array, payoffs: Array, zh: Boolean, calendarStart: String, compact: Boolean });
 const emit = defineEmits(['select']);
 const svg = ref(null), width = ref(1000);
 const hovered = ref(null);
 watch(() => [props.series, props.month, props.calendarStart], () => hovered.value = null);
 let observer;
-onMounted(() => { observer = new ResizeObserver(entries => { width.value = Math.max(240, entries[0].contentRect.width); }); observer.observe(svg.value); });
+onMounted(() => { width.value = Math.max(240, svg.value.getBoundingClientRect().width); observer = new ResizeObserver(entries => { width.value = Math.max(240, entries[0].contentRect.width); }); observer.observe(svg.value); });
 onBeforeUnmount(() => observer?.disconnect());
-const height = computed(() => width.value < 480 ? 400 : 360);
-const top = 94, bottom = computed(() => height.value - 72);
+const height = computed(() => props.compact ? (width.value < 480 ? 160 : 240) : width.value < 480 ? 400 : 360);
+const top = props.compact ? 32 : 94, bottom = computed(() => height.value - (props.compact ? 48 : 72));
 const bounds = computed(() => {
   const values = props.series.flatMap(s => s.points.map(p => p.value));
   const lo = Math.min(0, ...values), hi = Math.max(0, ...values);
@@ -22,7 +22,8 @@ const points = s => s.points.map(p => `${x(p.month)},${y(p.value)}`).join(' ');
 const ticks = computed(() => Array.from({length: 4}, (_, i) => bounds.value.lo + (bounds.value.hi - bounds.value.lo) * i / 3));
 const fmt = v => new Intl.NumberFormat(props.zh ? 'zh-CN' : 'en-US', {maximumFractionDigits: 1, notation: 'compact'}).format(v);
 const amount = v => new Intl.NumberFormat('en-US', {maximumFractionDigits:0}).format(v);
-const date = m => calendarMonth(props.calendarStart,m);
+const date = m => props.compact ? (props.zh ? `第${m}期` : `Month ${m}`) : calendarMonth(props.calendarStart,m);
+const axisLabel = m => props.compact ? `${new Intl.NumberFormat(props.zh ? 'zh-CN' : 'en-US', {maximumFractionDigits: 1}).format(m / 12)}${props.zh ? '年' : 'y'}` : date(m);
 const axisMonths = computed(() => [...new Set([props.start, Math.round((props.start+props.end)/2), props.end])]);
 const annotations = computed(() => {
   const valuesAt = m => props.series.map((s,i) => ({label:props.series.length === 1 ? 'A−B' : ['A','B'][i],value:s.points.find(p=>p.month===m)?.value ?? 0}));
@@ -51,9 +52,10 @@ function select(event) {
 }
 </script>
 <template>
-  <svg ref="svg" :viewBox="`0 0 ${width} ${height}`" :style="{height:height+'px'}" role="group" :aria-labelledby="`${id}-title ${id}-desc`" @pointerdown="select" @pointerleave="hovered=null" @keydown.esc="hovered=null">
+  <svg ref="svg" :viewBox="`0 0 ${width} ${height}`" :style="{height:height+'px'}" role="group" :tabindex="compact ? 0 : undefined" @keydown.left.prevent="compact && emit('select', Math.max(start, month-1))" @keydown.right.prevent="compact && emit('select', Math.min(end, month+1))" :aria-labelledby="`${id}-title ${id}-desc`" @pointerdown="select" @pointerleave="hovered=null" @keydown.esc="hovered=null">
     <title :id="`${id}-title`">{{ title }}</title><desc :id="`${id}-desc`">{{ description }}</desc>
-    <g class="selection-summary">
+    <g v-if="compact" class="selection-summary"><text x="8" y="16">{{ date(month) }} · {{ annotations[0].values.map(v => v.label + ' ' + fmt(v.value)).join(' · ') }} JPY</text></g>
+    <g v-else class="selection-summary">
       <text class="callout-title" x="8" y="20">{{ zh ? '所选' : 'Selected' }} {{ date(month) }} · {{ zh ? '日元取整' : 'whole JPY' }}</text>
       <text v-for="(v,j) in annotations[0].values" :key="v.label" class="callout-value" x="8" :y="40+j*18">{{ v.label }} {{ amount(v.value) }} {{ zh ? '日元' : 'JPY' }}</text>
     </g>
@@ -61,8 +63,8 @@ function select(event) {
     <g v-for="p in payoffs" :key="p.label"><line :x1="x(p.month)" :x2="x(p.month)" :y1="top" :y2="bottom" stroke="#aaa497" stroke-dasharray="2 5"/></g>
     <polyline v-for="(s,i) in series" :key="s.label" :points="points(s)" fill="none" :stroke="i ? '#6d681e' : '#b63824'" :stroke-dasharray="i ? '7 5' : undefined" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
     <line v-if="month >= start" :x1="x(month)" :x2="x(month)" :y1="top" :y2="bottom" stroke="#20231f" stroke-dasharray="3 4"/>
-    <g v-for="m in axisMonths" :key="m"><text :x="x(m)" :y="height-42" :text-anchor="m===start?'start':m===end?'end':'middle'">{{ date(m) }}</text></g>
-    <text x="64" :y="height-18">{{ zh ? '还款月份' : 'Repayment month' }}</text>
+    <g v-for="m in axisMonths" :key="m"><text :x="x(m)" :y="height-42" :text-anchor="m===start?'start':m===end?'end':'middle'">{{ axisLabel(m) }}</text></g>
+    <text x="64" :y="height-18">{{ compact ? (zh ? '经过年数' : 'Elapsed years') : (zh ? '还款月份' : 'Repayment month') }}</text>
     <g v-for="(p,i) in annotations" :key="i" class="point-marker" :tabindex="p.month >= start ? 0 : -1" role="button" :aria-label="`${p.label} ${date(Math.floor(p.month))}: ${p.values.map(v=>v.label+' '+amount(v.value)).join(', ')} ${zh ? '日元' : 'JPY'}`" @pointerenter="hovered=i" @pointerleave="hovered=null" @focus="hovered=i" @blur="hovered=null" @keydown.enter.prevent="emit('select',Math.max(0,Math.min(end,Math.round(p.month))))" @keydown.space.prevent="emit('select',Math.max(0,Math.min(end,Math.round(p.month))))" @pointerdown.stop="emit('select',Math.max(0,Math.min(end,Math.round(p.month))))">
       <g v-for="v in (p.month >= start ? p.values : [])" :key="v.label">
         <circle :cx="p.px" :cy="y(v.value)" r="14" fill="transparent"/>

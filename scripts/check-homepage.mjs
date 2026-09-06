@@ -88,6 +88,8 @@ async function main() {
         await navigate(cdp, origin + route);
         await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 10000);
         await evaluate('document.fonts.ready');
+        await cdp.send('Page.bringToFront');
+        await waitFor(cdp, "Math.abs(document.querySelector('.chart svg').viewBox.baseVal.width - Math.max(240, document.querySelector('.chart svg').getBoundingClientRect().width)) < 1", 5000);
         await assertFit();
         assert.equal(await evaluate("document.querySelectorAll('main').length"), 1);
         assert.equal(await evaluate("document.querySelectorAll('h1').length"), 1);
@@ -96,13 +98,12 @@ async function main() {
         assert.equal(await evaluate("document.querySelector('.language').getAttribute('href')"), homeRoute(language === 'en' ? 'zh' : 'en'));
         const geometry = await evaluate(`({termBottom:document.querySelector('.term-controls').getBoundingClientRect().bottom, explainBottom:document.querySelector('.primary').getBoundingClientRect().bottom, font:getComputedStyle(document.querySelector('.brand')).fontFamily})`);
         records.push({language,width,height,...geometry});
-        if (width >= 1280) assert.ok(geometry.explainBottom <= height, 'desktop explanation CTA below fold');
-        if (width === 390) assert.ok(geometry.termBottom <= height, 'mobile term below fold');
         await screenshot(`${language}-${width}`);
+        if (width >= 1280) assert.ok(geometry.explainBottom <= height, 'desktop tool CTA below fold');
+        if (width === 390) assert.ok(geometry.termBottom <= height, `mobile term below fold: ${geometry.termBottom}`);
         await click('.parameters summary');
-        await click('.data > summary');
-        await click('.data details summary');
-        await click('.primary');
+        assert.equal(await evaluate("document.querySelector('.data')"), null);
+        await click('.explain-action');
         assert.equal(await evaluate('document.activeElement.id'), 'explanation-title');
         if (width < 768) await click('.menu-button');
         await assertFit();
@@ -121,6 +122,10 @@ async function main() {
       await input('#loan-amount', '300000');
       await input('#loan-rate', '0');
       assert.equal(await evaluate("document.querySelector('#payment-interest dd').textContent"), '0.00');
+      assert.equal(await evaluate("document.querySelectorAll('.chart circle[r=\"5\"]').length"), 0, 'Zero-rate curves must not invent a crossing');
+      await evaluate("document.querySelector('.chart svg').focus()");
+      await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
+      assert.ok(await evaluate("document.querySelector('.point-readout').textContent.includes('2:')"), 'Chart keyboard inspection advances one month');
       await click('.questions button');
       await click('.explanation > button');
       assert.ok(await evaluate("document.querySelector('.explanation [role=status]').textContent.match(/Cancelled|已取消/) !== null"));
@@ -130,13 +135,13 @@ async function main() {
       assert.ok(await evaluate("document.querySelector('.explanation [role=status]').textContent.match(/three suggested|三个推荐/) !== null"));
       await evaluate("document.querySelector('#mock-question').focus()");
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
-      assert.ok(await evaluate("document.activeElement.classList.contains('primary')"));
+      assert.ok(await evaluate("document.activeElement.classList.contains('explain-action')"));
       await evaluate("document.querySelector('#loan-years').focus()");
       const old = await evaluate("document.querySelector('#loan-years').value");
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
       assert.equal(Number(await evaluate("document.querySelector('#loan-years').value")), Number(old)+1);
       // Parameter edits during generation must cancel the old snapshot.
-      await click('.primary'); await click('.questions button'); await input('#loan-rate', '5'); await delay(800);
+      await click('.explain-action'); await click('.questions button'); await input('#loan-rate', '5'); await delay(800);
       assert.ok(await evaluate("document.querySelector('.explanation [role=status]').textContent.match(/Cancelled|已取消/) !== null"));
       await cdp.send('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:'reduce'},{name:'prefers-color-scheme',value:'dark'}]});
       await assertFit();
@@ -145,6 +150,20 @@ async function main() {
       // 200% reflow equivalent: 1280 physical width -> 640 CSS pixels, 2x raster scale.
       await cdp.send('Emulation.setDeviceMetricsOverride', {width:640,height:450,deviceScaleFactor:2,mobile:false});
       await assertFit(); await screenshot(`${language}-200pct-reflow`);
+      const href = await evaluate("document.querySelector('.full-comparison').getAttribute('href')");
+      const current = await evaluate("({amount:Number(document.querySelector('#loan-amount').value),rate:Number(document.querySelector('#loan-rate').value),months:Number(document.querySelector('#loan-years').value)*12})");
+      await navigate(cdp, origin + href);
+      await waitFor(cdp, "document.querySelector('#amount') && !document.querySelector('.controls').disabled", 10000);
+      assert.equal(await evaluate("Number(document.querySelector('#amount').value.replaceAll(',', ''))"), current.amount);
+      for (const id of ['a','b']) {
+        assert.equal(await evaluate(`Number(document.querySelector('#${id}-rate').value)`), current.rate);
+        assert.equal(await evaluate(`Number(document.querySelector('#${id}-months').value)`), current.months);
+      }
+      assert.ok(href.startsWith(language === 'zh' ? '/zh/tools/mortgage.html?' : '/tools/mortgage.html?'));
+      await navigate(cdp, origin + (language === 'zh' ? '/zh' : '') + '/tools/mortgage.html?amount=-1&rate=99&months=999');
+      await waitFor(cdp, "document.querySelector('#amount') && !document.querySelector('.controls').disabled", 10000);
+      assert.equal(await evaluate("document.querySelector('#amount').value"), '50,000,000');
+      assert.equal(await evaluate("document.querySelector('#a-months').value"), '420');
       await cdp.send('Emulation.setEmulatedMedia', {features:[]});
       // Full SSR fallback with JavaScript disabled.
       await cdp.send('Emulation.setScriptExecutionDisabled', {value:true});
@@ -158,7 +177,7 @@ async function main() {
     await navigate(cdp, origin + homeRoute('en'));
     await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 10000);
     await click('.parameters summary');
-    await input('#loan-amount', '10000000'); await input('#loan-rate', '20'); await input('#loan-years', '40');
+    await input('#loan-amount', '10000000000'); await input('#loan-rate', '20'); await input('#loan-years', '50');
     await cdp.send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:false});
     await assertFit();
     await click('.menu-button');
@@ -175,7 +194,7 @@ async function main() {
     await evaluate(`document.querySelector('#app').__vue_app__.config.globalProperties.$router.push(${JSON.stringify(homeRoute('zh'))})`);
     await waitFor(cdp, "document.querySelector('.homepage.chinese') && !document.querySelector('.term-controls').disabled", 10000);
     assert.equal(await evaluate("document.querySelectorAll('main').length"), 1);
-    assert.equal(await evaluate("document.querySelector('#loan-years').value"), '25');
+    assert.equal(await evaluate("document.querySelector('#loan-years').value"), '35');
     // Consistent, repeated local measurements; never represented as field performance.
     await cdp.send('Emulation.setDeviceMetricsOverride', {width:1440,height:900,deviceScaleFactor:1,mobile:false});
     await cdp.send('Emulation.setCPUThrottlingRate', {rate:4});
