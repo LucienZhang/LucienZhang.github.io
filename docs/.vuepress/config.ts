@@ -10,12 +10,13 @@ import { getDirname, path } from "vuepress/utils";
 import { AntDesignVueResolver } from "unplugin-vue-components/resolvers";
 import Components from "unplugin-vue-components/vite";
 import {
-  // head,
+  head,
   navbarEn,
   navbarZh,
   sidebarEn,
   sidebarZh,
 } from "./configs/index.js";
+import { mathjaxAssets } from "./plugins/mathjax-assets.mjs";
 import { lucienTheme } from "./theme";
 
 import markdownItFootnotePlugin from "markdown-it-footnote";
@@ -39,15 +40,18 @@ export default defineUserConfig({
   // set site base to default value
   base: "/",
   alias: {
+    "@theme/VPNavbarItems.vue": path.resolve(__dirname, "theme/components/NavbarItems.vue"),
+    "@theme/VPToggleSidebarButton.vue": path.resolve(__dirname, "theme/components/SidebarToggle.vue"),
     "@assets": path.resolve(__dirname, "../assets"),
   },
 
   // extra tags in `<head>`
-  //   head,
+  head,
 
   bundler: viteBundler({
     viteOptions: {
       plugins: [
+        mathjaxAssets(),
         Components({
           resolvers: [AntDesignVueResolver({ importStyle: "css-in-js" })],
         }),
@@ -63,9 +67,6 @@ export default defineUserConfig({
       build: {
         rollupOptions: {
           external: [
-            "/static/js/d3.js",
-            "/static/js/nv.d3.js",
-            "/static/js/pseudocode.js",
             "/static/css/pseudocode.min.css?used",
           ],
         },
@@ -89,7 +90,7 @@ export default defineUserConfig({
 
   // configure default theme
   theme: lucienTheme({
-    logo: "/logo.png",
+    logo: "/logo.svg",
     repo: "LucienZhang/LucienZhang.github.io",
     docsDir: "docs",
 

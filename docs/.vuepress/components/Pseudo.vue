@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { loadClassicScript } from '../lib/load-classic-script.mjs';
 export default {
   data() {
     return {
@@ -47,7 +48,7 @@ export default {
 
         await import("@mathjax/src/es5/tex-svg.js");
         await window.MathJax.startup?.promise;
-        await import("/static/js/pseudocode.js");
+        await loadClassicScript('/static/js/pseudocode.js', () => typeof window.pseudocode?.renderElement === 'function');
         if (this.isUnmounted) return;
         window.pseudocode.renderElement(element, {
           indentSize: "1.5em",

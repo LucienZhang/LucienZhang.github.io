@@ -1,0 +1,57 @@
+// Brand surfaces shared by article chrome and the existing light-only tools.
+@mixin light-palette {
+  --vp-c-accent: #b63824;
+  --vp-c-accent-bg: #b63824;
+  --vp-c-accent-hover: #99301f;
+  --vp-c-accent-text: #fffdf8;
+  --vp-c-accent-soft: rgb(182 56 36 / 10%);
+  --vp-c-bg: #f7f4ed;
+  --vp-c-bg-alt: #efeae0;
+  --vp-c-bg-elv: #fffdf8;
+  --vp-c-text: #20231f;
+  --vp-c-text-mute: #64665f;
+  --vp-c-text-subtle: #64665f;
+  --vp-c-divider: #cbc7bd;
+  --vp-c-border: #aaa497;
+  --vp-c-border-hard: #797b71;
+  --vp-c-shadow: rgb(32 35 31 / 12%);
+  --vp-c-control: rgb(32 35 31 / 6%);
+  --vp-c-control-hover: rgb(32 35 31 / 10%);
+  --vp-c-control-disabled: #e5e0d6;
+  --vp-navbar-c-bg: var(--vp-c-bg);
+  --vp-sidebar-c-bg: var(--vp-c-bg);
+}
+
+:root { @include light-palette; }
+
+:root[data-theme='dark'] {
+  --vp-c-accent: #f08d77;
+  --vp-c-accent-bg: #b63824;
+  --vp-c-accent-hover: #99301f;
+  --vp-c-accent-soft: rgb(240 141 119 / 14%);
+  --vp-c-bg: #22231f;
+  --vp-c-bg-alt: #1b1c19;
+  --vp-c-bg-elv: #2c2d27;
+  --vp-c-text: #eeeae1;
+  --vp-c-text-mute: #b8b5aa;
+  --vp-c-text-subtle: #b8b5aa;
+  --vp-c-divider: #484a40;
+  --vp-c-border: #6c6e60;
+  --vp-c-border-hard: #898b7c;
+  --vp-c-shadow: rgb(0 0 0 / 30%);
+  --vp-c-control: rgb(238 234 225 / 6%);
+  --vp-c-control-hover: rgb(238 234 225 / 10%);
+  --vp-c-control-disabled: #3c3e35;
+}
+
+// These calculators already use a fixed light palette, including chart labels.
+// Match their navigation to the content without changing the saved article theme.
+.vp-theme-container:is(.homepage-page, .mortgage-page, .japan-tax-page, .stock-screener-page) {
+  @include light-palette;
+  color-scheme: light;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text);
+  min-height: 100vh;
+
+  .vp-toggle-color-mode-button { display: none; }
+}

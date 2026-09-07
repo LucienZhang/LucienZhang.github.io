@@ -2,6 +2,7 @@
 import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { usePageData, useRouteLocale } from 'vuepress/client';
 import { defaults, validate, calculate } from '../../lib/loan/loan.mjs';
+import SiteLayout from './SiteLayout.vue';
 import MortgageChart from '../../components/tools/mortgage/MortgageChart.vue';
 import { crossings } from '../../components/tools/mortgage/model.mjs';
 import { mortgageHref } from '../../lib/loan/handoff.mjs';
@@ -10,17 +11,14 @@ const locale = useRouteLocale();
 const zh = computed(() => locale.value === '/zh/');
 const t = (en, cn) => zh.value ? cn : en;
 const ready = ref(false);
-const menu = ref(false);
-const menuToggle = ref(null);
 const draft = ref({ ...defaults });
 const result = ref(calculate(defaults));
 const errors = computed(() => validate(draft.value));
 const invalid = computed(() => Object.values(errors.value).some(Boolean));
 const money = (n) => new Intl.NumberFormat(zh.value ? 'zh-CN' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 const methods = computed(() => [{ key: 'payment', label: t('Equal payment', '元利均等（等额本息）') }, { key: 'principal', label: t('Equal principal', '元金均等（等额本金）') }]);
-const nav = computed(() => [['tools', t('Tools', '工具')], ['engineering', t('Engineering', '工程')], ['notes', t('Notes', '笔记')], ['contact', t('Contact', '联系')]]);
-const other = computed(() => zh.value ? '/' : '/zh/');
 const selectedMonth = ref(1);
+const other = computed(() => zh.value ? '/' : '/zh/');
 const toolHref = computed(() => mortgageHref(result.value.input, zh.value));
 const series = computed(() => methods.value.map((method, i) => ({label: `${i ? 'B' : 'A'} · ${method.label}`, points: result.value[method.key].rows.map(row => ({month: row.month, value: row.payment}))})));
 const flips = computed(() => crossings(result.value.payment.rows.map((row, i) => ({month: row.month, value: row.payment-result.value.principal.rows[i].payment}))));
@@ -95,27 +93,19 @@ const statusText = computed(() => ({
   cancelled: t('Cancelled. You can try again.', '已取消，可以重新生成。'),
   outside: t('This local mock supports only the three suggested questions. Select one above.', '此示例仅支持上方三个推荐问题，请选择其中一个。'),
 }[status.value]));
-watch(locale, () => { cancel(); reset(); menu.value = false; explanationOpen.value = false; answer.value = null; stale.value = false; status.value = 'ready'; question.value = ''; });
+watch(locale, () => { cancel(); reset(); explanationOpen.value = false; answer.value = null; stale.value = false; status.value = 'ready'; question.value = ''; });
 onMounted(() => { ready.value = true; });
 onBeforeUnmount(() => clearTimeout(timer));
 </script>
 
 <template>
+  <SiteLayout><template #page>
   <div id="homepage-top" class="homepage" :class="{ chinese: zh }" data-homepage="production">
     <div class="page-wrap">
       <a class="skip" href="#playground">{{ t('Skip to loan comparison', '跳到贷款比较') }}</a>
-      <header class="masthead">
-        <a href="#homepage-top" class="brand">{{ t('Ziliang', '张本人') }}</a>
-        <nav @keydown.esc="menu = false; menuToggle?.focus()" id="homepage-nav" :class="{ expanded: menu }" :aria-label="t('Page sections', '页面区块')">
-          <a v-for="[id, label] in nav" :key="id" :href="`#${id}`" @click="menu = false">{{ label }}</a>
-        </nav>
-        <a class="language" :href="other" :lang="zh ? 'en' : 'zh'" :aria-label="t('Switch to Chinese', '切换到英文')">{{ t('中文', 'EN') }}</a>
-        <button ref="menuToggle" class="menu-button" :disabled="!ready" :aria-expanded="menu" aria-controls="homepage-nav" @click="menu = !menu" @keydown.esc="menu = false">{{ menu ? t('Close', '关闭') : t('Menu', '菜单') }} <span aria-hidden="true">☰</span></button>
-      </header>
       <main aria-labelledby="homepage-title">
         <section class="hero">
           <div class="identity">
-            <p class="eyebrow">{{ t('Ziliang Zhang', '张子良') }}</p>
             <h1 id="homepage-title">{{ t('Making data explorable and AI useful.', '让数据变得可探索，让 AI 变得有用。') }}</h1>
             <p class="intro">{{ t('AI applications, data, and backend engineering. Explore my tools and experiments.', '我关注 AI 应用、数据与后端工程。这里是我的工具与实验。') }}</p>
             <button class="text-action" :disabled="!ready" @click="focusTerm">{{ t('Try changing a parameter', '试着调整一下') }} <span aria-hidden="true">↓</span></button>
@@ -172,9 +162,9 @@ onBeforeUnmount(() => clearTimeout(timer));
           </div>
         </section>
         <section id="tools" class="page-section"><h2>{{ t('Tools', '工具') }}</h2><div class="tools-grid">
-          <article><h3>{{ t('Loan comparison', '贷款比较') }}</h3><span class="badge">{{ t('Preview', '预览') }}</span><p>{{ t('Explore repayment structures and see how assumptions shape outcomes.', '比较还款方式，探索参数如何影响结果。') }}</p><a class="text-action" :href="toolHref">{{ t('Explore the tool', '进入工具页') }} ↗</a></article>
-          <article><h3>{{ t('AI stock screener', 'AI 筛股器') }}</h3><span class="badge planned">{{ t('Planned', '规划中') }}</span><p>{{ t('Turn natural language into explicit filters and inspect the results.', '将自然语言转为明确条件，查看筛选依据与结果。') }}</p></article>
-          <article><h3>{{ t('Japan tax calculator', '日本税务计算器') }}</h3><span class="badge planned">{{ t('Planned', '规划中') }}</span><p>{{ t('Explore tax rules through clear inputs and a transparent breakdown.', '用清晰的输入与计算明细理解税务规则。') }}</p></article>
+          <article><h3>{{ t('Loan comparison', '贷款比较') }}</h3><span class="badge">{{ t('Available', '可使用') }}</span><p>{{ t('Compare fixed-rate repayment methods and explore how parameters affect outcomes.', '比较固定利率还款方式，探索参数如何影响结果。') }}</p><a class="text-action" :href="toolHref">{{ t('Explore the tool', '进入工具页') }} ↗</a></article>
+          <article><h3>{{ t('AI stock screener', 'AI 筛股器') }}</h3><span class="badge planned">{{ t('Planned', '规划中') }}</span><p>{{ t('Planned: turn natural language into explicit filters. Screening and AI are not connected.', '计划将自然语言转为明确筛选条件；尚未接入筛选或 AI。') }}</p></article>
+          <article><h3>{{ t('Japan tax calculator', '日本税务计算器') }}</h3><p>{{ t('2025 salary income / 2026 resident tax estimates. Enter confirmed deductions; limited scenarios only.', '2025 工资收入／2026 住民税概算。扣除额需自行确认，仅适用限定场景。') }}</p><a class="text-action" :href="zh ? '/zh/tools/japan-tax.html' : '/tools/japan-tax.html'">{{ t('Open the tax calculator', '打开税务计算器') }} ↗</a></article>
         </div></section>
         <section id="engineering" class="page-section"><h2>{{ t('Engineering', '工程') }}</h2><div class="engineering-grid"><div><h3 class="serif">{{ t('Behind the interface.', '界面背后的工程。') }}</h3><p>{{ t('Experience with data platforms for machine learning and configuration-driven engineering.', '为机器学习构建数据平台，让重复的数据流程成为可复用的系统。') }}</p></div><div class="experience"><article><span class="engineering-symbol" aria-hidden="true">⠿</span><div><h3>{{ t('Data for machine learning', '机器学习数据平台') }}</h3><p>{{ t('Worked on profile data pipelines and data integration supporting recommendation systems.', '曾参与支持推荐系统的个人资料数据管道与数据整合。') }}</p></div></article><article><span class="engineering-symbol" aria-hidden="true">⚙</span><div><h3>{{ t('Configuration-driven platforms', '配置驱动的工程') }}</h3><p>{{ t('Worked on data lake pipelines and reusable workflows driven by SQL and YAML.', '曾参与数据湖管道与 SQL、YAML 配置驱动的可复用数据流程。') }}</p></div></article></div></div>
           <details class="how"><summary>{{ t('How this preview works', '贷款预览如何实现') }}</summary><p>{{ t('Inputs are validated before deterministic calculations run. The chart and summary share the same result; explore monthly tables in the full tool. The local explanation mock reads a snapshot and cannot alter the calculation.', '输入通过校验后运行确定性计算。图表与摘要共用同一结果，完整月度表格可进入工具页探索。本地解释 mock 读取快照，不能改变计算。') }}</p><p><a href="https://v.icbc.com.cn/userfiles/resources/wap/fenhang/shanghai/fengxian/txt/jrkj231120.pdf">{{ t('Repayment formulas · ICBC', '还款公式依据 · 工商银行') }} ↗</a></p></details>
@@ -187,6 +177,7 @@ onBeforeUnmount(() => clearTimeout(timer));
       <footer><span>© {{ page.frontmatter.copyrightYear }} Ziliang Zhang</span><a :href="other">{{ t('中文', 'EN') }}</a></footer>
     </div>
   </div>
+  </template></SiteLayout>
 </template>
 
 <style scoped>
@@ -212,26 +203,26 @@ onBeforeUnmount(() => clearTimeout(timer));
 .homepage summary { min-height: 44px; padding: 10px 0; cursor: pointer; }
 .homepage small, .fine { font-size: 14px; color: var(--muted); }
 .homepage details { margin-top: 12px; }
-.masthead { display: flex; align-items: center; gap: 28px; min-height: 96px; border-bottom: 1px solid var(--line); }
-.homepage .brand { font: 400 1.8rem Sacramento, cursive; color: var(--ink); margin-right: auto; min-height: 44px; display: flex; align-items: center; }
-.chinese .brand { font-family: Slidefu, cursive; font-size: 2rem; }
-.masthead nav { display: flex; gap: 28px; }
-.masthead nav a, .language { display: flex; align-items: center; min-height: 44px; }
-.language, footer a { min-width: 44px; justify-content: center; }
-.masthead nav a { color: var(--ink); min-width: 44px; }
-.menu-button { display: none; }
-.skip { position: absolute; top: -100px; padding: 12px; background: var(--paper); z-index: 10; }
+
+
+
+
+
+
+footer a { min-width: 44px; justify-content: center; }
+
+
+.skip { position: absolute; top: -100px; padding: 12px; background: var(--paper); z-index: 40; }
 .skip:focus { top: 8px; }
 .hero { display: grid; grid-template-columns: 1fr 2fr; gap: 44px; padding: 48px 0 64px; }
 .identity { padding: 24px 0; }
-.eyebrow { font-size: 14px; color: var(--muted); margin-bottom: 16px !important; }
 .homepage h1 { font: 400 clamp(40px, 4vw, 60px)/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -.025em; }
 .chinese h1 { font-family: 'Songti SC', 'Noto Serif CJK SC', serif; line-height: 1.35; }
 .intro { margin-top: 28px !important; max-width: 29ch; }
 .homepage .text-action { border: 0; color: var(--accent); padding: 8px 0; text-align: left; }
 .identity .text-action { margin-top: 28px; }
 .secondary-link { display: block; min-height: 44px; padding: 10px 0; color: var(--muted) !important; }
-.playground { min-width: 0; border-left: 1px solid var(--line); padding-left: 40px; scroll-margin-top: 24px; }
+.playground { min-width: 0; border-left: 1px solid var(--line); padding-left: 40px; scroll-margin-top: calc(var(--navbar-height) + 24px); }
 .section-heading { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
 .badge { font-size: 14px; line-height: 1.6; background: #f9e5df; color: #96301e; padding: 2px 8px; border-radius: 5px; display: inline-block; }
 .badge.planned { background: #eae5d6; color: #605821; }
@@ -270,7 +261,7 @@ onBeforeUnmount(() => clearTimeout(timer));
 .error { color: #90231e !important; }
 .notice.error { background: #f6e2db; }
 .highlighted { background: #e9e1c7; outline: 2px solid var(--accent); }
-.page-section { border-top: 1px solid var(--line); padding: 36px 0 48px; scroll-margin-top: 16px; }
+.page-section { border-top: 1px solid var(--line); padding: 36px 0 48px; scroll-margin-top: calc(var(--navbar-height) + 16px); }
 .page-section > h2 { color: var(--accent); margin-bottom: 28px; }
 .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
 .tools-grid article { padding: 0 28px 0 0; border-right: 1px solid var(--line); }
@@ -296,11 +287,13 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 20px
 footer a { display: flex; min-height: 44px; align-items: center; }
 @media (max-width: 1100px) { .hero { gap: 28px; } .playground { padding-left: 28px; } .summary-grid { gap: 16px; } }
 @media (max-width: 1023px) { .hero { grid-template-columns: 1fr; padding-top: 32px; } .identity { padding: 0; } .intro { max-width: 52ch; margin-top: 16px !important; } .identity .text-action { margin-top: 16px; } .secondary-link { display: inline-block; margin-left: 24px; } .playground { border-left: 0; border-top: 1px solid var(--line); padding: 24px 0 0; } .chart svg { max-height: 260px; } .engineering-grid { gap: 32px; } }
-@media (max-width: 767px) { .page-wrap { padding: 0 24px; } .masthead { min-height: 76px; gap: 16px; flex-wrap: wrap; padding: 12px 0; } .masthead nav { display: none; order: 4; width: 100%; flex-wrap: wrap; gap: 8px 24px; } .masthead nav.expanded { display: flex; } .menu-button { display: block; } .homepage h1 { font-size: 36px; } .homepage h2 { font-size: 23px; } .hero { padding: 28px 0 40px; gap: 24px; } .eyebrow { margin-bottom: 8px !important; } .intro { font-size: 16px; } .secondary-link { margin-left: 12px; font-size: 14px; } .chart { margin-top: 16px !important; } .legend { justify-content: start; gap: 12px; } .term-controls { gap: 8px; } .term-controls output { min-width: 55px; font-size: 14px; } .page-section { padding: 28px 0 40px; } .page-section > h2 { margin-bottom: 20px; } .tools-grid, .engineering-grid { grid-template-columns: 1fr; gap: 24px; } .tools-grid article { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 24px; } .tools-grid p { max-width: none; } .tools-grid button { margin-top: 8px; } .homepage .serif { font-size: 28px; } .experience article { gap: 16px; } .flow { padding: 16px; gap: 8px 12px; } .note-row { padding: 14px 0; gap: 8px; } .explanation { padding: 16px; } .panel-heading { flex-wrap: wrap; } .input-grid { grid-template-columns: 1fr; } }
-@media (max-width: 389px) { .page-wrap { padding: 0 20px; } .homepage h1 { font-size: 32px; } .masthead { gap: 12px; } .summary-grid { grid-template-columns: 1fr; } .term-controls { grid-template-columns: auto 44px 1fr 44px; } .term-controls output { grid-column: 3 / 5; text-align: right; } .note-row { flex-wrap: wrap; } .note-row > span:first-child { max-width: 100%; } .note-row small { font-size: 12px; } .secondary-link { margin-left: 0; } }
+@media (max-width: 767px) {    .page-wrap { padding: 0 24px; }     .homepage h1 { font-size: 36px; } .homepage h2 { font-size: 23px; } .hero { padding: 28px 0 40px; gap: 24px; } .intro { font-size: 16px; } .secondary-link { margin-left: 12px; font-size: 14px; } .chart { margin-top: 16px !important; } .legend { justify-content: start; gap: 12px; } .term-controls { gap: 8px; } .term-controls output { min-width: 55px; font-size: 14px; } .page-section { padding: 28px 0 40px; } .page-section > h2 { margin-bottom: 20px; } .tools-grid, .engineering-grid { grid-template-columns: 1fr; gap: 24px; } .tools-grid article { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 24px; } .tools-grid p { max-width: none; } .tools-grid button { margin-top: 8px; } .homepage .serif { font-size: 28px; } .experience article { gap: 16px; } .flow { padding: 16px; gap: 8px 12px; } .note-row { padding: 14px 0; gap: 8px; } .explanation { padding: 16px; } .panel-heading { flex-wrap: wrap; } .input-grid { grid-template-columns: 1fr; } }
+@media (max-width: 389px) {   .page-wrap { padding: 0 20px; } .homepage h1 { font-size: 32px; }  .summary-grid { grid-template-columns: 1fr; } .term-controls { grid-template-columns: auto 44px 1fr 44px; } .term-controls output { grid-column: 3 / 5; text-align: right; } .note-row { flex-wrap: wrap; } .note-row > span:first-child { max-width: 100%; } .note-row small { font-size: 12px; } .secondary-link { margin-left: 0; } }
 @media (prefers-reduced-motion: reduce) { .homepage *, .homepage *::before, .homepage *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
 
 .full-comparison{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 14px;border:1px solid var(--accent);border-radius:3px;text-decoration:none}.full-comparison:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
 @media(max-width:767px){.hero{padding-top:12px;gap:16px}.identity{padding:0}.intro{margin-top:12px!important}.identity .text-action{margin-top:12px}}
 </style>
+
+<style>.site-layout .homepage { padding-top: var(--navbar-height); } .site-layout:has(.homepage) { color-scheme: light; } .site-layout:has(.homepage) .vp-navbar { background: #f7f4ed; }</style>

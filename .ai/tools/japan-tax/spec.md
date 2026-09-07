@@ -2,7 +2,7 @@
 
 2026-09-06；来源 codex/japan-tax-calculator / 70a9aa1。适用 **2025 年工资收入、2026 年度住民税**，不是任意年度计算器。规则核对日期与适用年度不同；2026 收入规则迁移另行实施。
 
-双语路由 /tools/japan-tax.html、/zh/tools/japan-tax.html 保留 noindex/nofollow。纯前端、本地内存、不保存或外发输入，不接 AI 或后台，不在主页展示 demo。本次只合并工具，不调整主页入口。
+双语路由 /tools/japan-tax.html、/zh/tools/japan-tax.html 保留 noindex/nofollow。纯前端、本地内存、不保存或外发输入，不接 AI 或后台，不在主页展示 demo。2026-09-07 收尾提供主页及默认导航双语入口；不显示“可体验”阶段标签，首屏注明限定年度/范围，计算逻辑不变。
 
 ## 当前功能与输入
 

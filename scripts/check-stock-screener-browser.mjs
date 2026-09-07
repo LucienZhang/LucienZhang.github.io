@@ -8,6 +8,16 @@ const out = new URL('../.ai/artifacts/stock-screener/', import.meta.url);
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const results = [];
+async function focusInput(page) {
+ const order=[];
+ for(let i=0;i<24;i++) {
+  await page.keyboard.press('Tab');
+  assert.equal(await page.evaluate(()=>Boolean(document.activeElement.closest('.vp-sidebar'))),false,'Closed sidebar must not receive focus');
+  const id=await page.evaluate(()=>document.activeElement.id || document.activeElement.className);order.push(id);
+  if(id==='stock-intent')return order;
+ }
+ assert.fail('Input not reachable from shared navigation');
+}
 try {
  for (const locale of ['en', 'zh']) {
   const route = `${locale === 'zh' ? '/zh' : ''}/tools/stock-screener.html`;
@@ -25,13 +35,12 @@ try {
    assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, nofollow');
    assert.equal(await page.locator('.stock-shell button, .stock-shell form').count(), 0);
    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${locale}/${width} overflow`);
+   await focusInput(page);
    if (name === 'desktop' || name === 'mobile') await page.screenshot({path: new URL(`${name}-${locale}.png`,out).pathname, fullPage:true});
    results.push({locale,width,height,overflow:false});
   }
   await page.goto(origin+route, {waitUntil:'networkidle'});
-  const focusOrder=[];
-  for (let i=0;i<4;i++) { await page.keyboard.press('Tab'); focusOrder.push(await page.evaluate(() => document.activeElement.id || [...document.activeElement.classList].sort().join(" "))); }
-  assert.deepEqual(focusOrder,['skip-link','brand'+(locale==='zh'?' chinese':''),'language','stock-intent']);
+  const focusOrder=await focusInput(page);
   assert.equal(await page.locator('#stock-intent').evaluate(el => getComputedStyle(el).outlineStyle),'solid');
   assert.ok(await page.locator('#stock-intent').getAttribute('aria-describedby'));
   const requests=[]; const listener=req=>requests.push(req.url()); page.on('request',listener);
@@ -44,12 +53,12 @@ try {
   assert.equal(await page.locator('.criteria-placeholder').innerText(),criteria);
   assert.equal(requests.length,0);
   page.off('request',listener);
-  await page.keyboard.press('Shift+Tab');
+  await page.locator('.vp-navbar .language').focus();
   await page.keyboard.press('Enter');
   await page.waitForURL(origin + (locale==='zh'?'':'/zh') + '/tools/stock-screener.html');
   assert.equal(await page.locator('#stock-intent').inputValue(),'');
   await page.goto(origin+route, {waitUntil:'networkidle'});
-  await page.keyboard.press('Tab'); await page.keyboard.press('Enter');
+  await page.locator('.skip-link').focus(); await page.keyboard.press('Enter');
   assert.equal(await page.evaluate(()=>document.activeElement.id),'stock-content');
   await page.emulateMedia({colorScheme:'dark',reducedMotion:'reduce'});
   assert.equal(await page.locator('.stock-shell').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(247, 244, 237)');

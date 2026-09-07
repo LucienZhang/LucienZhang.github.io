@@ -59,6 +59,7 @@ const pseudoCss = read("docs/.vuepress/public/static/css/pseudocode.min.css");
 assert.doesNotMatch(pseudoSource, /import\(["']https:/);
 assert.match(pseudoSource, /@mathjax\/src\/es5\/tex-svg\.js/);
 assert.match(pseudoSource, /mathjax:\s*["']\/static\/mathjax["']/);
+for (const source of [pseudoSource, leetCodeSource]) assert.doesNotMatch(source, /import\s*\([^)]*\/static\/js\//);
 assert.doesNotMatch(leetCodeSource, /cdnjs\.cloudflare\.com/);
 assert.doesNotMatch(pseudoCss, /@import\s+url\(https:/);
 
