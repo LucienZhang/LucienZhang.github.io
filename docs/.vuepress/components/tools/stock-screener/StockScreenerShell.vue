@@ -81,6 +81,8 @@ const copy = computed(() => zh.value ? {
 
 <style scoped>
 /* Only this route's theme wrapper is adjusted; all visual rules live below the tool root. */
+/* This shell owns its navigation; remove off-canvas theme links from keyboard order. */
+:global(.vp-theme-container.stock-screener-page.no-sidebar .vp-sidebar), :global(.vp-theme-container.stock-screener-page .vp-sidebar-mask) { display: none; }
 :global(.stock-screener-page .vp-page) { padding: 0; }
 :global(.stock-screener-page .vp-page [vp-content]) { max-width: none; padding: 0; margin: 0; }
 :global(.stock-screener-page .vp-page-meta), :global(.stock-screener-page .vp-page-nav) { display: none; }

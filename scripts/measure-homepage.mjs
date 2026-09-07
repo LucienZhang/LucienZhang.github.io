@@ -23,7 +23,7 @@ async function main() {
   const chromeLog = path.join(profile, "chrome-stderr.log");
   const chromeLogFd = fs.openSync(chromeLog, "w");
   const browser = spawn(chrome, [
-    "--headless=new",
+    ...(process.env.HOMEPAGE_HEADED === '1' ? [] : ["--headless=new"]),
     "--no-sandbox",
     "--use-angle=swiftshader",
     "--enable-unsafe-swiftshader",
@@ -84,16 +84,20 @@ async function main() {
     await cdp.send('Network.emulateNetworkConditions', {offline:false,latency:40,downloadThroughput:1250000,uploadThroughput:625000});
     await cdp.send('Page.addScriptToEvaluateOnNewDocument', {source:"window.__lcp=0;window.__cls=0;new PerformanceObserver(l=>{window.__lcp=l.getEntries().at(-1).startTime}).observe({type:'largest-contentful-paint',buffered:true});new PerformanceObserver(l=>{for(const e of l.getEntries())if(!e.hadRecentInput)window.__cls+=e.value}).observe({type:'layout-shift',buffered:true});"});
     const performanceRuns = [];
-    for(let i=0;i<3;i++) {
+    for (const route of ['/', '/zh/']) for(let i=0;i<3;i++) {
       await cdp.send('Network.clearBrowserCache');
-      await navigate(cdp, origin + '/');
+      await navigate(cdp, origin + route);
+      await cdp.send('Page.bringToFront');
       await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 15000);
       await delay(2500);
-      performanceRuns.push(await evaluate(`(() => {const n=performance.getEntriesByType('navigation')[0];return {lcp:window.__lcp || null,cls:window.__cls,domContentLoaded:n.domContentLoadedEventEnd,load:n.loadEventEnd,responseEnd:n.responseEnd,visibility:document.visibilityState,paints:performance.getEntriesByType('paint').map(p=>({name:p.name,time:p.startTime}))}})()`));
+      const sample = await evaluate(`(() => {const n=performance.getEntriesByType('navigation')[0];return {lcp:window.__lcp || null,cls:window.__cls,domContentLoaded:n.domContentLoadedEventEnd,load:n.loadEventEnd,responseEnd:n.responseEnd,visibility:document.visibilityState,paints:performance.getEntriesByType('paint').map(p=>({name:p.name,time:p.startTime}))}})()`);
+      assert.equal(sample.visibility, 'visible', 'Performance sample must be visible');
+      assert.ok(Number.isFinite(sample.lcp) && sample.lcp > 0, 'A non-null LCP is required');
+      performanceRuns.push({route, ...sample});
     }
     const version = await cdp.send('Browser.getVersion');
     const ax = await cdp.send('Accessibility.getFullAXTree');
-    assert.ok(ax.nodes.some(n => n.role?.value === 'slider' && n.name?.value === 'Term'));
+    assert.ok(ax.nodes.some(n => n.role?.value === 'slider' && ['Term', '年限'].includes(n.name?.value)));
     fs.writeFileSync(path.join(output, 'timing.json'), JSON.stringify({version,records,performanceRuns,errors:runtimeErrors}, null, 2));
     assert.deepEqual(runtimeErrors, [], `Browser runtime errors:\n${runtimeErrors.join("\n")}`);
     assert.deepEqual(
@@ -102,7 +106,7 @@ async function main() {
       `Unexpected runtime CDN requests:\n${forbiddenRemoteRequests.join("\n")}`,
     );
     await cdp.close();
-    console.log('Prototype timing samples saved.');
+    console.log('Visible bilingual homepage timing samples saved.');
   } finally {
     await stopBrowser(browser);
     await new Promise((resolve) => server.close(resolve));

@@ -1,6 +1,6 @@
 # 验证摘要与复现
 
-更新：2026-09-06。适用于当前 PR #14；不表示生产部署或真实设备验收完成。
+更新：2026-09-07。PR #14 已合并并部署；下方各历史轮次结果保留当时语境。本轮结论见末节，不代表真实设备验收完成。
 
 ## 可复现命令
 
@@ -10,7 +10,7 @@ Node >=22.18，按 package-lock 安装。完整链 `npm run verify` 包含生产
 - `npm run check:mortgage`：房贷数值、交点、日期验证。
 - `node scripts/check-mortgage-browser.mjs`：已构建站点的双语工具交互、SSR、焦点/无障碍树、布局和截图，写入 `.ai/artifacts/mortgage/`。
 - `node scripts/measure-homepage-assets.mjs`：构建产物的去重脚本/样式 gzip 体积，写入 `.ai/artifacts/homepage/assets.json`。
-- `node scripts/measure-homepage.mjs`：独立可见页面性能采样，写入 `.ai/artifacts/homepage/timing.json`。综合交互测试经过无 JS 模拟后页面可能 hidden，不使用其中空 LCP 作为性能结论。
+- `node scripts/measure-homepage.mjs`（无头页面为hidden时使用`HOMEPAGE_HEADED=1`）：独立可见页面性能采样，写入 `.ai/artifacts/homepage/timing.json`。综合交互测试经过无 JS 模拟后页面可能 hidden，不使用其中空 LCP 作为性能结论。
 - `PLAYWRIGHT_MODULE=/absolute/path/to/playwright/index.mjs PREVIEW_ORIGIN=http://127.0.0.1:4387 node scripts/check-stock-screener-browser.mjs`：可选的筛股器专项检查，需已有 Playwright 安装及自行启动的构建目录 HTTP 服务器；不会向仓库添加依赖。产物在 `.ai/artifacts/stock-screener/`。常规 verify 的 smoke 已包含两条筛股器路由。
 
 ## 上一轮主页清理验证
@@ -52,3 +52,34 @@ Chrome 自动化不能替代 Safari、实际触屏和人工 VoiceOver/NVDA。200
 主页覆盖1440/1280/768/390/320、首屏控件、窄屏/重排、键盘逐期查看、零利率无伪交点、100亿/50年上界、解释快照、SSR和SPA默认35年。手机图表去除多行常驻读数，改为单行简写读数并调整留白；完整工具使用原图表模式。挂载时立即测量宽度，随后由 ResizeObserver 更新；测试等待图表达到实际容器宽度后检查首屏，不放宽尺寸断言。
 
 截图仅在 .ai/artifacts/homepage/，已人工查看英文桌面及中文手机。完整房贷专项浏览器退出0，中英文桌面/移动、多视图、日期、焦点及SSR均通过；资源报告脚本和 git diff --check 通过。已有跨浏览器/真机/人工读屏限制不变；本轮不声称最新线上性能，也不开放工具搜索索引。
+
+## 上线收尾（2026-09-07，c4184ee 后独立 worktree）
+
+### 基线与本轮范围
+
+HEAD、本地 main、origin/main 与 `git ls-remote origin refs/heads/main` 均为 c4184eed10b1cd879cd921fcb2c94ba5dbae4e76。GitHub Pages [run 34072025368](https://github.com/LucienZhang/LucienZhang.github.io/actions/runs/34072025368) 成功；GitHub 域名跳转到 https://ziliang.red/。这确认 PR #14 已合并发布，本轮入口文案及筛股器键盘修复尚未发布。分支 codex/homepage-launch-closeout，仅本地提交，不 push/PR/合并/部署。
+
+房贷卡标可使用并注明固定利率；税务卡标可试用、限定年度与扣除输入范围并加入对应语言入口；筛股器仍规划中、明确无筛选/AI且无入口。没有修改计算逻辑、共享图表、默认参数、路由或robots。线上窄屏键盘检查发现筛股器隐藏的默认主题侧栏仍可聚焦；本轮只在该工具pageClass下隐藏侧栏与遮罩，并补各宽度焦点顺序断言。首版局部样式被默认主题更高优先级规则覆盖，新增回归确实失败；修正选择器后通过，没有放宽断言。
+
+### 本地最终构建验证
+
+- `npm ci`、`npm ls --depth=0`、最终 `HOMEPAGE_CAPTURE=1 npm run verify` 退出0：56页、3252内部引用、15关键产物、严格路由/安全、9路由smoke、双语主页、独立贷款oracle、参数handoff、120房贷场景和税务7组测试。依旧有大chunk及中文项目sidebar配置提示，未调高阈值。税务数值合计283项、金额格式19项、鼠标走廊104项断言通过。
+- `node scripts/check-mortgage-browser.mjs`；`TAX_FULL_AUDIT=1 TAX_LOCALE=en node scripts/check-japan-tax-browser.mjs` 与zh版本均退出0。房贷、税务专项在本轮首个构建执行；其后仅修复筛股器局部CSS，最终构建重新执行完整verify。
+- 启动 `python3 -m http.server 4387 --bind 127.0.0.1 --directory docs/.vuepress/dist`，再执行 `PLAYWRIGHT_MODULE=/Users/lucien/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs PREVIEW_ORIGIN=http://127.0.0.1:4387 node scripts/check-stock-screener-browser.mjs` 退出0。双语1440/1280/768/390/320px全部覆盖焦点顺序、无溢出；输入不请求、语言切换清空、skip link、深色偏好、字号重排与SSR通过。Playwright路径因机器而异，不新增仓库依赖。
+- 新税务链接补充键盘Enter跳转验证：中英入口各到对应工具，robots仍noindex/nofollow。已查看英文桌面、中文手机首页截图；截图与日志均在忽略目录 `.ai/artifacts/`，不是自动图片差异基准。
+- `node --check scripts/measure-homepage.mjs`、`node --check scripts/check-stock-screener-browser.mjs`、修改文档相对链接检查与 `git diff --check` 通过。
+
+### 线上检查与限制
+
+- 八条路径：`/`、`/zh/`，以及两语言的`/tools/mortgage.html`、`/tools/japan-tax.html`、`/tools/stock-screener.html`，全部HTTP200；HTML引用的28个去重初始assets返回200，六个工具页robots均为`noindex, nofollow`。初始资源检查不等于全站所有动态资源审计。
+- 对公开站点运行现有首页/房贷/税务浏览器脚本的临时副本，仅将origin替换为`https://ziliang.red`、root固定为当前checkout、输出移至`.ai/artifacts/launch/online-*`。首页、房贷、中英税务均退出0，覆盖两语言参数跳转、布局/键盘/SSR；税务报告无页面异常和外部请求。可复现方式：从对应`scripts/check-*.mjs`生成上述替换的临时副本，按本地命令顺序运行，避免税务测试争用鼠标焦点。
+- In-app Browser实查线上首页中英切换、筛股器中英切换与320px布局。线上筛股器隐藏导航焦点缺陷已在本地修复，须在后续合并部署后复核；新税务首页入口同样尚待发布后检查。
+- Safari虽然本机安装，但当前浏览器工具未提供Safari控制；未完成Safari、实际手机触控、人工VoiceOver/NVDA或真实浏览器200%缩放。自动无障碍树与CSS重排检查不能代替这些人工项目。未取得CrUX/RUM用户p75，不声称线上用户性能达标。
+
+### 最终资源与性能
+
+复现：`node scripts/measure-homepage-assets.mjs` 和独立运行 `node scripts/measure-homepage.mjs`。后者现分别对中英首页采样3次，导航后bringToFront，并强制要求visible且LCP为正有限数。无头Chrome两次遇到hidden而被断言拒绝，没有将空值当成绩；最终使用`HOMEPAGE_HEADED=1 node scripts/measure-homepage.mjs`打开独立可见窗口完成采样。原始数据保存在`.ai/artifacts/homepage/assets.json`和`timing.json`。
+
+最终构建初始script/modulepreload去重gzip（level 9）英文90.17 KiB、中文90.24 KiB；公共CSS23.22 KiB，另列异步Home模块8.93 KiB。该口径不是整个运行期依赖图或真实网络传输量；初始JS/CSS低于既有160/36 KiB候选预算，不改变预算。
+
+本地受控条件：Chrome152.0.7977.76，1440×900，CPU4×、网络40ms/10Mbps、每次清浏览器缓存，每语言3次。英文LCP1440/952/980ms，中位980ms；中文1136/848/876ms，中位876ms；六次CLS均约0.0160842，全部visible且LCP非空。未采集线上用户性能数据；不将线上功能回归中的hidden/lcp:null记录用于性能结论。

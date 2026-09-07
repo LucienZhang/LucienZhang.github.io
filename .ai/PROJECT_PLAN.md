@@ -1,6 +1,7 @@
 # LucienZhang.github.io 维护与升级计划
 
-> 状态：Phase 0–4（含 Phase 3.5）已通过 PR #8 合并到 `main`；Phase 4.5 的 CI 清理、Chrome 启动稳定性和最终记录已通过 PR #9–#12 合并。后续 navbar 字体选择器修复已由 commit `740de38` 发布，GitHub Actions run `33945849908` 的 docs、notebooks 和 Pages deploy 全部成功；维护升级阶段至此完成，下一步进入 Phase 5A 主页设计探索。
+> 历史维护阶段状态（2026-09-05）：Phase 0–4（含 Phase 3.5）已通过 PR #8 合并到 `main`；Phase 4.5 的 CI 清理、Chrome 启动稳定性和最终记录已通过 PR #9–#12 合并。后续 navbar 字体选择器修复已由 commit `740de38` 发布，GitHub Actions run `33945849908` 的 docs、notebooks 和 Pages deploy 全部成功；维护升级阶段至此完成，下一步进入 Phase 5A 主页设计探索。
+> 当前产品状态（2026-09-07）：PR #14 已合并 main（c4184ee），Pages run 34072025368 成功；A v2 主页、房贷、限定年度税务及 demo 已上线，筛股器仅空壳。当前从 main 独立收尾，后续按上线收尾 → AI 解释器设计 → 筛股 MVP 需求推进，详见 [单一后续清单](./phase5/remaining-work.md)。下方基础设施审计及旧计划保留历史语境。
 > 基线审计日期：2026-09-04
 > 适用仓库：`LucienZhang/LucienZhang.github.io`
 
@@ -430,7 +431,7 @@ Phase 3.5B 实施与验证记录：[`phase3.5/2026-09-04-home.md`](./phase3.5/20
 
 Phase 5A 的产品目标是将主页构建为具有原创感的 Programming × AI showcase，并将 chatbot 设计为可引用、定位和强调页面内容的增强式导航层。Phase 5A 只定义交互并使用 mock adapter；真实模型调用、检索、密钥、限流和观测仍属于后续独立后端阶段。
 
-Phase 5A 当前状态（2026-09-06）：A v2 已确认并迁移至 / 与 /zh/；房贷比较工具、2025收入/2026住民税计算器及筛股器空壳已集成至 PR #14，未合并 main 或部署。重复主页 preview 与审阅控件已移除。当前规格、验证及剩余工作见 [文档索引](./README.md)；上方分阶段流程作为历史计划保留。
+Phase 5A 当前状态（2026-09-07）：A v2 已迁移至 / 与 /zh/；房贷比较工具、2025收入/2026住民税计算器、单图 demo 及筛股器空壳已通过 PR #14 合并 main 并部署。当前独立收尾调整工具展示，尚未发布这轮修改。重复主页 preview 与审阅控件已移除。当前规格、验证及剩余工作见 [文档索引](./README.md)；上方分阶段流程作为历史计划保留。
 
 ## 7. 验证矩阵
 

@@ -25,6 +25,12 @@ try {
    assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, nofollow');
    assert.equal(await page.locator('.stock-shell button, .stock-shell form').count(), 0);
    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${locale}/${width} overflow`);
+   const viewportFocus = [];
+   for (let i = 0; i < 4; i++) {
+    await page.keyboard.press('Tab');
+    viewportFocus.push(await page.evaluate(() => document.activeElement.id || [...document.activeElement.classList].sort().join(' ')));
+   }
+   assert.deepEqual(viewportFocus, ['skip-link', 'brand' + (locale === 'zh' ? ' chinese' : ''), 'language', 'stock-intent'], `${locale}/${width} visible keyboard order`);
    if (name === 'desktop' || name === 'mobile') await page.screenshot({path: new URL(`${name}-${locale}.png`,out).pathname, fullPage:true});
    results.push({locale,width,height,overflow:false});
   }
