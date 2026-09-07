@@ -10,7 +10,7 @@ import { getDirname, path } from "vuepress/utils";
 import { AntDesignVueResolver } from "unplugin-vue-components/resolvers";
 import Components from "unplugin-vue-components/vite";
 import {
-  // head,
+  head,
   navbarEn,
   navbarZh,
   sidebarEn,
@@ -43,7 +43,7 @@ export default defineUserConfig({
   },
 
   // extra tags in `<head>`
-  //   head,
+  head,
 
   bundler: viteBundler({
     viteOptions: {
@@ -89,7 +89,7 @@ export default defineUserConfig({
 
   // configure default theme
   theme: lucienTheme({
-    logo: "/logo.png",
+    logo: "/logo.svg",
     repo: "LucienZhang/LucienZhang.github.io",
     docsDir: "docs",
 

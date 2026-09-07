@@ -119,3 +119,10 @@ HEAD、本地 main、origin/main 与 `git ls-remote origin refs/heads/main` 均�
 用户确认保留切口的精修版为最终版，统一文件名`docs/.vuepress/public/logo.svg`，首页改为引用`/logo.svg`，宽高属性同步1366×748；沿用48/40/32px响应式宽度。未采用SVG移出public至忽略产物目录，其他页面使用的既有logo.png保留。几何检查已接入`check:home`。
 
 最终`HOMEPAGE_CAPTURE=1 npm run verify`退出0，覆盖56页构建、3254内部引用、严格路由/产物/安全、9路由smoke、Logo几何约束、双语主页及贷款/房贷/税务回归。补充中英1440/390/320px检查确认实际加载`/logo.svg`，窄屏导航同排、无横向溢出；截图在`.ai/artifacts/homepage/logo-final-zh-*.png`。文档相对链接及`git diff --check`通过。本轮仅本地提交，未push/PR/部署。
+
+### 最终品牌资产清理与 favicon 同步（2026-09-07）
+
+- 全站默认导航统一引用 `/logo.svg`，删除已无运行时引用的旧 `logo.png`。
+- 启用全站 favicon head 配置；`favicon.svg`复用最终 logo 的完整路径，仅改为正方形画布；`favicon.ico`包含16/32/48px透明图标。
+- 本地构建通过；56页3366处内部引用、关键产物与路由基线、logo几何检查通过。逐页确认 SVG/ICO 图标链接存在且无旧 PNG 引用，favicon 与 logo 路径完全相同。9条路由浏览器冒烟通过。
+- 尚未推送或发布。
