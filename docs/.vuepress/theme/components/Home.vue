@@ -105,7 +105,7 @@ onBeforeUnmount(() => clearTimeout(timer));
     <div class="page-wrap">
       <a class="skip" href="#playground">{{ t('Skip to loan comparison', '跳到贷款比较') }}</a>
       <header class="masthead">
-        <a href="#homepage-top" class="brand">{{ t('Ziliang', '张本人') }}</a>
+        <a href="#homepage-top" class="brand"><img class="brand-logo" src="/logo.svg" alt="" width="1366" height="748"><span>{{ t('Ziliang', '张本人') }}</span></a>
         <nav @keydown.esc="menu = false; menuToggle?.focus()" id="homepage-nav" :class="{ expanded: menu }" :aria-label="t('Page sections', '页面区块')">
           <a v-for="[id, label] in nav" :key="id" :href="`#${id}`" @click="menu = false">{{ label }}</a>
         </nav>
@@ -115,7 +115,6 @@ onBeforeUnmount(() => clearTimeout(timer));
       <main aria-labelledby="homepage-title">
         <section class="hero">
           <div class="identity">
-            <p class="eyebrow">{{ t('Ziliang Zhang', '张子良') }}</p>
             <h1 id="homepage-title">{{ t('Making data explorable and AI useful.', '让数据变得可探索，让 AI 变得有用。') }}</h1>
             <p class="intro">{{ t('AI applications, data, and backend engineering. Explore my tools and experiments.', '我关注 AI 应用、数据与后端工程。这里是我的工具与实验。') }}</p>
             <button class="text-action" :disabled="!ready" @click="focusTerm">{{ t('Try changing a parameter', '试着调整一下') }} <span aria-hidden="true">↓</span></button>
@@ -213,7 +212,8 @@ onBeforeUnmount(() => clearTimeout(timer));
 .homepage small, .fine { font-size: 14px; color: var(--muted); }
 .homepage details { margin-top: 12px; }
 .masthead { display: flex; align-items: center; gap: 28px; min-height: 96px; border-bottom: 1px solid var(--line); }
-.homepage .brand { font: 400 1.8rem Sacramento, cursive; color: var(--ink); margin-right: auto; min-height: 44px; display: flex; align-items: center; }
+.homepage .brand { font: 400 1.8rem Sacramento, cursive; color: var(--ink); margin-right: auto; min-height: 44px; display: flex; align-items: center; gap: 10px; }
+.homepage .brand-logo { display: block; width: 48px; height: auto; object-fit: contain; flex: none; }
 .chinese .brand { font-family: Slidefu, cursive; font-size: 2rem; }
 .masthead nav { display: flex; gap: 28px; }
 .masthead nav a, .language { display: flex; align-items: center; min-height: 44px; }
@@ -224,7 +224,6 @@ onBeforeUnmount(() => clearTimeout(timer));
 .skip:focus { top: 8px; }
 .hero { display: grid; grid-template-columns: 1fr 2fr; gap: 44px; padding: 48px 0 64px; }
 .identity { padding: 24px 0; }
-.eyebrow { font-size: 14px; color: var(--muted); margin-bottom: 16px !important; }
 .homepage h1 { font: 400 clamp(40px, 4vw, 60px)/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -.025em; }
 .chinese h1 { font-family: 'Songti SC', 'Noto Serif CJK SC', serif; line-height: 1.35; }
 .intro { margin-top: 28px !important; max-width: 29ch; }
@@ -296,8 +295,8 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding: 20px
 footer a { display: flex; min-height: 44px; align-items: center; }
 @media (max-width: 1100px) { .hero { gap: 28px; } .playground { padding-left: 28px; } .summary-grid { gap: 16px; } }
 @media (max-width: 1023px) { .hero { grid-template-columns: 1fr; padding-top: 32px; } .identity { padding: 0; } .intro { max-width: 52ch; margin-top: 16px !important; } .identity .text-action { margin-top: 16px; } .secondary-link { display: inline-block; margin-left: 24px; } .playground { border-left: 0; border-top: 1px solid var(--line); padding: 24px 0 0; } .chart svg { max-height: 260px; } .engineering-grid { gap: 32px; } }
-@media (max-width: 767px) { .page-wrap { padding: 0 24px; } .masthead { min-height: 76px; gap: 16px; flex-wrap: wrap; padding: 12px 0; } .masthead nav { display: none; order: 4; width: 100%; flex-wrap: wrap; gap: 8px 24px; } .masthead nav.expanded { display: flex; } .menu-button { display: block; } .homepage h1 { font-size: 36px; } .homepage h2 { font-size: 23px; } .hero { padding: 28px 0 40px; gap: 24px; } .eyebrow { margin-bottom: 8px !important; } .intro { font-size: 16px; } .secondary-link { margin-left: 12px; font-size: 14px; } .chart { margin-top: 16px !important; } .legend { justify-content: start; gap: 12px; } .term-controls { gap: 8px; } .term-controls output { min-width: 55px; font-size: 14px; } .page-section { padding: 28px 0 40px; } .page-section > h2 { margin-bottom: 20px; } .tools-grid, .engineering-grid { grid-template-columns: 1fr; gap: 24px; } .tools-grid article { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 24px; } .tools-grid p { max-width: none; } .tools-grid button { margin-top: 8px; } .homepage .serif { font-size: 28px; } .experience article { gap: 16px; } .flow { padding: 16px; gap: 8px 12px; } .note-row { padding: 14px 0; gap: 8px; } .explanation { padding: 16px; } .panel-heading { flex-wrap: wrap; } .input-grid { grid-template-columns: 1fr; } }
-@media (max-width: 389px) { .page-wrap { padding: 0 20px; } .homepage h1 { font-size: 32px; } .masthead { gap: 12px; } .summary-grid { grid-template-columns: 1fr; } .term-controls { grid-template-columns: auto 44px 1fr 44px; } .term-controls output { grid-column: 3 / 5; text-align: right; } .note-row { flex-wrap: wrap; } .note-row > span:first-child { max-width: 100%; } .note-row small { font-size: 12px; } .secondary-link { margin-left: 0; } }
+@media (max-width: 767px) { .homepage .brand { gap: 8px; } .homepage .brand-logo { width: 40px; height: auto; } .chinese .brand { font-size: 1.8rem; } .page-wrap { padding: 0 24px; } .masthead { min-height: 76px; gap: 16px; flex-wrap: wrap; padding: 12px 0; } .masthead nav { display: none; order: 4; width: 100%; flex-wrap: wrap; gap: 8px 24px; } .masthead nav.expanded { display: flex; } .menu-button { display: block; } .homepage h1 { font-size: 36px; } .homepage h2 { font-size: 23px; } .hero { padding: 28px 0 40px; gap: 24px; } .intro { font-size: 16px; } .secondary-link { margin-left: 12px; font-size: 14px; } .chart { margin-top: 16px !important; } .legend { justify-content: start; gap: 12px; } .term-controls { gap: 8px; } .term-controls output { min-width: 55px; font-size: 14px; } .page-section { padding: 28px 0 40px; } .page-section > h2 { margin-bottom: 20px; } .tools-grid, .engineering-grid { grid-template-columns: 1fr; gap: 24px; } .tools-grid article { border-right: 0; border-bottom: 1px solid var(--line); padding: 0 0 24px; } .tools-grid p { max-width: none; } .tools-grid button { margin-top: 8px; } .homepage .serif { font-size: 28px; } .experience article { gap: 16px; } .flow { padding: 16px; gap: 8px 12px; } .note-row { padding: 14px 0; gap: 8px; } .explanation { padding: 16px; } .panel-heading { flex-wrap: wrap; } .input-grid { grid-template-columns: 1fr; } }
+@media (max-width: 389px) { .homepage .brand-logo { width: 32px; height: auto; } .chinese .brand { font-size: 1.65rem; } .page-wrap { padding: 0 20px; } .homepage h1 { font-size: 32px; } .masthead { gap: 12px; } .summary-grid { grid-template-columns: 1fr; } .term-controls { grid-template-columns: auto 44px 1fr 44px; } .term-controls output { grid-column: 3 / 5; text-align: right; } .note-row { flex-wrap: wrap; } .note-row > span:first-child { max-width: 100%; } .note-row small { font-size: 12px; } .secondary-link { margin-left: 0; } }
 @media (prefers-reduced-motion: reduce) { .homepage *, .homepage *::before, .homepage *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
 
 .full-comparison{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 14px;border:1px solid var(--accent);border-radius:3px;text-decoration:none}.full-comparison:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
