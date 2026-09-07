@@ -112,7 +112,7 @@ onBeforeUnmount(() => clearTimeout(timer));
             <a class="secondary-link" href="#contact">{{ t('Get in touch', '联系我') }} <span aria-hidden="true">↗</span></a>
           </div>
           <div id="playground" class="playground">
-            <div class="section-heading"><h2>{{ t('Loan comparison', '贷款比较') }}</h2><span class="badge">{{ t('Preview', '交互预览') }}</span></div>
+            <div class="section-heading"><h2>{{ t('Loan comparison', '贷款比较') }}</h2></div>
             <p class="assumptions">JPY {{ money(result.input.amount) }} · {{ result.input.rate }}% {{ t('fixed / year', '固定年利率') }} · {{ result.input.years }} {{ t('years', '年') }}<br>{{ t('Monthly payments. No taxes, fees or insurance. Illustrative assumptions.', '按月还款，不含税费及保险。仅为示例假设。') }}</p>
             <p v-if="!ready" class="notice">{{ t('JavaScript is off. The default chart and results below remain readable; interactive controls are disabled.', 'JavaScript 已关闭，以下默认图表和结果仍可阅读，交互控件已禁用。') }}</p>
             <p v-if="invalid" class="notice error" role="status">{{ t('Inputs are invalid. Showing the last valid result; explanation is paused.', '输入无效，当前保留最后有效结果，解释已暂停。') }}</p>
@@ -162,7 +162,7 @@ onBeforeUnmount(() => clearTimeout(timer));
           </div>
         </section>
         <section id="tools" class="page-section"><h2>{{ t('Tools', '工具') }}</h2><div class="tools-grid">
-          <article><h3>{{ t('Loan comparison', '贷款比较') }}</h3><span class="badge">{{ t('Available', '可使用') }}</span><p>{{ t('Compare fixed-rate repayment methods and explore how parameters affect outcomes.', '比较固定利率还款方式，探索参数如何影响结果。') }}</p><a class="text-action" :href="toolHref">{{ t('Explore the tool', '进入工具页') }} ↗</a></article>
+          <article><h3>{{ t('Loan comparison', '贷款比较') }}</h3><p>{{ t('Compare fixed-rate repayment methods and explore how parameters affect outcomes.', '比较固定利率还款方式，探索参数如何影响结果。') }}</p><a class="text-action" :href="toolHref">{{ t('Explore the tool', '进入工具页') }} ↗</a></article>
           <article><h3>{{ t('AI stock screener', 'AI 筛股器') }}</h3><span class="badge planned">{{ t('Planned', '规划中') }}</span><p>{{ t('Planned: turn natural language into explicit filters. Screening and AI are not connected.', '计划将自然语言转为明确筛选条件；尚未接入筛选或 AI。') }}</p></article>
           <article><h3>{{ t('Japan tax calculator', '日本税务计算器') }}</h3><p>{{ t('2025 salary income / 2026 resident tax estimates. Enter confirmed deductions; limited scenarios only.', '2025 工资收入／2026 住民税概算。扣除额需自行确认，仅适用限定场景。') }}</p><a class="text-action" :href="zh ? '/zh/tools/japan-tax.html' : '/tools/japan-tax.html'">{{ t('Open the tax calculator', '打开税务计算器') }} ↗</a></article>
         </div></section>
