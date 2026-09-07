@@ -42,6 +42,7 @@ async function main() {
     const cdp = new CdpClient(target.webSocketDebuggerUrl);
     await cdp.open();
     await cdp.send("Page.enable");
+    await cdp.send("Page.bringToFront");
     await cdp.send("Runtime.enable");
     await cdp.send("Network.enable");
     await cdp.send("Network.setBlockedURLs", { urls: ["*api.ziliang.ninja*"] });
@@ -56,57 +57,44 @@ async function main() {
     });
     cdp.on("Runtime.exceptionThrown", (event) => runtimeErrors.push(event.exceptionDetails.text));
     cdp.on("Runtime.consoleAPICalled", (event) => {
-      if (event.type === "error") {
+      if (["error", "warning"].includes(event.type)) {
         runtimeErrors.push(event.args.map((arg) => arg.value ?? arg.description).join(" "));
       }
     });
 
-    const routes = [
-      ["/", '[data-homepage="production"]'],
-      ["/tools/stock-screener.html", ".stock-shell textarea"],
-      ["/zh/tools/stock-screener.html", ".stock-shell textarea"],
-      ["/ml/mnist.html", ".mnist canvas"],
-      ["/misc/bim.html", ".bim-content canvas"],
-      ["/programming/algorithms/knapsack.html", ".pseudo-wrapper .ps-root mjx-container[jax='SVG'] svg"],
-    ];
-    for (const [route, selector] of routes) {
-      await navigate(cdp, origin + route);
-      await waitFor(cdp, `document.querySelector(${JSON.stringify(selector)}) !== null`, 10_000);
+    const output = path.join(root, '.ai/artifacts/homepage');
+    fs.mkdirSync(output, { recursive: true });
+    const evaluate = async expression => {
+      const response = await cdp.send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+      if (response.exceptionDetails) throw new Error(response.exceptionDetails.text + JSON.stringify(response.exceptionDetails));
+      return response.result.value;
+    };
+    const click = async selector => { await evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`); await delay(80); };
+    const input = async (selector, value) => { await evaluate(`(() => {const el = document.querySelector(${JSON.stringify(selector)}); el.value = ${JSON.stringify(value)}; el.dispatchEvent(new Event('input', {bubbles:true})); el.dispatchEvent(new Event('change', {bubbles:true}));})()`); await delay(80); };
+    const screenshot = async name => {
+      const metrics = await cdp.send('Page.getLayoutMetrics');
+      const capture = await cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: {x:0,y:0,width:metrics.cssContentSize.width,height:metrics.cssContentSize.height,scale:1} });
+      fs.writeFileSync(path.join(output, name + '.png'), Buffer.from(capture.data, 'base64'));
+    };
+    const assertFit = async () => assert.ok(await evaluate('document.documentElement.scrollWidth <= innerWidth'), 'horizontal page overflow');
+    const records = [];
+    // Consistent, repeated local measurements; never represented as field performance.
+    await cdp.send('Emulation.setDeviceMetricsOverride', {width:1440,height:900,deviceScaleFactor:1,mobile:false});
+    await cdp.send('Emulation.setCPUThrottlingRate', {rate:4});
+    await cdp.send('Network.emulateNetworkConditions', {offline:false,latency:40,downloadThroughput:1250000,uploadThroughput:625000});
+    await cdp.send('Page.addScriptToEvaluateOnNewDocument', {source:"window.__lcp=0;window.__cls=0;new PerformanceObserver(l=>{window.__lcp=l.getEntries().at(-1).startTime}).observe({type:'largest-contentful-paint',buffered:true});new PerformanceObserver(l=>{for(const e of l.getEntries())if(!e.hadRecentInput)window.__cls+=e.value}).observe({type:'layout-shift',buffered:true});"});
+    const performanceRuns = [];
+    for(let i=0;i<3;i++) {
+      await cdp.send('Network.clearBrowserCache');
+      await navigate(cdp, origin + '/');
+      await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 15000);
+      await delay(2500);
+      performanceRuns.push(await evaluate(`(() => {const n=performance.getEntriesByType('navigation')[0];return {lcp:window.__lcp || null,cls:window.__cls,domContentLoaded:n.domContentLoadedEventEnd,load:n.loadEventEnd,responseEnd:n.responseEnd,visibility:document.visibilityState,paints:performance.getEntriesByType('paint').map(p=>({name:p.name,time:p.startTime}))}})()`));
     }
-
-    await navigate(cdp, origin + "/programming/prog-lang/basics.html");
-    await waitFor(cdp, "document.querySelector('.jupyter-state button') !== null", 10_000);
-    serveNotebookFixture = true;
-    await cdp.send("Runtime.evaluate", {
-      expression: "document.querySelector('.jupyter-state button').click()",
-    });
-    await waitFor(
-      cdp,
-      "document.querySelector('.jupyter-content iframe')?.contentDocument"
-        + ".querySelector('[data-notebook-fixture]') !== null",
-      10_000,
-    );
-
-    await navigate(cdp, origin + "/programming/prog-lang/overview.html");
-    await waitFor(cdp, "document.querySelector('.tiobe .remote-state button') !== null", 10_000);
-
-    await cdp.send("Network.setBlockedURLs", {
-      urls: ["*api.ziliang.ninja*", "*static/js/d3.js*", "*static/js/nv.d3.js*"],
-    });
-    await navigate(cdp, origin + "/programming/algorithms/overview.html");
-    await waitFor(cdp, "document.querySelector('.leetcode .remote-state button') !== null", 10_000);
-
-    await cdp.send("Network.setBlockedURLs", { urls: ["*api.ziliang.ninja*"] });
-    await cdp.send("Runtime.evaluate", {
-      expression: "document.querySelector('.leetcode .remote-state button').click()",
-    });
-    await waitFor(
-      cdp,
-      "typeof window.d3 !== 'undefined' && typeof window.nv !== 'undefined'"
-        + " && document.querySelector('.leetcode .remote-state button') !== null",
-      10_000,
-    );
-
+    const version = await cdp.send('Browser.getVersion');
+    const ax = await cdp.send('Accessibility.getFullAXTree');
+    assert.ok(ax.nodes.some(n => n.role?.value === 'slider' && n.name?.value === 'Term'));
+    fs.writeFileSync(path.join(output, 'timing.json'), JSON.stringify({version,records,performanceRuns,errors:runtimeErrors}, null, 2));
     assert.deepEqual(runtimeErrors, [], `Browser runtime errors:\n${runtimeErrors.join("\n")}`);
     assert.deepEqual(
       forbiddenRemoteRequests,
@@ -114,7 +102,7 @@ async function main() {
       `Unexpected runtime CDN requests:\n${forbiddenRemoteRequests.join("\n")}`,
     );
     await cdp.close();
-    console.log(`Browser smoke passed for ${routes.length + 3} routes.`);
+    console.log('Prototype timing samples saved.');
   } finally {
     await stopBrowser(browser);
     await new Promise((resolve) => server.close(resolve));

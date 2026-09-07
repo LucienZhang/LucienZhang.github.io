@@ -26,6 +26,11 @@ import { isProd } from "./common";
 const __dirname = getDirname(import.meta.url);
 
 export default defineUserConfig({
+  extendsPage(page) {
+    if (page.frontmatter.layout === 'Homepage') {
+      page.frontmatter.copyrightYear = new Date().getFullYear();
+    }
+  },
   define: isProd
     ? {
         __APP_DEBUG__: false,

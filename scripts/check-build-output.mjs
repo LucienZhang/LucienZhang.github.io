@@ -1,10 +1,12 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { load } from "cheerio";
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const distDir = join(rootDir, "docs/.vuepress/dist");
 const routeBaseline = join(rootDir, ".ai/baseline/2026-09-04/routes.txt");
+const routeAdditions = join(rootDir, ".ai/baseline/route-additions.txt");
 const requiredArtifacts = [
   "index.html",
   "404.html",
@@ -35,10 +37,31 @@ if (!existsSync(distDir)) {
     }
   }
 
-  const expectedRoutes = readFileSync(routeBaseline, "utf8")
+  const expectedRoutes = (readFileSync(routeBaseline, "utf8") + "\n" + readFileSync(routeAdditions, "utf8"))
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
+  // Preserve the route baseline (including tool shells); allow the explicitly listed noindex mortgage tool pages.
+  const toolRoutes = ['/tools/mortgage.html', '/zh/tools/mortgage.html'];
+  expectedRoutes.push(...toolRoutes);
+  for (const route of [...toolRoutes, '/tools/japan-tax.html', '/zh/tools/japan-tax.html']) {
+    const file = join(distDir, route.slice(1));
+    if (!existsSync(file) || !readFileSync(file, 'utf8').includes('noindex, nofollow')) {
+      failures.push(`tool page missing or indexable: ${route}`);
+    }
+  }
+  for (const [route, other] of [['/index.html', '/zh/'], ['/zh/index.html', '/']]) {
+    const file = join(distDir, route.slice(1));
+    if (!existsSync(file)) continue;
+    const $ = load(readFileSync(file, 'utf8'));
+    if ($('[data-homepage="production"]').length !== 1 || $('main').length !== 1 || $('h1').length !== 1) {
+      failures.push(`production homepage layout/semantics missing: ${route}`);
+    }
+    if (($('meta[name="robots"]').attr('content') || '').includes('noindex')) failures.push(`production homepage is noindex: ${route}`);
+    if ($('.language').attr('href') !== other) failures.push(`homepage locale points to preview: ${route}`);
+    if ($('.home-shell, #typed, .review-controls').length) failures.push(`legacy or review UI leaked onto homepage: ${route}`);
+    if ($('a[href="mailto:lucienzhangzl@gmail.com"]').length !== 1 || $('.chart polyline').length !== 2) failures.push(`homepage SSR content missing: ${route}`);
+  }
   const actualRoutes = walk(distDir)
     .filter((file) => extname(file) === ".html")
     .map((file) => `/${relative(distDir, file).replaceAll("\\", "/")}`)
@@ -59,7 +82,7 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verified ${requiredArtifacts.length} critical artifacts and the 50-route baseline.`);
+console.log(`Verified ${requiredArtifacts.length} critical artifacts, the route baseline plus additions, and 4 explicitly listed noindex tool pages.`);
 
 function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
