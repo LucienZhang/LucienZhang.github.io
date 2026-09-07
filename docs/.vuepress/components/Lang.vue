@@ -201,35 +201,35 @@ export default {
 
   .remote-state {
     padding: 1rem;
-    border: 1px solid #d8dee4;
+    border: 1px solid var(--vp-c-divider);
     border-radius: 4px;
     text-align: center;
 
     button {
       padding: 0.4rem 0.9rem;
-      border: 1px solid #3eaf7c;
+      border: 1px solid var(--vp-c-accent);
       border-radius: 4px;
       background: transparent;
-      color: #2c8f68;
+      color: var(--vp-c-accent);
       cursor: pointer;
     }
   }
 
   table.table-top20 {
     text-align: center;
-    background-color: #f2f7fc;
+    background-color: var(--vp-c-bg);
 
     tbody {
       td {
-        border-color: rgb(166, 170, 175);
+        border-color: var(--vp-c-divider);
       }
 
       tr:nth-child(2n) {
-        background-color: #dbe0e5;
+        background-color: var(--vp-c-bg-alt);
       }
 
       tr:hover td {
-        background-color: lightgrey;
+        background-color: var(--vp-c-control-hover);
         font-weight: bold;
         cursor: pointer;
       }
@@ -246,7 +246,7 @@ export default {
 .tiobe {
   table.table-top20 {
     th {
-      border-color: rgb(166, 170, 175);
+      border-color: var(--vp-c-divider);
     }
   }
 }

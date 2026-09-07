@@ -138,7 +138,7 @@ export default {
     button {
       border: 0;
       background: transparent;
-      color: #2c8f68;
+      color: var(--vp-c-accent);
       text-decoration: underline;
       cursor: pointer;
     }

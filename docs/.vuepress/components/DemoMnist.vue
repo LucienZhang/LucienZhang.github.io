@@ -345,28 +345,29 @@ export default {
 }
 
 .mnist-button:focus-visible {
-  outline: 2px solid currentColor;
+  outline: 2px solid var(--vp-c-accent);
   outline-offset: 2px;
 }
 
 .mnist-button--clear {
-  border-color: #17a2b8;
-  background-color: #17a2b8;
+  border-color: var(--vp-c-border-hard);
+  background-color: var(--vp-c-bg-elv);
+  color: var(--vp-c-text);
 }
 
 .mnist-button--clear:hover {
-  border-color: #117a8b;
-  background-color: #138496;
+  border-color: var(--vp-c-border-hard);
+  background-color: var(--vp-c-bg-alt);
 }
 
 .mnist-button--recognize {
-  border-color: #28a745;
-  background-color: #28a745;
+  border-color: var(--vp-c-accent-bg);
+  background-color: var(--vp-c-accent-bg);
 }
 
 .mnist-button--recognize:hover {
-  border-color: #1e7e34;
-  background-color: #218838;
+  border-color: var(--vp-c-accent-hover);
+  background-color: var(--vp-c-accent-hover);
 }
 
 .mnist-button:disabled {
