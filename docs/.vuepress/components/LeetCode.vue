@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { loadClassicScript } from '../lib/load-classic-script.mjs';
 import { useSiteLocaleData } from '@vuepress/client';
 import {
   requestLeetCodeCnRanking,
@@ -72,7 +73,6 @@ export default {
       resizeListener: null,
       chartInstance: null,
       assetsReady: false,
-      assetAttempt: 0,
       isUnmounted: false,
     };
   },
@@ -88,11 +88,10 @@ export default {
       if (typeof window === "undefined") return;
 
       this.status = "loading";
-      this.assetAttempt += 1;
-      const cacheKey = `?attempt=${this.assetAttempt}`;
       try {
-        await import(/* @vite-ignore */ `/static/js/d3.js${cacheKey}`);
-        await import(/* @vite-ignore */ `/static/js/nv.d3.js${cacheKey}`);
+        await loadClassicScript('/static/js/d3.js', () => typeof window.d3?.select === 'function');
+        if (this.isUnmounted) return;
+        await loadClassicScript('/static/js/nv.d3.js', () => typeof window.nv?.models?.lineChart === 'function');
         if (this.isUnmounted) return;
         this.assetsReady = true;
         await this.loadData();

@@ -46,7 +46,7 @@
 
 // These calculators already use a fixed light palette, including chart labels.
 // Match their navigation to the content without changing the saved article theme.
-.vp-theme-container:is(.mortgage-page, .japan-tax-page, .stock-screener-page) {
+.vp-theme-container:is(.homepage-page, .mortgage-page, .japan-tax-page, .stock-screener-page) {
   @include light-palette;
   color-scheme: light;
   background: var(--vp-c-bg);

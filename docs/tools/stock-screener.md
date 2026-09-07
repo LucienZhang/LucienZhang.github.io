@@ -1,7 +1,6 @@
 ---
 title: AI stock screener · In planning
 description: AI stock screener page preview. Functionality is not implemented.
-navbar: false
 sidebar: false
 pageClass: stock-screener-page
 editLink: false

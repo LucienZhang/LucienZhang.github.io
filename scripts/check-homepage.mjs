@@ -96,7 +96,7 @@ async function main() {
         assert.equal(await evaluate("document.querySelector('[data-homepage]').dataset.homepage"), 'production');
         assert.equal(await evaluate("Boolean(document.querySelector('meta[name=robots]')?.content.includes('noindex'))"), false);
         assert.equal(await evaluate("document.querySelector('.language').getAttribute('href')"), homeRoute(language === 'en' ? 'zh' : 'en'));
-        const geometry = await evaluate(`({termBottom:document.querySelector('.term-controls').getBoundingClientRect().bottom, explainBottom:document.querySelector('.primary').getBoundingClientRect().bottom, font:getComputedStyle(document.querySelector('.brand')).fontFamily})`);
+        const geometry = await evaluate(`({termBottom:document.querySelector('.term-controls').getBoundingClientRect().bottom, explainBottom:document.querySelector('.primary').getBoundingClientRect().bottom, font:getComputedStyle(document.querySelector('.vp-site-name')).fontFamily})`);
         records.push({language,width,height,...geometry});
         await screenshot(`${language}-${width}`);
         if (width >= 1280) assert.ok(geometry.explainBottom <= height, 'desktop tool CTA below fold');
@@ -105,9 +105,10 @@ async function main() {
         assert.equal(await evaluate("document.querySelector('.data')"), null);
         await click('.explain-action');
         assert.equal(await evaluate('document.activeElement.id'), 'explanation-title');
-        if (width < 768) await click('.menu-button');
+        if (width < 720) await click('.menu-button');
         await assertFit();
         if (width === 390 || width === 1440) await screenshot(`${language}-${width}-expanded`);
+        if (width < 720) await click('.menu-button');
       }
       await click('.questions button');
       await waitFor(cdp, "document.querySelector('[role=status]').textContent.includes('ready') || document.querySelector('[role=status]').textContent.includes('完成')", 3000);
@@ -181,7 +182,7 @@ async function main() {
     await cdp.send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:false});
     await assertFit();
     await click('.menu-button');
-    await evaluate("document.querySelector('#homepage-nav a').focus()");
+    await evaluate("document.querySelector('.vp-sidebar .vp-navbar-item > a').focus()");
     await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
     assert.ok(await evaluate("document.activeElement.classList.contains('menu-button')"));
     const unnamed = await evaluate("[...document.querySelectorAll('.homepage button, .homepage input, .homepage select')].filter(e => !(e.getAttribute('aria-label') || e.textContent.trim() || e.labels?.length)).map(e=>e.id)");

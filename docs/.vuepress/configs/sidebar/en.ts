@@ -32,7 +32,8 @@ export const sidebarEn: SidebarConfig = {
         "/programming/algorithms/heap",
         "/programming/algorithms/segment-tree",
         "/programming/algorithms/dynamic-programming",
-        // "/programming/algorithms/tree-misc",
+        "/programming/algorithms/tree-misc",
+        "/programming/algorithms/java",
         "/programming/algorithms/disjoint-sets",
         "/programming/algorithms/graph-traversal",
         "/programming/algorithms/mst",
@@ -53,22 +54,14 @@ export const sidebarEn: SidebarConfig = {
   "/ml/": [
     {
       text: "ML & DL",
-      children: [{ text: "Overview", link: "/ml/overview" }, "/ml/mnist"],
+      children: [{ text: "Overview", link: "/ml/overview" }, "/ml/mnist",
+        { text: "Cross-entropy", link: "/ml/loss/cross-entropy" }],
     },
   ],
   "/misc/": [
     {
       text: "Misc",
-      children: ["/misc/apis", "/misc/bim", "/misc/pixel-streaming"],
+      children: ["/misc/apis", "/misc/bim", "/misc/pixel-streaming", "/misc/werewolf"],
     },
   ],
-  // "/projects/": [
-  //   "/projects/werewolf",
-  //   // {
-  //   //     text: 'Games',
-  //   //     children: [
-  //   //         '/projects/games/werewolf',
-  //   //     ]
-  //   // },
-  // ],
 };

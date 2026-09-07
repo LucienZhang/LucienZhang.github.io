@@ -24,3 +24,5 @@
 当前执行依据：[主页规格](./homepage-design-spec.md)、[房贷规格](../tools/mortgage/spec.md)、[筛股器规格](../tools/stock-screener/spec.md)、[验证](./validation.md)、[剩余工作](./remaining-work.md)。原型时期的“先审计、尚未选方案、禁止迁移”是历史状态，不再作为当前停止点。
 
 旧效果图、审计原始输出和逐轮报告在本地 .ai/artifacts/pre-cleanup-cc817a8/，也可从 cc817a8 的 Git 历史查阅。它们不是当前规格或自动图片对比基准。
+
+2026-09-07 用户确认全站共用“工具、笔记、工程、联系”导航与统一手机侧栏，文章目录独立分组；实施与验证见现行规格及validation.md。

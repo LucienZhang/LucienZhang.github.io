@@ -16,6 +16,7 @@ import {
   sidebarEn,
   sidebarZh,
 } from "./configs/index.js";
+import { mathjaxAssets } from "./plugins/mathjax-assets.mjs";
 import { lucienTheme } from "./theme";
 
 import markdownItFootnotePlugin from "markdown-it-footnote";
@@ -39,6 +40,8 @@ export default defineUserConfig({
   // set site base to default value
   base: "/",
   alias: {
+    "@theme/VPNavbarItems.vue": path.resolve(__dirname, "theme/components/NavbarItems.vue"),
+    "@theme/VPToggleSidebarButton.vue": path.resolve(__dirname, "theme/components/SidebarToggle.vue"),
     "@assets": path.resolve(__dirname, "../assets"),
   },
 
@@ -48,6 +51,7 @@ export default defineUserConfig({
   bundler: viteBundler({
     viteOptions: {
       plugins: [
+        mathjaxAssets(),
         Components({
           resolvers: [AntDesignVueResolver({ importStyle: "css-in-js" })],
         }),
@@ -63,9 +67,6 @@ export default defineUserConfig({
       build: {
         rollupOptions: {
           external: [
-            "/static/js/d3.js",
-            "/static/js/nv.d3.js",
-            "/static/js/pseudocode.js",
             "/static/css/pseudocode.min.css?used",
           ],
         },

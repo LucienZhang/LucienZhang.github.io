@@ -38,10 +38,6 @@ const copy = computed(() => zh.value ? {
 <template>
   <div class="stock-shell" :lang="zh ? 'zh-CN' : 'en-US'">
     <a class="skip-link" href="#stock-content">{{ zh ? '跳至页面内容' : 'Skip to content' }}</a>
-    <header class="stock-header">
-      <a class="brand" :class="{ chinese: zh }" :href="zh ? '/zh/' : '/'" :aria-label="`${copy.brand} — ${copy.home}`"><img class="brand-logo" src="/logo.svg" alt="" width="1366" height="748"><span>{{ copy.brand }}</span></a>
-      <a class="language" :href="zh ? '/tools/stock-screener.html' : '/zh/tools/stock-screener.html'" :lang="zh ? 'en' : 'zh-CN'" :aria-label="copy.languageLabel">{{ copy.language }} <span aria-hidden="true">↗</span></a>
-    </header>
     <div id="stock-content" class="stock-content" tabindex="-1">
       <section class="hero" aria-labelledby="stock-title">
         <div class="eyebrow"><span>{{ copy.eyebrow }}</span><span class="status">{{ copy.status }}</span></div>
@@ -81,22 +77,16 @@ const copy = computed(() => zh.value ? {
 
 <style scoped>
 /* Only this route's theme wrapper is adjusted; all visual rules live below the tool root. */
-/* This shell owns its navigation; remove off-canvas theme links from keyboard order. */
-:global(.vp-theme-container.stock-screener-page.no-sidebar .vp-sidebar), :global(.vp-theme-container.stock-screener-page .vp-sidebar-mask) { display: none; }
-:global(.stock-screener-page .vp-page) { padding: 0; }
+:global(.stock-screener-page .vp-page) { padding: var(--navbar-height) 0 0; }
 :global(.stock-screener-page .vp-page [vp-content]) { max-width: none; padding: 0; margin: 0; }
 :global(.stock-screener-page .vp-page-meta), :global(.stock-screener-page .vp-page-nav) { display: none; }
 .stock-shell { color-scheme: light; background: #f7f4ed; color: #20231f; min-height: 100vh; font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 .stock-shell * { box-sizing: border-box; }
-.stock-header, .stock-content, footer { max-width: 1280px; margin: 0 auto; padding-inline: 40px; }
-.stock-header { min-height: 96px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #cbc7bd; }
+.stock-content, footer { max-width: 1280px; margin: 0 auto; padding-inline: 40px; }
 .stock-shell a { color: #b63824; text-decoration: none; }
 .stock-shell a:hover { text-decoration: underline; }
 .stock-shell a:focus-visible, textarea:focus-visible, #stock-content:focus-visible { outline: 2px solid #b63824; outline-offset: 3px; }
-.stock-shell .brand { font-family: Sacramento, cursive; font-size: 1.8rem; font-weight: 400; color: #20231f; min-height: 44px; }
-.stock-shell .brand.chinese { font-family: Slidefu, serif; font-size: 2rem; }
-.language { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 8px; }
-.skip-link { position: absolute; top: 8px; left: 16px; padding: 12px; background: #f7f4ed; z-index: 5; transform: translateY(-200%); }
+.skip-link { position: absolute; top: 8px; left: 16px; padding: 12px; background: #f7f4ed; z-index: 40; transform: translateY(-200%); }
 .skip-link:focus { transform: none; }
 .hero { padding-block: 56px 40px; }
 .eyebrow { display: flex; align-items: center; gap: 16px; color: #64665f; font-size: 14px; }
@@ -126,13 +116,6 @@ textarea::placeholder { color: #64665f; opacity: 1; }
 .directions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
 footer { display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid #cbc7bd; padding-block: 24px; font-size: 14px; color: #64665f; }
 @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; gap: 32px; } .results { border-left: 0; border-top: 1px solid #cbc7bd; padding: 32px 0 0; } .empty-state { min-height: 280px; } }
-@media (max-width: 767px) { .stock-header, .stock-content, footer { padding-inline: 24px; } .stock-header { min-height: 80px; } .hero { padding-block: 40px 32px; } .stock-shell h1 { font-size: 36px; } .stock-shell h2 { font-size: 22px; } .intro { font-size: 18px; } .directions { grid-template-columns: 1fr; gap: 24px; } .next { margin-block: 40px; } footer { flex-direction: column; gap: 8px; } }
-@media (max-width: 389px) { .stock-header, .stock-content, footer { padding-inline: 20px; } .stock-shell h1 { font-size: 32px; } }
-</style>
-
-<style scoped>
-.stock-shell .brand { display: flex; align-items: center; gap: 10px; }
-.brand-logo { width: 48px; height: auto; flex: none; }
-@media (max-width: 767px) { .stock-shell .brand { gap: 8px; } .brand-logo { width: 40px; } .stock-shell .brand.chinese { font-size: 1.8rem; } }
-@media (max-width: 389px) { .brand-logo { width: 32px; } .stock-shell .brand.chinese { font-size: 1.65rem; } }
+@media (max-width: 767px) { .stock-content, footer { padding-inline: 24px; }  .hero { padding-block: 40px 32px; } .stock-shell h1 { font-size: 36px; } .stock-shell h2 { font-size: 22px; } .intro { font-size: 18px; } .directions { grid-template-columns: 1fr; gap: 24px; } .next { margin-block: 40px; } footer { flex-direction: column; gap: 8px; } }
+@media (max-width: 389px) { .stock-content, footer { padding-inline: 20px; } .stock-shell h1 { font-size: 32px; } }
 </style>

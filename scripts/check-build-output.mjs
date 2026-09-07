@@ -21,6 +21,9 @@ const requiredArtifacts = [
   "static/js/d3.js",
   "static/js/nv.d3.js",
   "static/js/pseudocode.js",
+  "static/mathjax/sre/speech-worker.js",
+  "static/mathjax/sre/mathmaps/base.json",
+  "static/mathjax/sre/mathmaps/en.json",
   "static/css/pseudocode.min.css",
   "static/fonts/Slidefu-Regular.woff2",
 ];

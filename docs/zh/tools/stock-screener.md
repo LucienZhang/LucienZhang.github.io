@@ -1,7 +1,6 @@
 ---
 title: AI 筛股器 · 规划中
 description: AI 筛股器页面预览，功能尚未实现。
-navbar: false
 sidebar: false
 pageClass: stock-screener-page
 editLink: false
