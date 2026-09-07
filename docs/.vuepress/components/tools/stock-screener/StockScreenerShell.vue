@@ -39,7 +39,7 @@ const copy = computed(() => zh.value ? {
   <div class="stock-shell" :lang="zh ? 'zh-CN' : 'en-US'">
     <a class="skip-link" href="#stock-content">{{ zh ? '跳至页面内容' : 'Skip to content' }}</a>
     <header class="stock-header">
-      <a class="brand" :class="{ chinese: zh }" :href="zh ? '/zh/' : '/'" :aria-label="`${copy.brand} — ${copy.home}`">{{ copy.brand }}</a>
+      <a class="brand" :class="{ chinese: zh }" :href="zh ? '/zh/' : '/'" :aria-label="`${copy.brand} — ${copy.home}`"><img class="brand-logo" src="/logo.svg" alt="" width="1366" height="748"><span>{{ copy.brand }}</span></a>
       <a class="language" :href="zh ? '/tools/stock-screener.html' : '/zh/tools/stock-screener.html'" :lang="zh ? 'en' : 'zh-CN'" :aria-label="copy.languageLabel">{{ copy.language }} <span aria-hidden="true">↗</span></a>
     </header>
     <div id="stock-content" class="stock-content" tabindex="-1">
@@ -128,4 +128,11 @@ footer { display: flex; justify-content: space-between; gap: 16px; border-top: 1
 @media (max-width: 900px) { .workspace { grid-template-columns: 1fr; gap: 32px; } .results { border-left: 0; border-top: 1px solid #cbc7bd; padding: 32px 0 0; } .empty-state { min-height: 280px; } }
 @media (max-width: 767px) { .stock-header, .stock-content, footer { padding-inline: 24px; } .stock-header { min-height: 80px; } .hero { padding-block: 40px 32px; } .stock-shell h1 { font-size: 36px; } .stock-shell h2 { font-size: 22px; } .intro { font-size: 18px; } .directions { grid-template-columns: 1fr; gap: 24px; } .next { margin-block: 40px; } footer { flex-direction: column; gap: 8px; } }
 @media (max-width: 389px) { .stock-header, .stock-content, footer { padding-inline: 20px; } .stock-shell h1 { font-size: 32px; } }
+</style>
+
+<style scoped>
+.stock-shell .brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo { width: 48px; height: auto; flex: none; }
+@media (max-width: 767px) { .stock-shell .brand { gap: 8px; } .brand-logo { width: 40px; } .stock-shell .brand.chinese { font-size: 1.8rem; } }
+@media (max-width: 389px) { .brand-logo { width: 32px; } .stock-shell .brand.chinese { font-size: 1.65rem; } }
 </style>

@@ -56,3 +56,17 @@ html[lang="zh-CN"] {
     }
   }
 }
+
+// Keep the shared brand consistent while retaining article navigation and sidebars.
+.vp-navbar > span > a { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; }
+.vp-navbar .vp-site-logo { width: 48px; height: auto; margin: 0; flex: none; }
+.vp-navbar .vp-site-name { display: inline; width: auto; }
+@media (max-width: 767px) {
+  .vp-navbar > span > a { gap: 8px; }
+  .vp-navbar .vp-site-logo { width: 40px; }
+  html[lang="zh-CN"] .vp-navbar .vp-site-name { font-size: 1.8rem; }
+}
+@media (max-width: 389px) {
+  .vp-navbar .vp-site-logo { width: 32px; }
+  html[lang="zh-CN"] .vp-navbar .vp-site-name { font-size: 1.65rem; }
+}
