@@ -63,16 +63,29 @@ async function main() {
 
     const routes = [
       ["/", '[data-homepage="production"]'],
+      ["/zh/", '[data-homepage="production"]'],
       ["/tools/stock-screener.html", ".stock-shell textarea"],
       ["/zh/tools/stock-screener.html", ".stock-shell textarea"],
       ["/ml/mnist.html", ".mnist canvas"],
       ["/misc/bim.html", ".bim-content canvas"],
       ["/programming/algorithms/knapsack.html", ".pseudo-wrapper .ps-root mjx-container[jax='SVG'] svg"],
     ];
+    const checkTitleAndBrand = async (zh) => {
+      await waitFor(cdp, `document.title === '張本人' && document.querySelector('.vp-site-name')?.textContent.trim() === ${JSON.stringify(zh ? '张本人' : 'Ziliang')}`, 10_000);
+    };
     for (const [route, selector] of routes) {
       await navigate(cdp, origin + route);
       await waitFor(cdp, `document.querySelector(${JSON.stringify(selector)}) !== null`, 10_000);
+      await checkTitleAndBrand(route.startsWith("/zh/"));
     }
+
+    // Exercise client-side home navigation and locale switching as well as direct loads.
+    await cdp.send("Runtime.evaluate", { expression: "document.querySelector('.vp-site-name').closest('a').click()" });
+    await waitFor(cdp, "location.pathname === '/' && document.querySelector('[data-homepage]') !== null", 10_000);
+    await checkTitleAndBrand(false);
+    await cdp.send("Runtime.evaluate", { expression: "document.querySelector('.vp-navbar .language').click()" });
+    await waitFor(cdp, "location.pathname === '/zh/'", 10_000);
+    await checkTitleAndBrand(true);
 
     await navigate(cdp, origin + "/programming/prog-lang/basics.html");
     await waitFor(cdp, "document.querySelector('.jupyter-state button') !== null", 10_000);
