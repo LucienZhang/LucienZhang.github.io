@@ -78,12 +78,12 @@ export default defineUserConfig({
   locales: {
     "/": {
       lang: "en-US",
-      title: "張本人",
+      title: "Ziliang",
       description: "Not Only a Coder",
     },
     "/zh/": {
       lang: "zh-CN",
-      title: "張本人",
+      title: "张本人",
       description: "不仅是程序员",
     },
   },
