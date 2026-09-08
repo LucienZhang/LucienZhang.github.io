@@ -6,8 +6,12 @@ const Homepage = defineAsyncComponent(() => import('./theme/components/Home.vue'
 
 export default defineClientConfig({
   enhance() {
-    // Keep browser titles independent of navbar branding and page headings.
-    resolvers.resolvePageHeadTitle = () => '張本人';
+    // Only homepages override the browser title; keep VuePress defaults elsewhere.
+    const defaultTitle = resolvers.resolvePageHeadTitle;
+    resolvers.resolvePageHeadTitle = (page, siteLocale) =>
+      page.path === '/' || page.path === '/zh/'
+        ? '張本人'
+        : defaultTitle(page, siteLocale);
   },
   layouts: {
     Homepage,

@@ -72,7 +72,14 @@ if (!existsSync(distDir)) {
 
   for (const route of actualRoutes) {
     const $ = load(readFileSync(join(distDir, route.slice(1)), 'utf8'));
-    if ($('head > title').length !== 1 || $('head > title').text() !== '張本人') failures.push(`browser title mismatch: ${route}`);
+    const title = $('head > title').text();
+    const home = route === '/index.html' || route === '/zh/index.html';
+    const siteName = route.startsWith('/zh/') ? '张本人' : 'Ziliang';
+    if ($('head > title').length !== 1 || (home ? title !== '張本人' : !(title === siteName || title.endsWith(` | ${siteName}`)))) failures.push(`browser title mismatch: ${route}`);
+    if (/\/tools\/(mortgage|japan-tax)\.html$/.test(route)) {
+      const heading = $('h1').first().text().trim();
+      if (title !== `${heading} | ${siteName}`) failures.push(`tool page heading missing from title: ${route}`);
+    }
     const brand = $('.vp-site-name').text();
     if (brand && brand !== (route.startsWith('/zh/') ? '张本人' : 'Ziliang')) failures.push(`navbar brand changed: ${route}`);
   }

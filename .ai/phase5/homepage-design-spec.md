@@ -12,7 +12,7 @@
 
 算法与 API 笔记中文入口指向英文文章并标注语言；MNIST 有对应中文页。Gmail 为 lucienzhangzl@gmail.com，辅助 GitHub/LinkedIn；无微信、Modal、联系表单、宠物或浮动聊天。区块和笔记去编号；版权年份由构建写入以保持 SSR 一致。
 
-浏览器标签页标题在所有页面及中英文语言中固定为「張本人」（无页面标题前缀或站点后缀），通过 client.ts 的 `resolvers.resolvePageHeadTitle` 单独设置，覆盖 SSR 与客户端路由切换。站点配置仍为英文 Ziliang / 中文「张本人」，导航名称、中文 Slidefu 字体、首页内容及文章标题保持原样。
+仅中英文主页（`/`、`/zh/`）的浏览器标签页标题为「張本人」（无前后缀），通过 client.ts 的 `resolvers.resolvePageHeadTitle` 单独设置。其它页面继续调用 VuePress 原始标题逻辑（页面标题 | 当前语言站点名称），覆盖 SSR 与客户端路由切换。站点配置仍为英文 Ziliang / 中文「张本人」，导航名称、中文 Slidefu 字体、首页内容及文章标题保持原样。
 
 ## 视觉与响应式
 
