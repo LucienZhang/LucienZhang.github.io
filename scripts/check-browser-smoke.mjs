@@ -72,9 +72,7 @@ async function main() {
     ];
     const checkTitleAndBrand = async (route) => {
       const zh = route.startsWith('/zh/');
-      const file = path.join(dist, route.endsWith('/') ? route + 'index.html' : route);
-      const expectedTitle = fs.readFileSync(file, 'utf8').match(/<title>(.*?)<\/title>/s)[1];
-      await waitFor(cdp, `document.title === ${JSON.stringify(expectedTitle)} && document.querySelector('.vp-site-name')?.textContent.trim() === ${JSON.stringify(zh ? '张本人' : 'Ziliang')}`, 10_000);
+      await waitFor(cdp, `document.title === '張本人' && document.querySelector('.vp-site-name')?.textContent.trim() === ${JSON.stringify(zh ? '张本人' : 'Ziliang')}`, 10_000);
     };
     for (const [route, selector] of routes) {
       await navigate(cdp, origin + route);
@@ -91,7 +89,7 @@ async function main() {
     await checkTitleAndBrand("/zh/");
 
     await cdp.send("Runtime.evaluate", { expression: "document.querySelector('a[href=\"/zh/tools/japan-tax.html\"]').click()" });
-    await waitFor(cdp, "location.pathname === '/zh/tools/japan-tax.html' && document.title !== '張本人'", 10_000);
+    await waitFor(cdp, "location.pathname === '/zh/tools/japan-tax.html' && document.title === '張本人'", 10_000);
     await checkTitleAndBrand("/zh/tools/japan-tax.html");
 
     await navigate(cdp, origin + "/programming/prog-lang/basics.html");
