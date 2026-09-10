@@ -336,3 +336,7 @@ node_modules
 # Application source, not Python build output.
 !docs/.vuepress/lib/
 !docs/.vuepress/lib/**
+
+# AI interpreter application modules, not Python build output.
+!services/ai-interpreter/lib/
+!services/ai-interpreter/lib/**

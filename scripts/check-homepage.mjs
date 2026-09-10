@@ -110,13 +110,9 @@ async function main() {
         if (width === 390 || width === 1440) await screenshot(`${language}-${width}-expanded`);
         if (width < 720) await click('.menu-button');
       }
-      await click('.questions button');
-      await waitFor(cdp, "document.querySelector('[role=status]').textContent.includes('ready') || document.querySelector('[role=status]').textContent.includes('完成')", 3000);
-      await click('.explanation .actions button');
-      assert.equal(await evaluate('document.activeElement.id'), 'payment-first');
+      assert.ok(await evaluate("[...document.querySelectorAll('.questions button')].every(button => button.disabled)"), 'AI questions require sign-in');
+      assert.equal(await evaluate("document.querySelector('#mock-question')"), null, 'Old mock question input is removed');
       await input('#loan-years', '20');
-      assert.ok(await evaluate("document.querySelector('.explanation .notice') !== null"));
-      assert.ok(await evaluate("document.querySelector('.explanation .actions button').disabled"));
       await input('#loan-amount', '');
       assert.equal(await evaluate("document.querySelector('#loan-amount').getAttribute('aria-invalid')"), 'true');
       assert.ok(await evaluate("document.querySelector('.questions button').disabled"));
@@ -127,23 +123,14 @@ async function main() {
       await evaluate("document.querySelector('.chart svg').focus()");
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
       assert.ok(await evaluate("document.querySelector('.point-readout').textContent.includes('2:')"), 'Chart keyboard inspection advances one month');
-      await click('.questions button');
-      await click('.explanation > button');
-      assert.ok(await evaluate("document.querySelector('.explanation [role=status]').textContent.match(/Cancelled|已取消/) !== null"));
       assert.equal(await evaluate("document.querySelector('.review-controls')"), null);
-      await input('#mock-question', 'Tell me a stock to buy');
-      await click('.question-input button');
-      assert.ok(await evaluate("document.querySelector('.explanation [role=status]').textContent.match(/three suggested|三个推荐/) !== null"));
-      await evaluate("document.querySelector('#mock-question').focus()");
+      await evaluate("document.querySelector('.panel-heading button').focus()");
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
       assert.ok(await evaluate("document.activeElement.classList.contains('explain-action')"));
       await evaluate("document.querySelector('#loan-years').focus()");
       const old = await evaluate("document.querySelector('#loan-years').value");
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
       assert.equal(Number(await evaluate("document.querySelector('#loan-years').value")), Number(old)+1);
-      // Parameter edits during generation must cancel the old snapshot.
-      await click('.explain-action'); await click('.questions button'); await input('#loan-rate', '5'); await delay(800);
-      assert.ok(await evaluate("document.querySelector('.explanation [role=status]').textContent.match(/Cancelled|已取消/) !== null"));
       await cdp.send('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:'reduce'},{name:'prefers-color-scheme',value:'dark'}]});
       await assertFit();
       assert.equal(await evaluate("getComputedStyle(document.querySelector('.homepage')).colorScheme"), 'light');
@@ -391,4 +378,5 @@ class CdpClient {
   }
 }
 
-await main();
+export { CdpClient, findChrome, readDebugPort, stopBrowser, removeBrowserProfile, navigate, waitFor, delay };
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

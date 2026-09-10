@@ -1,2 +1,4 @@
 /tools/japan-tax.html
 /zh/tools/japan-tax.html
+/callback/index.html
+/logout/index.html

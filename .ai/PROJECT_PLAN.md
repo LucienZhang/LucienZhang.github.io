@@ -15,7 +15,7 @@
 - 实际依赖版本以 package.json / package-lock.json 为准。VuePress core、bundler、theme、plugins 作为兼容组合验证，Vite 不单独升级。
 - 首页自定义布局；文章和计算工具复用默认导航及侧栏机制。Ant Design Vue 用于必要的工具交互。
 - 静态站由 GitHub Pages 发布；notebook 来自 website-binder，既有 ML/proxy 后端独立维护。
-- 真实 AI 使用独立后端，模型密钥、限流和成本控制不得放入静态前端；当前解释仍为本地 mock。
+- 真实 AI 使用独立后端，模型密钥、限流和成本控制不得放入静态前端；本分支已接入 Cognito 与共享 personal-site API，等待前端合并发布。
 - 数值工具的年度、资格、公式和舍入边界记录在对应规格及规则文档，不能仅凭构建通过声称算法完整适用。
 
 ## 当前文档
@@ -40,3 +40,6 @@
 生产变更执行适当的构建、链接、路由、安全、浏览器及业务回归；完整链为 `npm run verify`。数值正确性与页面交互分别验证，不降低阈值掩盖失败。Safari、真机、读屏与线上用户性能不能由本地 Chromium 结果代替。
 
 每轮保留必要代码、测试、当前规格与精简验证结论。截图、生成草稿、日志、原始测量放 `.ai/artifacts/`，不进入源码 PR。需求、算法、基础设施和发布保持可独立审查；合并后新工作从 main 建独立 worktree。
+
+
+2026-09-09：AI 后端已合并到 personal-site 并部署；本分支首页接入 Cognito 登录和共享 API，替换旧模拟解释。普通计算不要求登录。当前前端尚未发布，状态与验收见 [.ai/ai-interpreter/handoff.md](./ai-interpreter/handoff.md)。

@@ -11,6 +11,7 @@ export default defineClientConfig({
   },
   layouts: {
     Homepage,
+    AuthCallback: defineAsyncComponent(() => import('./theme/components/AuthCallback.vue')),
     Layout: SiteLayout,
   },
 });
