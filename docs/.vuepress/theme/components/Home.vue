@@ -1,12 +1,16 @@
 <script setup>
-import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { computed, ref, shallowRef, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { usePageData, useRouteLocale } from 'vuepress/client';
 import { defaults, validate, calculate } from '../../lib/loan/loan.mjs';
 import SiteLayout from './SiteLayout.vue';
+import AiExplanationPanel from './AiExplanationPanel.vue';
+import { getBrowserClient } from '../../../../services/ai-interpreter/client/browser.mjs';
+import { useRoute } from 'vue-router';
 import MortgageChart from '../../components/tools/mortgage/MortgageChart.vue';
 import { crossings } from '../../components/tools/mortgage/model.mjs';
 import { mortgageHref } from '../../lib/loan/handoff.mjs';
 const page = usePageData();
+const route = useRoute();
 const locale = useRouteLocale();
 const zh = computed(() => locale.value === '/zh/');
 const t = (en, cn) => zh.value ? cn : en;
@@ -26,25 +30,12 @@ const markers = computed(() => flips.value.flips.map(f => ({month: f.month, valu
 const chartDescription = computed(() => t('A: equal payment. B: equal principal. Crossings compare monthly payments, not overall cost. Use left/right arrows to inspect months.', 'A：元利均等。B：元金均等。交点仅比较月供，不代表整体成本优劣。左右方向键可查看各期。'));
 const term = ref(null);
 const trigger = ref(null);
-const panel = ref(null);
-const highlight = ref('');
 const explanationOpen = ref(false);
-const status = ref('ready');
-const answer = ref(null);
-const stale = ref(false);
-const question = ref('');
-const lastIntent = ref('curves');
-let timer;
-const questions = computed(() => [
-  ['curves', t('Why do the curves differ?', '为什么月供曲线不同？')],
-  ['term', t('What does the term change?', '期限变化影响了什么？')],
-  ['assumptions', t('What are the assumptions?', '这个例子有哪些假设？')],
-]);
-function cancel() { clearTimeout(timer); if (status.value === 'generating') status.value = 'cancelled'; }
+const aiPanel = ref(null);
+const aiClient = shallowRef(null);
+function cancel() { aiPanel.value?.invalidate(); }
 watch(draft, () => {
   cancel();
-  if (answer.value) stale.value = true;
-  highlight.value = '';
   if (!invalid.value) {
     result.value = calculate(draft.value);
     selectedMonth.value = Math.min(selectedMonth.value, result.value.months);
@@ -52,50 +43,23 @@ watch(draft, () => {
 }, { deep: true, flush: 'sync' });
 function reset() { draft.value = { ...defaults }; selectedMonth.value = 1; }
 function focusTerm() { term.value?.focus(); term.value?.scrollIntoView({ block: 'center', behavior: 'instant' }); }
-async function openExplanation() { explanationOpen.value = true; await nextTick(); panel.value?.focus(); }
+async function openExplanation() { explanationOpen.value = true; await nextTick(); aiPanel.value?.focus(); }
 async function closeExplanation() { cancel(); explanationOpen.value = false; await nextTick(); trigger.value?.focus(); }
-function explain(intent) {
-  if (invalid.value) return;
-  cancel();
-  lastIntent.value = intent;
-  const snapshot = result.value;
-  const language = zh.value;
-  status.value = 'generating';
-  timer = setTimeout(() => {
-    const i = snapshot.input;
-    const format = n => new Intl.NumberFormat(language ? 'zh-CN' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
-    let text;
-    if (intent === 'assumptions') text = language
-      ? '这个示例采用固定名义年利率，月利率为年利率 ÷ 12，按月末还款。未计税费、保险、提前还款或浮动利率。内部不逐期舍入，末期结清；展示金额四舍五入到分，可能存在分位加总差异。这不是银行报价或金融建议。'
-      : 'This example uses a fixed nominal annual rate divided by 12 and end-of-month payments. It excludes fees, taxes, insurance, prepayments and variable rates. Calculations retain precision, with the balance cleared in the final month. Rounded values may not add exactly. This is not a bank quote or financial advice.';
-    else if (intent === 'term') text = language
-      ? `当前快照为 ${i.years} 年，共 ${snapshot.months} 期。等额本息首月为 JPY ${format(snapshot.payment.first)}，总利息为 JPY ${format(snapshot.payment.interest)}。在本金和正利率不变时，延长期限会降低月供、增加总利息；零利率时总利息始终为零。这里描述一般规律，不将之前的参数当作比较基准。`
-      : `This snapshot spans ${i.years} years and ${snapshot.months} payments. Equal payment starts at JPY ${format(snapshot.payment.first)}, with JPY ${format(snapshot.payment.interest)} total interest. At the same principal and a positive rate, a longer term lowers payments and increases total interest; at zero interest the total stays zero. This describes the general relationship, not a comparison against earlier inputs.`;
-    else text = language
-      ? `等额本息将月供保持平稳；等额本金每月偿还相同本金，利息随余额减少。这个快照的首月分别为 JPY ${format(snapshot.payment.first)} 和 JPY ${format(snapshot.principal.first)}，总利息分别为 JPY ${format(snapshot.payment.interest)} 和 JPY ${format(snapshot.principal.interest)}。${i.rate === 0 ? '零利率下两种曲线重合。' : '等额本金前期还款较高，本金下降更快。'}这不代表哪一种适合你。`
-      : `Equal payment keeps monthly payments steady. Equal principal repays the same principal each month, so interest falls with the balance. This snapshot starts at JPY ${format(snapshot.payment.first)} and JPY ${format(snapshot.principal.first)}, with total interest of JPY ${format(snapshot.payment.interest)} and JPY ${format(snapshot.principal.interest)}, respectively. ${i.rate === 0 ? 'At zero interest both curves overlap.' : 'Equal principal pays down the balance faster, with higher early payments.'} This does not determine which method suits you.`;
-    answer.value = { text, input: { ...i } }; stale.value = false; status.value = 'complete';
-  }, 700);
-}
-function send() {
-  const q = question.value.trim().toLowerCase();
-  if (!q) return;
-  const matched = questions.value.find(([, label]) => label.toLowerCase() === q);
-  // Deliberately finite mock intents: unsupported questions must never invent a reply.
-  if (matched) explain(matched[0]);
-  else { cancel(); status.value = 'outside'; }
-}
-function cite(id) { if (stale.value || invalid.value) return; highlight.value = id; document.getElementById(id)?.focus(); }
-const statusText = computed(() => ({
-  ready: t('Choose a question to explore this result.', '选择一个问题，了解当前结果。'),
-  generating: t('Generating an example explanation…', '正在生成示例解释…'),
-  complete: t('Example explanation ready.', '示例解释已完成。'),
-  cancelled: t('Cancelled. You can try again.', '已取消，可以重新生成。'),
-  outside: t('This local mock supports only the three suggested questions. Select one above.', '此示例仅支持上方三个推荐问题，请选择其中一个。'),
-}[status.value]));
-watch(locale, () => { cancel(); reset(); explanationOpen.value = false; answer.value = null; stale.value = false; status.value = 'ready'; question.value = ''; });
-onMounted(() => { ready.value = true; });
-onBeforeUnmount(() => clearTimeout(timer));
+watch(locale, () => { cancel(); reset(); explanationOpen.value = false; });
+onMounted(async () => {
+  ready.value = true;
+  try { aiClient.value = getBrowserClient(); } catch { /* Unsupported preview origins keep the calculator usable. */ }
+  if (route.query.ai === 'return' && aiClient.value) {
+    const saved = aiClient.value.takeReturn();
+    const input = saved.input;
+    if (input) {
+      const restored = { amount: input.amount, rate: input.annualRatePct, years: input.months / 12 };
+      if (!Object.values(validate(restored)).some(Boolean)) draft.value = restored;
+    }
+    await openExplanation();
+  }
+});
+onBeforeUnmount(cancel);
 </script>
 
 <template>
@@ -128,7 +92,7 @@ onBeforeUnmount(() => clearTimeout(timer));
               <button :disabled="draft.years >= 50" :aria-label="t('Increase term by one year', '年限增加一年')" @click="draft.years++">+</button>
               <output for="loan-years">{{ draft.years }} {{ t('years', '年') }}</output>
             </fieldset>
-            <div class="actions"><a class="primary full-comparison" :href="toolHref">{{ t('Open full comparison', '打开完整房贷比较') }} ↗</a><button ref="trigger" class="explain-action" :disabled="!ready" :aria-expanded="explanationOpen" aria-controls="explanation" @click="openExplanation">{{ t('Example explanation', '示例解释') }}</button></div>
+            <div class="actions"><a class="primary full-comparison" :href="toolHref">{{ t('Open full comparison', '打开完整房贷比较') }} ↗</a><button ref="trigger" class="explain-action" :disabled="!ready" :aria-expanded="explanationOpen" aria-controls="explanation" @click="openExplanation">{{ t('AI explanation', 'AI 解释') }}</button></div>
             <details class="parameters"><summary>{{ t('More inputs', '更多参数') }}</summary>
               <fieldset :disabled="!ready" class="input-grid">
                 <label for="loan-amount">{{ t('Amount · JPY', '金额 · JPY') }}<input id="loan-amount" v-model.number="draft.amount" type="number" min="1" max="10000000000" step="1" :aria-invalid="errors.amount" aria-describedby="amount-help"><small id="amount-help" :class="{ error: errors.amount }">{{ t('1–10,000,000,000; whole JPY.', '1–100 亿，整数日元。') }}</small></label>
@@ -141,24 +105,13 @@ onBeforeUnmount(() => clearTimeout(timer));
               <div class="summary-grid">
                 <section v-for="method in methods" :key="method.key" :aria-labelledby="`${method.key}-heading`">
                   <h3 :id="`${method.key}-heading`">{{ method.label }}</h3>
-                  <dl><div v-for="[key, label] in [['first', t('First month', '首月')], ['interest', t('Total interest', '总利息')]]" :id="`${method.key}-${key}`" :key="key" tabindex="-1" :class="{ highlighted: highlight === `${method.key}-${key}` }"><dt>{{ label }}</dt><dd>{{ money(result[method.key][key]) }}</dd></div></dl>
+                  <dl><div v-for="[key, label] in [['first', t('First month', '首月')], ['interest', t('Total interest', '总利息')]]" :id="`${method.key}-${key}`" :key="key" tabindex="-1"><dt>{{ label }}</dt><dd>{{ money(result[method.key][key]) }}</dd></div></dl>
                 </section>
               </div>
               <p class="fine">{{ t('All amounts in JPY, rounded to 2 decimals for display.', '金额均为 JPY，展示保留两位小数。') }}</p>
 
             </div>
-            <section v-if="explanationOpen" id="explanation" class="explanation" aria-labelledby="explanation-title" @keydown.esc.stop="closeExplanation">
-              <div class="panel-heading"><h3 id="explanation-title" ref="panel" tabindex="-1">{{ t('Example explanation · AI not connected', '示例解释 · AI 未连接') }}</h3><button @click="closeExplanation">{{ t('Close', '关闭') }}</button></div>
-              <p class="fine">{{ t('Example explanation using a calculation snapshot. No AI service is connected.', '示例解释读取上方计算结果的快照，未连接 AI 服务。') }}</p>
-              <div class="questions"><button v-for="[intent, label] in questions" :key="intent" :disabled="invalid || status === 'generating'" @click="explain(intent)">{{ label }}</button></div>
-              <p role="status" aria-live="polite">{{ statusText }}</p>
-              <button v-if="status === 'generating'" @click="cancel">{{ t('Cancel', '取消') }}</button>
-              <template v-if="answer"><p v-if="stale" class="notice">{{ t('Based on previous inputs. This answer does not describe the current result.', '基于之前的参数，此回答不代表当前结果。') }}</p><p class="fine">{{ t('Answer snapshot', '回答快照') }}: JPY {{ money(answer.input.amount) }} · {{ answer.input.rate }}% · {{ answer.input.years }} {{ t('years', '年') }}</p><p>{{ answer.text }}</p>
-                <div class="actions"><button :disabled="stale || invalid" @click="cite('payment-first')">{{ t('Locate first month', '定位首月') }}</button><button :disabled="stale || invalid" @click="cite('payment-interest')">{{ t('Locate total interest', '定位总利息') }}</button><button v-if="highlight" @click="highlight = ''">{{ t('Clear highlight', '取消高亮') }}</button></div>
-              </template>
-              <button v-if="stale || status === 'cancelled'" :disabled="invalid || status === 'generating'" @click="explain(lastIntent)">{{ stale ? t('Update explanation', '更新解释') : t('Retry', '重试') }}</button>
-              <form @submit.prevent="send"><label for="mock-question">{{ t('Ask a suggested question', '输入推荐问题') }}</label><div class="question-input"><input id="mock-question" v-model="question" maxlength="300" :disabled="status === 'generating'" :placeholder="questions[0][1]"><button type="submit" :disabled="!question.trim() || invalid || status === 'generating'">{{ t('Send', '发送') }}</button></div></form>
-            </section>
+            <AiExplanationPanel v-if="explanationOpen" ref="aiPanel" :input="{ currency: 'JPY', amount: draft.amount, annualRatePct: draft.rate, months: draft.years * 12 }" :invalid="invalid" :locale="zh ? 'zh-CN' : 'en-US'" :client="aiClient" @close="closeExplanation" />
           </div>
         </section>
         <section id="tools" class="page-section"><h2>{{ t('Tools', '工具') }}</h2><div class="tools-grid">
@@ -167,8 +120,8 @@ onBeforeUnmount(() => clearTimeout(timer));
           <article><h3>{{ t('Japan tax calculator', '日本税务计算器') }}</h3><p>{{ t('2025 salary income / 2026 resident tax estimates. Enter confirmed deductions; limited scenarios only.', '2025 工资收入／2026 住民税概算。扣除额需自行确认，仅适用限定场景。') }}</p><a class="text-action" :href="zh ? '/zh/tools/japan-tax.html' : '/tools/japan-tax.html'">{{ t('Open the tax calculator', '打开税务计算器') }} ↗</a></article>
         </div></section>
         <section id="engineering" class="page-section"><h2>{{ t('Engineering', '工程') }}</h2><div class="engineering-grid"><div><h3 class="serif">{{ t('Behind the interface.', '界面背后的工程。') }}</h3><p>{{ t('Experience with data platforms for machine learning and configuration-driven engineering.', '为机器学习构建数据平台，让重复的数据流程成为可复用的系统。') }}</p></div><div class="experience"><article><span class="engineering-symbol" aria-hidden="true">⠿</span><div><h3>{{ t('Data for machine learning', '机器学习数据平台') }}</h3><p>{{ t('Worked on profile data pipelines and data integration supporting recommendation systems.', '曾参与支持推荐系统的个人资料数据管道与数据整合。') }}</p></div></article><article><span class="engineering-symbol" aria-hidden="true">⚙</span><div><h3>{{ t('Configuration-driven platforms', '配置驱动的工程') }}</h3><p>{{ t('Worked on data lake pipelines and reusable workflows driven by SQL and YAML.', '曾参与数据湖管道与 SQL、YAML 配置驱动的可复用数据流程。') }}</p></div></article></div></div>
-          <details class="how"><summary>{{ t('How this preview works', '贷款预览如何实现') }}</summary><p>{{ t('Inputs are validated before deterministic calculations run. The chart and summary share the same result; explore monthly tables in the full tool. The local explanation mock reads a snapshot and cannot alter the calculation.', '输入通过校验后运行确定性计算。图表与摘要共用同一结果，完整月度表格可进入工具页探索。本地解释 mock 读取快照，不能改变计算。') }}</p><p><a href="https://v.icbc.com.cn/userfiles/resources/wap/fenhang/shanghai/fengxian/txt/jrkj231120.pdf">{{ t('Repayment formulas · ICBC', '还款公式依据 · 工商银行') }} ↗</a></p></details>
-          <div class="flow" :aria-label="t('Calculation flow', '计算流程')"><span>{{ t('Inputs', '输入') }}</span><span aria-hidden="true">→</span><span>{{ t('Calculation', '计算') }}</span><span aria-hidden="true">→</span><span>{{ t('Chart + table', '图表与数据') }}</span><span aria-hidden="true">→</span><span>{{ t('AI explanation', 'AI 解释') }} <small>{{ t('(local mock)', '（本地 mock）') }}</small></span></div>
+          <details class="how"><summary>{{ t('How this preview works', '贷款预览如何实现') }}</summary><p>{{ t('Inputs are validated before deterministic calculations run. The chart and summary share the same result; explore monthly tables in the full tool. After sign-in, AI explains the current inputs and backend calculation summaries. It does not change the calculator results.', '输入通过校验后运行确定性计算。图表与摘要共用同一结果，完整月度表格可进入工具页探索。登录后，AI 根据当前参数和后端计算摘要生成解释，不改变计算器结果。') }}</p><p><a href="https://v.icbc.com.cn/userfiles/resources/wap/fenhang/shanghai/fengxian/txt/jrkj231120.pdf">{{ t('Repayment formulas · ICBC', '还款公式依据 · 工商银行') }} ↗</a></p></details>
+          <div class="flow" :aria-label="t('Calculation flow', '计算流程')"><span>{{ t('Inputs', '输入') }}</span><span aria-hidden="true">→</span><span>{{ t('Calculation', '计算') }}</span><span aria-hidden="true">→</span><span>{{ t('Chart + table', '图表与数据') }}</span><span aria-hidden="true">→</span><span>{{ t('AI explanation', 'AI 解释') }} <small>{{ t('(sign-in required)', '（需登录）') }}</small></span></div>
           <div class="links"><a href="https://github.com/LucienZhang/goto">Goto · Go CLI ↗</a><a href="https://github.com/vuepress/vuepress-next/pull/460">{{ t('VuePress · contribution', 'VuePress · 开源贡献') }} ↗</a></div>
         </section>
         <section id="notes" class="page-section"><h2>{{ t('Notes', '笔记') }}</h2><a class="note-row" href="/programming/algorithms/overview.html"><span>{{ t('Algorithms', '算法笔记') }}</span><small v-if="zh" class="badge planned">英文内容</small><span aria-hidden="true">→</span></a><a class="note-row" href="/misc/apis.html"><span>{{ t('Web API Design', 'Web API 设计') }}</span><small v-if="zh" class="badge planned">英文内容</small><span aria-hidden="true">→</span></a><a class="note-row" :href="zh ? '/zh/ml/mnist.html' : '/ml/mnist.html'"><span>{{ t('Handwritten Digit Recognition', '手写数字识别') }}</span><span aria-hidden="true">→</span></a></section>
