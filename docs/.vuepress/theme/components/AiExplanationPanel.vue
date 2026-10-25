@@ -81,15 +81,17 @@ onBeforeUnmount(invalidate);
   </section>
 </template>
 <style scoped>
-.explanation { border-top: 3px solid #287a68; margin-top: 24px; padding: 20px; background: #f0eade; }
+.explanation { border: 1px solid var(--line, #cbc7bd); margin-top: 24px; padding: 16px; background: #f0eade; }
 .panel-heading, .actions, .questions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .panel-heading { justify-content: space-between; }
 .panel-heading h3 { margin: 0; }
-button { padding: 8px 12px; font: inherit; cursor: pointer; border: 1px solid #76756c; border-radius: 4px; background: #fffdf7; color: #24352f; }
+button { min-height: 44px; padding: 8px 12px; font: inherit; cursor: pointer; border: 1px solid #797b72; border-radius: 4px; background: #fffdf8; color: #20231f; }
+button:hover:not(:disabled) { background: #eee7db; }
+button:active:not(:disabled) { background: #e2d8c9; }
 button:disabled { opacity: .55; cursor: default; }
-button:focus-visible { outline: 3px solid #287a68; outline-offset: 3px; }
+button:focus-visible { outline: 2px solid var(--accent, #b63824); outline-offset: 4px; }
 .questions { margin-top: 16px; }
 .ai-answer { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; }
 .notice { border-left: 3px solid #947024; padding-left: 12px; }
-.fine { font-size: 13px; line-height: 1.6; }
+.fine { font-size: 14px; line-height: 20px; }
 </style>

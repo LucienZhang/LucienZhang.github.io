@@ -96,11 +96,21 @@ async function main() {
         assert.equal(await evaluate("document.querySelector('[data-homepage]').dataset.homepage"), 'production');
         assert.equal(await evaluate("Boolean(document.querySelector('meta[name=robots]')?.content.includes('noindex'))"), false);
         assert.equal(await evaluate("document.querySelector('.language').getAttribute('href')"), homeRoute(language === 'en' ? 'zh' : 'en'));
-        const geometry = await evaluate(`({termBottom:document.querySelector('.term-controls').getBoundingClientRect().bottom, explainBottom:document.querySelector('.primary').getBoundingClientRect().bottom, font:getComputedStyle(document.querySelector('.vp-site-name')).fontFamily})`);
+        const geometry = await evaluate(`({termBottom:document.querySelector('.term-controls').getBoundingClientRect().bottom, summaryBottom:document.querySelector('.comparison-summary').getBoundingClientRect().bottom, actionTop:document.querySelector('.primary').getBoundingClientRect().top, explainBottom:document.querySelector('.primary').getBoundingClientRect().bottom, titleHeight:document.querySelector('h1').getBoundingClientRect().height, titleLineHeight:parseFloat(getComputedStyle(document.querySelector('h1')).lineHeight), font:getComputedStyle(document.querySelector('.vp-site-name')).fontFamily})`);
         records.push({language,width,height,...geometry});
         await screenshot(`${language}-${width}`);
+        assert.ok(geometry.titleHeight <= geometry.titleLineHeight * 2 + 1, `hero heading must fit two meaningful lines: ${language} ${width}px ${JSON.stringify(geometry)}`);
+        assert.ok(geometry.summaryBottom <= geometry.actionTop, 'results must appear before the full-tool action');
         if (width >= 1280) assert.ok(geometry.explainBottom <= height, 'desktop tool CTA below fold');
-        if (width === 390) assert.ok(geometry.termBottom <= height, `mobile term below fold: ${geometry.termBottom}`);
+        if (width === 390) {
+          assert.ok(geometry.summaryBottom <= height, `mobile comparison results below fold: ${geometry.summaryBottom}`);
+          assert.ok(geometry.explainBottom <= height, `mobile tool CTA below fold: ${geometry.explainBottom}`);
+        }
+        assert.equal(await evaluate("document.querySelector('.comparison-summary tbody tr:first-child td data').getAttribute('value') !== null"), true);
+        await click('.exact-results summary');
+        assert.ok(await evaluate("document.querySelector('#payment-first dd').getClientRects().length > 0"), 'exact amounts remain available');
+        assert.equal(await evaluate("document.querySelector('#payment-first dd').textContent"), '153,092.22');
+        await click('.exact-results summary');
         await click('.parameters summary');
         assert.equal(await evaluate("document.querySelector('.data')"), null);
         await click('.explain-action');
@@ -112,13 +122,18 @@ async function main() {
       }
       assert.ok(await evaluate("[...document.querySelectorAll('.questions button')].every(button => button.disabled)"), 'AI questions require sign-in');
       assert.equal(await evaluate("document.querySelector('#mock-question')"), null, 'Old mock question input is removed');
+      const defaultSummary = await evaluate("[...document.querySelectorAll('.comparison-summary data')].map(el => el.getAttribute('value'))");
       await input('#loan-years', '20');
+      const validSummary = await evaluate("[...document.querySelectorAll('.comparison-summary data')].map(el => el.getAttribute('value'))");
+      assert.notDeepEqual(validSummary, defaultSummary, 'term changes update the summary');
       await input('#loan-amount', '');
       assert.equal(await evaluate("document.querySelector('#loan-amount').getAttribute('aria-invalid')"), 'true');
       assert.ok(await evaluate("document.querySelector('.questions button').disabled"));
+      assert.deepEqual(await evaluate("[...document.querySelectorAll('.comparison-summary data')].map(el => el.getAttribute('value'))"), validSummary, 'invalid inputs retain the last valid comparison');
       await input('#loan-amount', '300000');
       await input('#loan-rate', '0');
       assert.equal(await evaluate("document.querySelector('#payment-interest dd').textContent"), '0.00');
+      assert.equal(await evaluate("Number(document.querySelectorAll('.comparison-summary tbody tr:last-child data')[0].getAttribute('value'))"), 0);
       assert.equal(await evaluate("document.querySelectorAll('.chart circle[r=\"5\"]').length"), 0, 'Zero-rate curves must not invent a crossing');
       await evaluate("document.querySelector('.chart svg').focus()");
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
