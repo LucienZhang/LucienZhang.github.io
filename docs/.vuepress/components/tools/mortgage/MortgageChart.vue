@@ -9,7 +9,7 @@ watch(() => [props.series, props.month, props.calendarStart], () => hovered.valu
 let observer;
 onMounted(() => { width.value = Math.max(240, svg.value.getBoundingClientRect().width); observer = new ResizeObserver(entries => { width.value = Math.max(240, entries[0].contentRect.width); }); observer.observe(svg.value); });
 onBeforeUnmount(() => observer?.disconnect());
-const height = computed(() => props.compact ? (width.value < 480 ? 160 : 240) : width.value < 480 ? 400 : 360);
+const height = computed(() => props.compact ? (width.value < 480 ? 160 : 192) : width.value < 480 ? 400 : 360);
 const top = props.compact ? 32 : 94, bottom = computed(() => height.value - (props.compact ? 48 : 72));
 const bounds = computed(() => {
   const values = props.series.flatMap(s => s.points.map(p => p.value));

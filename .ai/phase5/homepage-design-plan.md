@@ -26,3 +26,6 @@
 旧效果图、审计原始输出和逐轮报告在本地 .ai/artifacts/pre-cleanup-cc817a8/，也可从 cc817a8 的 Git 历史查阅。它们不是当前规格或自动图片对比基准。
 
 2026-09-07 用户确认全站共用“工具、笔记、工程、联系”导航与统一手机侧栏，文章目录独立分组；实施与验证见现行规格及validation.md。
+
+
+2026-10-25 用户确认首屏优化示意并要求实施、提交PR：保留暖白/朱红、品牌字体、既有功能和共用导航；缩短双语标题并按语义断行，说明房贷是交互作品，将结果移到主按钮前。默认显示本地化缩写金额，精确金额仍可展开；手机优先展示图表、年限和结果。参考 [landing-page-design](https://github.com/elayadesign/ai-design-skills/blob/main/skills/landing-page-design/SKILL.md) 的信息层级与排版节奏，沿用已确认品牌，不引入玻璃导航或滚动入场动画。
