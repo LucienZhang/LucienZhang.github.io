@@ -7,6 +7,9 @@ prev: false
 next: false
 head:
   - [meta, { name: robots, content: 'noindex, nofollow' }]
+editLink: false
+lastUpdated: false
+contributors: false
 ---
 
 <script setup>

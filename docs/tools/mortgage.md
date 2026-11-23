@@ -6,6 +6,11 @@ head:
   - - meta
     - name: robots
       content: noindex, nofollow
+editLink: false
+lastUpdated: false
+contributors: false
+prev: false
+next: false
 ---
 
 <script setup>
