@@ -18,8 +18,6 @@ try {
   const target = await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, {method:'PUT'}).then(r=>r.json());
   cdp = new CdpClient(target.webSocketDebuggerUrl); await cdp.open();
   await cdp.send('Page.enable'); await cdp.send('Runtime.enable');
-  // AI explanations are hidden publicly until model access is live; exercise the owner preview flag.
-  await cdp.send('Page.addScriptToEvaluateOnNewDocument', {source:"try{localStorage.setItem('ai-preview','1')}catch{}"});
   cdp.on('Runtime.exceptionThrown', e => errors.push(e.exceptionDetails.text));
   await cdp.send('Fetch.enable', {patterns:[{urlPattern:'*'}]});
   const fulfill = (id, body, type = 'text/html', status = 200, headers = []) => cdp.send('Fetch.fulfillRequest', {requestId:id,responseCode:status,responseHeaders:[{name:'Content-Type',value:type}, ...headers],body:Buffer.from(body).toString('base64')});
@@ -105,7 +103,7 @@ try {
     }
     for (const [setting, expected] of [['quota','limited'],['failure','failed']]) { scenario=setting; await click('.questions button'); await status(expected); }
     scenario='pending'; await click('.questions button'); await status('waiting');
-    await click('.explanation > button'); await status('cancelled');
+    await click('.explanation .stop'); await status('cancelled');
     scenario='auth'; await click('.questions button'); await status('expired');
     assert.ok(await evaluate("document.querySelector('.questions button').disabled"));
     await click('.ai-login'); await wait("document.querySelector('.ai-logout') && !document.querySelector('.questions button').disabled");

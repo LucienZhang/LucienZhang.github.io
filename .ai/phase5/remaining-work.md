@@ -46,5 +46,10 @@ D. **可延后独立任务**：税务新收入年度及适用范围、房贷变�
 
 ## 2026-11-23 改用 Claude API
 
-- 后端 bitinker/aws_sam PR #26：Bedrock → Claude API（Opus 5.5）+ Workload Identity Federation，无 API key。合并前在 AWS 开启 Outbound web identity federation，在 Anthropic Console 创建 AWS 联邦（规则匹配 `AiRoleArn` 输出），把组织 ID 与规则 ID 写入 samconfig `parameter_overrides`。
+- 后端 bitinker/aws_sam PR #26：Bedrock → Claude API（Opus 5.5）+ Workload Identity Federation，无 API key。在 AWS 开启 Outbound web identity federation，在 Anthropic Console 创建 AWS 联邦（规则 subject 为 `arn:aws:iam::258410268602:role/personal-site-ai`），把组织 ID 与规则 ID 写进 `personal-site/template.yaml` 中 AiFunction 的环境变量。
 - 部署后用 `?ai-preview=1` 做真实登录、解释、额度与日志验收；通过后把 `aiExplanationLive` 改为 true，并把首页 AI 链路的 Claude 站去掉“接入中”。
+
+## 2026-11-23 AI 解释上线
+
+- 后端 bitinker/aws_sam#26 已部署，用户真实验收成功；前端 `aiExplanationLive = true` 正式开放。
+- AI 解释面板已按方案 A + D 改为右侧抽屉/手机底部弹层，见主页规格。

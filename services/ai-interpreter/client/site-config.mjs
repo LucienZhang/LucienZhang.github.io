@@ -18,10 +18,10 @@ export const cognitoDomain = 'https://bitinker-dev.auth.ap-northeast-1.amazoncog
 export const cognitoClientId = '44vib0bmejkp82ghvfsvffiio1';
 export const apiBase = 'https://api.ziliang.ninja'; // /v1 is added by the transport and mapped by API Gateway.
 
-// The backend is deployed but model access (Bedrock) is pending, so the public UI keeps
-// AI explanations off. Owners can preview the real flow with ?ai-preview=1 (stored locally;
-// ?ai-preview=0 clears it). Flip aiExplanationLive once real inference is verified.
-export const aiExplanationLive = false;
+// Live since 2026-11-23 (Claude API via workload identity federation, verified end to end).
+// Set to false to hide AI explanations publicly; ?ai-preview=1 then still previews the flow
+// for the current browser (?ai-preview=0 clears it).
+export const aiExplanationLive = true;
 export function aiExplanationEnabled(location = globalThis.location, storage = globalThis.localStorage) {
   if (aiExplanationLive) return true;
   try {

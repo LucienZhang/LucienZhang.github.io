@@ -16,7 +16,9 @@
 
 ### AI 解释开关
 
-后端已部署但 Bedrock 模型权限未开通，`services/ai-interpreter/client/site-config.mjs` 的 `aiExplanationLive = false`。公开页面不显示 AI 解释按钮，改为“后端已部署，模型权限开通中”的状态说明。所有者可用 `?ai-preview=1` 在本机打开真实流程（写入 localStorage，`?ai-preview=0` 清除）；`check-ai-browser.mjs` 通过同一开关运行受控夹具。真实推理验收后把 `aiExplanationLive` 改为 true。
+2026-11-23 起正式上线：后端改用 Claude API（Opus 5.5，工作负载身份联合，无 API key），用户在 `?ai-preview=1` 下完成真实登录与解释验收后，`services/ai-interpreter/client/site-config.mjs` 的 `aiExplanationLive = true`。贷款卡片显示“AI 解释（需登录）”按钮，首页 AI 链路第 5 站为 CLAUDE API，不再标“接入中”。需要临时下线时改回 false；此时 `?ai-preview=1` 仍可在本机预览。
+
+AI 解释面板（2026-11-23 用户选定方案 A + D）：点贷款卡的“✦ 问问 AI”打开右侧 480px 深色抽屉（手机为底部弹层，最高 88vh），Teleport 到 body，不再撑高贷款卡及同行的手写识别卡。抽屉为 `role="dialog"` + `aria-modal`，打开时锁定页面滚动、聚焦标题、Tab 循环在抽屉内，Esc/× /点遮罩关闭并把焦点还给触发按钮。头部：“问问这笔贷款”、标题、`Claude Opus 5.5` 与“今日剩余 n / 20”标签、当前参数标签（金额/利率/年限）。未登录时显示带主按钮的登录卡；三个问题为大号可选卡片，当前问题高亮；等待时显示跳动点与“停止等待”；错误/额度/过期以彩色提示条区分，空闲与完成状态仅保留给读屏。答案为浅色阅读卡（左侧朱红条，17px/1.8），出现后自动滚动到答案。隐私与免责声明收为底部一行脚注，退出登录放在脚注旁。
 
 ## 视觉与响应式
 

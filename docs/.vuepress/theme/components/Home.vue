@@ -88,7 +88,7 @@ const steps = computed(() => [
           <header class="band-head">
             <p class="eyebrow">{{ t('02 · AI service design', '02 · AI 服务架构') }}</p>
             <h2 id="journey-title">{{ t('Anatomy of one AI request.', '一次 AI 请求的旅程。') }}</h2>
-            <p>{{ t('The loan explainer’s backend on AWS. Calling a model is one line; the other five stops are what make it safe to put in front of strangers.', '贷款 AI 解释的 AWS 后端。调用模型只是一行代码，另外五站才决定它能不能放心交给陌生人用。') }}</p>
+            <p>{{ t('The live loan explainer’s backend on AWS. Calling a model is one line; the other five stops are what make it safe to put in front of strangers.', '已上线的贷款 AI 解释，AWS 后端。调用模型只是一行代码，另外五站才决定它能不能放心交给陌生人用。') }}</p>
           </header>
           <RequestJourney :zh="zh" />
         </div>
