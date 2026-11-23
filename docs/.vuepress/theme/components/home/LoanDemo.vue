@@ -105,7 +105,7 @@ onBeforeUnmount(cancel);
     </div></details>
     <div class="actions">
       <a class="primary full-comparison" :href="toolHref">{{ t('Open full comparison', '打开完整房贷比较') }} <LinkArrow /></a>
-      <button v-if="aiEnabled" ref="trigger" type="button" class="explain-action" :disabled="!ready" :aria-expanded="explanationOpen" aria-controls="explanation" @click="openExplanation"><span>{{ t('AI explanation', 'AI 解释') }}</span><small>{{ t('Sign-in required', '需登录') }}</small></button>
+      <button v-if="aiEnabled" ref="trigger" type="button" class="explain-action" :disabled="!ready" :aria-expanded="explanationOpen" aria-controls="explanation" @click="openExplanation"><span><span class="spark" aria-hidden="true">✦</span> {{ t('Ask AI', '问问 AI') }}</span><small>{{ t('Claude · sign-in', 'Claude · 需登录') }}</small></button>
     </div>
     <p v-if="!aiEnabled" class="ai-status"><span class="pending-dot" aria-hidden="true"></span>{{ t('AI explanation: switching to the Claude API, coming soon.', 'AI 解释：正在接入 Claude API，即将上线。') }} <a href="#ai-service">{{ t('See how it works', '看看它怎么工作') }}</a></p>
     <AiExplanationPanel v-if="aiEnabled && explanationOpen" ref="aiPanel" :input="{ currency: 'JPY', amount: draft.amount, annualRatePct: draft.rate, months: draft.years * 12 }" :invalid="invalid" :locale="locale" :client="aiClient" @close="closeExplanation" />
@@ -153,8 +153,10 @@ h3 { margin: 0; font-size: 22px !important; line-height: 30px !important; }
 .actions { display: flex; gap: 10px; align-items: stretch; margin-top: auto; padding-top: 12px; }
 .primary { display: inline-flex; flex: 1; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 8px 16px; border-radius: 10px; background: #b63824; color: #fff !important; font-weight: 600; }
 .primary:hover { background: #962c1b; text-decoration: none !important; }
-.explain-action { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 4px 14px !important; border-radius: 10px !important; }
-.explain-action small { font-size: 11px; line-height: 14px; }
+.explain-action { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 4px 16px !important; border-radius: 10px !important; border: 0 !important; background: #12110f !important; color: #efeae0 !important; font-weight: 600; }
+.explain-action:hover:not(:disabled) { background: #24221e !important; }
+.explain-action small { font-size: 11px; line-height: 14px; color: #a8a397; font-weight: 400; }
+.explain-action .spark { color: #ff7a5c; }
 .ai-status { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 10px 0 0; font-size: 12px; line-height: 18px; color: #64665f; }
 .ai-status a { padding: 4px 0; }
 .pending-dot { width: 8px; height: 8px; border-radius: 50%; background: #d9a441; box-shadow: 0 0 0 3px rgb(217 164 65 / 22%); }

@@ -103,7 +103,7 @@ try {
     }
     for (const [setting, expected] of [['quota','limited'],['failure','failed']]) { scenario=setting; await click('.questions button'); await status(expected); }
     scenario='pending'; await click('.questions button'); await status('waiting');
-    await click('.explanation > button'); await status('cancelled');
+    await click('.explanation .stop'); await status('cancelled');
     scenario='auth'; await click('.questions button'); await status('expired');
     assert.ok(await evaluate("document.querySelector('.questions button').disabled"));
     await click('.ai-login'); await wait("document.querySelector('.ai-logout') && !document.querySelector('.questions button').disabled");
