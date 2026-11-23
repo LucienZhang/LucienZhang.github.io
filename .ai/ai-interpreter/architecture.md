@@ -1,5 +1,7 @@
 # AI 解释器架构
 
+2026-11-23 更新：账户无法获得 Bedrock 模型权限，模型调用改为 Anthropic Claude API（bitinker/aws_sam PR #26）。`claude-opus-5-5`、effort low、max_tokens 4000（含思考）、server-side fallback `default`。凭证为 Workload Identity Federation：AI Lambda 角色调用 STS `GetWebIdentityToken`（audience `https://api.anthropic.com`，RS256，900 秒），SDK 换取短期 Anthropic 令牌并按容器缓存；不存 API key，环境里出现 `ANTHROPIC_API_KEY`/`ANTHROPIC_AUTH_TOKEN` 时拒绝启动。IAM 去掉 `bedrock:InvokeModel`，改授 `sts:GetWebIdentityToken`。联邦 ID（组织、规则，可选服务账号/工作区）为非机密模板参数，留空时接口返回 503。上线前需开启 AWS 账户级 Outbound web identity federation，并在 Anthropic Console 建 AWS issuer、服务账号与匹配 `AiRoleArn` 的规则。下文 Bedrock/Nova 描述为历史记录。
+
 2026-09-09。HTTP API 与函数已通过 aws_sam PR #23 合并部署到东京 personal-site stack。复用 api.ziliang.ninja，保留原 MNIST/proxy 路由；AI 是单独的 Node.js 22/arm64/128 MB Lambda。Python 函数是 Python 3.13/arm64。模板和 CI 统一在 aws_sam/personal-site；Terraform 管 dev Cognito，所有 AI 文档留在本仓库。
 
 浏览器 Cognito 授权码 + PKCE 登录 → POST https://api.ziliang.ninja/v1/loan-explanations → HTTP API JWT authorizer → AI Lambda 参数校验和计算 → DDB 每日额度 → Bedrock Converse → 单次 JSON 响应。API 内部路径为 /loan-explanations，域名映射提供 /v1 前缀。
