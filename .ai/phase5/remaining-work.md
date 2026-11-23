@@ -12,7 +12,7 @@
 ## 推进顺序与边界
 
 A. **完成本轮收尾 PR**：品牌 logo/favicon 定稿、旧 PNG 删除、全站共享导航与品牌对齐，文章目录补齐及手机焦点管理；主页及税务页面提供直接入口和适用年度，不额外显示“可体验”标签，默认导航补上房贷/税务入口；筛股器仍规划中。代码与文档验证后提交推送，合并部署后复核 favicon、双语入口、导航及窄屏焦点。推送不代表发布。
-B. **AI 解释器接入与验收**：后端已部署到共享 personal-site stack；本分支替换首页 mock，登录后使用 JSON 请求与每日 20 次额度。前端发布后验证真实 Cognito 登录、模型响应与额度；实现与验收见 ../ai-interpreter/handoff.md。
+B. **AI 解释器接入与验收**（2026-11-23：Bedrock 模型权限未开通，公开页已用 `aiExplanationLive=false` 隐藏入口，可用 `?ai-preview=1` 预览；先按 CloudWatch 原始报错区分 IAM、推理配置文件 ID、配额为 0 或账户级限制，必要时改用 Anthropic API）：后端已部署到共享 personal-site stack；本分支替换首页 mock，登录后使用 JSON 请求与每日 20 次额度。前端发布后验证真实 Cognito 登录、模型响应与额度；实现与验收见 ../ai-interpreter/handoff.md。
 
 C. **AI 筛股器 MVP 先确认需求**：市场/证券范围、数据源及许可与更新频率、首批条件确定后，再设计自然语言到明确筛选条件与后端。空壳不是筛股实现完成，无行情、伪造结果或真实 AI。
 
@@ -36,3 +36,10 @@ D. **可延后独立任务**：税务新收入年度及适用范围、房贷变�
 
 
 2026-09-09：AI 后端已合并到 personal-site 并部署；本分支首页接入 Cognito 登录和共享 API，替换旧模拟解释。普通计算不要求登录。当前前端尚未发布，状态与验收见 [.ai/ai-interpreter/handoff.md](../ai-interpreter/handoff.md)。
+
+## 2026-11-23 墨与朱改版后续
+
+- Bedrock 权限开通并完成真实登录、推理、额度验收后，把 `aiExplanationLive` 改为 true，并恢复首页 AI 解释按钮相关断言。
+- 手写模型如需更新：`python3 -I scripts/digits/train.py <MNIST目录> docs/.vuepress/public/static/models/digits-mlp.bin`，同时更新 `lib/digits/meta.json`，再跑 `node scripts/digits/check-model.mjs`。
+- 既有问题（main 上同样存在）：`check-japan-tax-browser.mjs` 第 405 行仍按旧文案断言首个 `.preview-note` 不含“2025”；筛股器专项需 `PREVIEW_ORIGIN` 预启动服务器。
+- Safari、实体手机触控书写和 VoiceOver 仍待人工检查。
