@@ -16,7 +16,7 @@
 
 ### AI 解释开关
 
-后端已部署但 Bedrock 模型权限未开通，`services/ai-interpreter/client/site-config.mjs` 的 `aiExplanationLive = false`。公开页面不显示 AI 解释按钮，改为“后端已部署，模型权限开通中”的状态说明。所有者可用 `?ai-preview=1` 在本机打开真实流程（写入 localStorage，`?ai-preview=0` 清除）；`check-ai-browser.mjs` 通过同一开关运行受控夹具。真实推理验收后把 `aiExplanationLive` 改为 true。
+2026-11-23 起正式上线：后端改用 Claude API（Opus 5.5，工作负载身份联合，无 API key），用户在 `?ai-preview=1` 下完成真实登录与解释验收后，`services/ai-interpreter/client/site-config.mjs` 的 `aiExplanationLive = true`。贷款卡片显示“AI 解释（需登录）”按钮，首页 AI 链路第 5 站为 CLAUDE API，不再标“接入中”。需要临时下线时改回 false；此时 `?ai-preview=1` 仍可在本机预览。
 
 ## 视觉与响应式
 

@@ -18,8 +18,6 @@ try {
   const target = await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, {method:'PUT'}).then(r=>r.json());
   cdp = new CdpClient(target.webSocketDebuggerUrl); await cdp.open();
   await cdp.send('Page.enable'); await cdp.send('Runtime.enable');
-  // AI explanations are hidden publicly until model access is live; exercise the owner preview flag.
-  await cdp.send('Page.addScriptToEvaluateOnNewDocument', {source:"try{localStorage.setItem('ai-preview','1')}catch{}"});
   cdp.on('Runtime.exceptionThrown', e => errors.push(e.exceptionDetails.text));
   await cdp.send('Fetch.enable', {patterns:[{urlPattern:'*'}]});
   const fulfill = (id, body, type = 'text/html', status = 200, headers = []) => cdp.send('Fetch.fulfillRequest', {requestId:id,responseCode:status,responseHeaders:[{name:'Content-Type',value:type}, ...headers],body:Buffer.from(body).toString('base64')});

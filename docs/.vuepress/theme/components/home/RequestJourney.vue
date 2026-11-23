@@ -7,7 +7,7 @@ const stops = computed(() => [
   { tag: 'API GATEWAY', title: t('Verify at the edge', '入口验签'), detail: t('JWT checked before any code runs. AI route limited to 5 req/s, burst 10.', '代码运行前先验 JWT；AI 路由每秒 5 次、突发 10 次。') },
   { tag: 'LAMBDA', title: t('Recompute, don’t trust', '重算，不轻信'), detail: t('Validates the numbers and recalculates the loan deterministically. The prompt never leaves the backend.', '校验参数并确定性重算贷款；提示词只在后端，不下发浏览器。') },
   { tag: 'DYNAMODB', title: t('Daily quota', '每日额度'), detail: t('20 explanations per user per day, conditional writes, reset at midnight Tokyo.', '每人每天 20 次，条件写入计数，东京零点重置。') },
-  { tag: 'CLAUDE API', title: t('Model call', '调用模型'), detail: t('Claude Opus 5.5 at low effort, via workload identity federation: a short-lived AWS token, no stored API key. Explains the numbers; never changes them.', 'Claude Opus 5.5，低思考强度；用工作负载身份联合换取短期令牌，不存 API key。只解释数字，不改数字。'), pending: true },
+  { tag: 'CLAUDE API', title: t('Model call', '调用模型'), detail: t('Claude Opus 5.5 at low effort, via workload identity federation: a short-lived AWS token, no stored API key. Explains the numbers; never changes them.', 'Claude Opus 5.5，低思考强度；用工作负载身份联合换取短期令牌，不存 API key。只解释数字，不改数字。') },
   { tag: 'PAGE', title: t('Render safely', '安全呈现'), detail: t('Plain text only — no HTML, no Markdown links — beside the calculator, never over it.', '只渲染纯文本，不执行 HTML 或 Markdown 链接；放在计算结果旁边，不覆盖它。') },
 ]);
 const guards = computed(() => [

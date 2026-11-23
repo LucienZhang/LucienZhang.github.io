@@ -1,5 +1,7 @@
 # AI 解释器交接
 
+2026-11-23：模型调用改为 Claude API（WIF），后端 #26 部署，用户真实登录与解释验收成功，前端正式开放 AI 解释。以下为历史记录。
+
 2026-09-10 当前状态：Terraform PR #154、SAM PR #22 和合并 PR #23 均已合并。用户删除了旧 personal-site-ai-dev stack 和 Ledger 表。新资源已部署到现有 personal-site stack，复用 PersonalSiteApi/api.ziliang.ninja；Actions 34346766280 成功。三个 Lambda 均 arm64；Python 3.13、AI Node.js 22。
 
 SAM PR #24 和 Terraform PR #155 也已合并；最新 SAM 部署 Actions 34443485105 成功。共享客户端名称为 dev-site，ID 不变；DDB 固定名 personal-site-ai-quota，替换删除空旧表。

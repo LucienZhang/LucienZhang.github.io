@@ -109,14 +109,15 @@ async function main() {
         assert.equal(await evaluate("document.querySelector('#payment-first dd').textContent"), '153,092.22');
         await click('.exact-results summary');
         await click('.parameters summary');
-        // AI explanations stay off publicly until model access is live.
-        assert.equal(await evaluate("document.querySelector('.explain-action')"), null, 'AI explanation must be hidden while the model is not live');
-        assert.ok(await evaluate("Boolean(document.querySelector('.ai-status'))"), 'AI status note is shown');
+        assert.equal(await evaluate("document.querySelector('.ai-status')"), null, 'live AI shows the explain action, not the pending note');
+        await click('.explain-action');
+        assert.equal(await evaluate('document.activeElement.id'), 'explanation-title');
         if (width < 720) await click('.menu-button');
         await assertFit();
         if (width === 390 || width === 1440) await screenshot(`${language}-${width}-expanded`);
         if (width < 720) await click('.menu-button');
       }
+      assert.ok(await evaluate("[...document.querySelectorAll('.questions button')].every(button => button.disabled)"), 'AI questions require sign-in');
       // In-browser digit model: three built-in samples must be recognised.
       await evaluate("document.querySelector('#lab').scrollIntoView()");
       for (const expected of ['2', '7', '3']) {
@@ -143,6 +144,9 @@ async function main() {
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
       assert.ok(await evaluate("document.querySelector('.point-readout').textContent.includes('2:')"), 'Chart keyboard inspection advances one month');
       assert.equal(await evaluate("document.querySelector('.review-controls')"), null);
+      await evaluate("document.querySelector('.panel-heading button').focus()");
+      await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+      assert.ok(await evaluate("document.activeElement.classList.contains('explain-action')"), 'Escape closes the AI panel and returns focus');
       await evaluate("document.querySelector('#loan-years').focus()");
       const old = await evaluate("document.querySelector('#loan-years').value");
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
