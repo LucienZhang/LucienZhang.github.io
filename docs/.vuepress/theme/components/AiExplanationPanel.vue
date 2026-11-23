@@ -74,9 +74,12 @@ function trap(event) {
   if (event.key !== 'Tab') return;
   const items = [...dialog.value.querySelectorAll('button:not(:disabled), a[href], [tabindex="0"]')];
   if (!items.length) return;
-  const first = items[0], last = items.at(-1);
-  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  const first = items[0], last = items.at(-1), active = document.activeElement;
+  // Focus can sit on the heading (tabindex -1), which is not in the list; wrap from there too,
+  // e.g. when AI is unavailable and the close button is the only enabled control.
+  if (!items.includes(active)) { event.preventDefault(); (event.shiftKey ? last : first).focus(); }
+  else if (event.shiftKey && active === first) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && active === last) { event.preventDefault(); first.focus(); }
 }
 onMounted(async () => {
   previousOverflow = document.body.style.overflow;
