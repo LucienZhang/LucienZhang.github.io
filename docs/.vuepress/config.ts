@@ -6,7 +6,7 @@ import { defineUserConfig } from "vuepress";
 import { markdownMathPlugin } from "@vuepress/plugin-markdown-math";
 import { registerComponentsPlugin } from "@vuepress/plugin-register-components";
 import { shikiPlugin } from "@vuepress/plugin-shiki";
-import { getDirname, path } from "vuepress/utils";
+import { fs, getDirname, path } from "vuepress/utils";
 import { AntDesignVueResolver } from "unplugin-vue-components/resolvers";
 import Components from "unplugin-vue-components/vite";
 import {
@@ -26,10 +26,27 @@ import { isProd } from "./common";
 
 const __dirname = getDirname(import.meta.url);
 
+// Facts shown on the homepage, counted from the checkout at build time (CI clones are shallow,
+// so nothing here depends on git history).
+const repoRoot = path.resolve(__dirname, "../..");
+const listFiles = (dir: string, match: (file: string) => boolean): string[] =>
+  fs.readdirSync(path.join(repoRoot, dir), { withFileTypes: true }).flatMap((entry) => {
+    const relative = path.join(dir, entry.name);
+    if (entry.isDirectory()) return entry.name === "artifacts" ? [] : listFiles(relative, match);
+    return match(entry.name) ? [relative] : [];
+  });
+const buildStats = {
+  specDocs: listFiles(".ai", (name) => name.endsWith(".md")).length,
+  checks:
+    listFiles("scripts", (name) => /^check-.*\.mjs$|\.test\.mjs$/.test(name)).length +
+    listFiles("services", (name) => name.endsWith(".test.mjs")).length,
+};
+
 export default defineUserConfig({
   extendsPage(page) {
     if (page.frontmatter.layout === 'Homepage') {
       page.frontmatter.copyrightYear = new Date().getFullYear();
+      page.frontmatter.buildStats = buildStats;
     }
   },
   define: isProd

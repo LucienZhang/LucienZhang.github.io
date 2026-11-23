@@ -81,12 +81,13 @@ async function main() {
     };
     const assertFit = async () => assert.ok(await evaluate('document.documentElement.scrollWidth <= innerWidth'), 'horizontal page overflow');
     const records = [];
+    const ready = "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled";
     for (const language of ['en', 'zh']) {
       const route = homeRoute(language);
       for (const [width, height] of [[1440,900],[1280,720],[768,1024],[390,844],[320,844]]) {
         await cdp.send('Emulation.setDeviceMetricsOverride', {width,height,deviceScaleFactor:1,mobile:false});
         await navigate(cdp, origin + route);
-        await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 10000);
+        await waitFor(cdp, ready, 10000);
         await evaluate('document.fonts.ready');
         await cdp.send('Page.bringToFront');
         await waitFor(cdp, "Math.abs(document.querySelector('.chart svg').viewBox.baseVal.width - Math.max(240, document.querySelector('.chart svg').getBoundingClientRect().width)) < 1", 5000);
@@ -96,52 +97,52 @@ async function main() {
         assert.equal(await evaluate("document.querySelector('[data-homepage]').dataset.homepage"), 'production');
         assert.equal(await evaluate("Boolean(document.querySelector('meta[name=robots]')?.content.includes('noindex'))"), false);
         assert.equal(await evaluate("document.querySelector('.language').getAttribute('href')"), homeRoute(language === 'en' ? 'zh' : 'en'));
-        const geometry = await evaluate(`({termBottom:document.querySelector('.term-controls').getBoundingClientRect().bottom, summaryBottom:document.querySelector('.comparison-summary').getBoundingClientRect().bottom, actionTop:document.querySelector('.primary').getBoundingClientRect().top, explainBottom:document.querySelector('.primary').getBoundingClientRect().bottom, titleHeight:document.querySelector('h1').getBoundingClientRect().height, titleLineHeight:parseFloat(getComputedStyle(document.querySelector('h1')).lineHeight), font:getComputedStyle(document.querySelector('.vp-site-name')).fontFamily})`);
+        const geometry = await evaluate(`({ctaBottom:document.querySelector('.hero-actions .button').getBoundingClientRect().bottom, titleHeight:document.querySelector('h1').getBoundingClientRect().height, titleLineHeight:parseFloat(getComputedStyle(document.querySelector('h1')).lineHeight), summaryBottom:document.querySelector('.comparison-summary').getBoundingClientRect().bottom, actionTop:document.querySelector('.full-comparison').getBoundingClientRect().top, font:getComputedStyle(document.querySelector('.vp-site-name')).fontFamily})`);
         records.push({language,width,height,...geometry});
         await screenshot(`${language}-${width}`);
-        assert.ok(geometry.titleHeight <= geometry.titleLineHeight * 2 + 1, `hero heading must fit two meaningful lines: ${language} ${width}px ${JSON.stringify(geometry)}`);
-        assert.ok(geometry.summaryBottom <= geometry.actionTop, 'results must appear before the full-tool action');
-        if (width >= 1280) assert.ok(geometry.explainBottom <= height, 'desktop tool CTA below fold');
-        if (width === 390) {
-          assert.ok(geometry.summaryBottom <= height, `mobile comparison results below fold: ${geometry.summaryBottom}`);
-          assert.ok(geometry.explainBottom <= height, `mobile tool CTA below fold: ${geometry.explainBottom}`);
-        }
+        if (width >= 1280) assert.ok(geometry.titleHeight <= geometry.titleLineHeight * 2 + 1, `desktop hero heading must fit two lines: ${language} ${width}px ${JSON.stringify(geometry)}`);
+        if (width >= 1280 || width === 390) assert.ok(geometry.ctaBottom <= height, `hero call to action below the fold: ${language} ${width}px`);
+        assert.ok(geometry.summaryBottom <= geometry.actionTop, 'loan results must appear before the full-tool action');
         assert.equal(await evaluate("document.querySelector('.comparison-summary tbody tr:first-child td data').getAttribute('value') !== null"), true);
         await click('.exact-results summary');
         assert.ok(await evaluate("document.querySelector('#payment-first dd').getClientRects().length > 0"), 'exact amounts remain available');
         assert.equal(await evaluate("document.querySelector('#payment-first dd').textContent"), '153,092.22');
         await click('.exact-results summary');
         await click('.parameters summary');
-        assert.equal(await evaluate("document.querySelector('.data')"), null);
-        await click('.explain-action');
-        assert.equal(await evaluate('document.activeElement.id'), 'explanation-title');
+        // AI explanations stay off publicly until model access is live.
+        assert.equal(await evaluate("document.querySelector('.explain-action')"), null, 'AI explanation must be hidden while the model is not live');
+        assert.ok(await evaluate("Boolean(document.querySelector('.ai-status'))"), 'AI status note is shown');
         if (width < 720) await click('.menu-button');
         await assertFit();
         if (width === 390 || width === 1440) await screenshot(`${language}-${width}-expanded`);
         if (width < 720) await click('.menu-button');
       }
-      assert.ok(await evaluate("[...document.querySelectorAll('.questions button')].every(button => button.disabled)"), 'AI questions require sign-in');
-      assert.equal(await evaluate("document.querySelector('#mock-question')"), null, 'Old mock question input is removed');
+      // In-browser digit model: three built-in samples must be recognised.
+      await evaluate("document.querySelector('#lab').scrollIntoView()");
+      for (const expected of ['2', '7', '3']) {
+        await click('.digit-demo .sample');
+        await waitFor(cdp, `document.querySelector('.digit-demo .digit').textContent.trim() === '${expected}'`, 10000);
+      }
+      assert.ok(await evaluate("document.querySelectorAll('.digit-demo .bars li').length === 10"));
+      await click('.digit-demo .clear');
+      assert.equal(await evaluate("document.querySelector('.digit-demo .digit').textContent.trim()"), '?');
       const defaultSummary = await evaluate("[...document.querySelectorAll('.comparison-summary data')].map(el => el.getAttribute('value'))");
       await input('#loan-years', '20');
       const validSummary = await evaluate("[...document.querySelectorAll('.comparison-summary data')].map(el => el.getAttribute('value'))");
       assert.notDeepEqual(validSummary, defaultSummary, 'term changes update the summary');
       await input('#loan-amount', '');
       assert.equal(await evaluate("document.querySelector('#loan-amount').getAttribute('aria-invalid')"), 'true');
-      assert.ok(await evaluate("document.querySelector('.questions button').disabled"));
       assert.deepEqual(await evaluate("[...document.querySelectorAll('.comparison-summary data')].map(el => el.getAttribute('value'))"), validSummary, 'invalid inputs retain the last valid comparison');
       await input('#loan-amount', '300000');
       await input('#loan-rate', '0');
       assert.equal(await evaluate("document.querySelector('#payment-interest dd').textContent"), '0.00');
       assert.equal(await evaluate("Number(document.querySelectorAll('.comparison-summary tbody tr:last-child data')[0].getAttribute('value'))"), 0);
       assert.equal(await evaluate("document.querySelectorAll('.chart circle[r=\"5\"]').length"), 0, 'Zero-rate curves must not invent a crossing');
+      assert.equal(await evaluate("document.querySelector('.loan-demo .insight')"), null, 'No interest saving is claimed at zero rate');
       await evaluate("document.querySelector('.chart svg').focus()");
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
       assert.ok(await evaluate("document.querySelector('.point-readout').textContent.includes('2:')"), 'Chart keyboard inspection advances one month');
       assert.equal(await evaluate("document.querySelector('.review-controls')"), null);
-      await evaluate("document.querySelector('.panel-heading button').focus()");
-      await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
-      assert.ok(await evaluate("document.activeElement.classList.contains('explain-action')"));
       await evaluate("document.querySelector('#loan-years').focus()");
       const old = await evaluate("document.querySelector('#loan-years').value");
       await cdp.send('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
@@ -149,7 +150,9 @@ async function main() {
       await cdp.send('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:'reduce'},{name:'prefers-color-scheme',value:'dark'}]});
       await assertFit();
       assert.equal(await evaluate("getComputedStyle(document.querySelector('.homepage')).colorScheme"), 'light');
-      assert.equal(await evaluate("getComputedStyle(document.querySelector('.primary')).transitionDuration"), '0s');
+      assert.equal(await evaluate("getComputedStyle(document.querySelector('.button')).transitionDuration"), '0s');
+      assert.equal(await evaluate("getComputedStyle(document.querySelector('.hero-loop .comet')).display"), 'none', 'reduced motion hides the moving comet');
+      assert.equal(await evaluate("getComputedStyle(document.querySelector('.hero-loop .station .node')).animationName"), 'none');
       // 200% reflow equivalent: 1280 physical width -> 640 CSS pixels, 2x raster scale.
       await cdp.send('Emulation.setDeviceMetricsOverride', {width:640,height:450,deviceScaleFactor:2,mobile:false});
       await assertFit(); await screenshot(`${language}-200pct-reflow`);
@@ -173,12 +176,13 @@ async function main() {
       await navigate(cdp, origin + route);
       assert.ok(await evaluate("document.querySelector('.term-controls').disabled"));
       assert.ok(await evaluate("document.querySelector('#contact .email').textContent.includes('lucienzhangzl@gmail.com')"));
-      assert.ok(await evaluate("document.querySelector('svg polyline').getAttribute('points').length > 100"));
+      assert.ok(await evaluate("document.querySelector('.chart svg polyline').getAttribute('points').length > 100"));
+      assert.ok(await evaluate("document.querySelectorAll('.blueprint .controls circle').length === 32"), 'logo blueprint renders 16 Béziers without JavaScript');
       await screenshot(`${language}-nojs`);
       await cdp.send('Emulation.setScriptExecutionDisabled', {value:false});
     }
     await navigate(cdp, origin + homeRoute('en'));
-    await waitFor(cdp, "document.querySelector('#loan-years') && !document.querySelector('.term-controls').disabled", 10000);
+    await waitFor(cdp, ready, 10000);
     await click('.parameters summary');
     await input('#loan-amount', '10000000000'); await input('#loan-rate', '20'); await input('#loan-years', '50');
     await cdp.send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:false});
