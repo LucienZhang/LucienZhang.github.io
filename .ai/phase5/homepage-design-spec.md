@@ -6,7 +6,7 @@
 
 阅读顺序：首屏主张 → 01 现场演示 → 02 AI 服务架构 → 03 这个网站怎么造出来 → 04 联系。区块锚点 #lab、#ai-service、#engineering（导航“工程”）、#notes、#contact（导航“联系”）。
 
-- 首屏：主张“Agents write the code. / I write the guardrails.” / “Agent 写代码，/ 我写规格、测试与护栏。”；说明句点出浏览器内模型、带登录与额度的大模型解释后端、由 AI 编码 agent 实现的本站。两个按钮跳到 #lab 与 #engineering。三项统计在构建时从检出目录计数（`.ai/**/*.md` 规格与决策记录、`scripts/` 与 `services/` 下的 check/test 脚本），不依赖 git 历史（CI 为浅克隆）；第三项为浏览器内模型测试准确率，读自 `lib/digits/meta.json`。
+- 首屏：口号“One human. / Infinite agents.” / “一个人，/ 无限 Agent。”（2026-11-23 用户要求更口号化，替代较像解释的“Agents write the code. / I write the guardrails.”），与右侧 ∞ 呼应；说明句承接“AI 编码 agent 写代码，我写规格、测试和护栏”，再列出浏览器内模型、带登录与额度的大模型解释后端和本站。两个按钮跳到 #lab 与 #engineering。三项统计在构建时从检出目录计数（`.ai/**/*.md` 规格与决策记录、`scripts/` 与 `services/` 下的 check/test 脚本），不依赖 git 历史（CI 为浅克隆）；第三项为浏览器内模型测试准确率，读自 `lib/digits/meta.json`。
 - 首屏视觉 HeroLoop：用 logo 路径作底，中心线 ∞ 上一束光循环流动，依次点亮 规格/生成/校验/上线 四站；站点时刻按贝塞尔弧长比例（0.129/0.371/0.629/0.871）同步。离开视口暂停动画。
 - 现场演示：手写数字识别（大卡）+ 房贷比较（卡片）+ 税务入口 + 筛股器设计稿。筛股器明确标注“设计中 · 尚未实现”，示例 JSON 只表示目标效果。
 - 手写识别：784→128→10 MLP，int8 按行对称量化，102,736 字节（`public/static/models/digits-mlp.bin`），接近视口时懒加载。笔画按 MNIST 方式归一化（20×20 外框、质心居中到 28×28）后推理，边写边更新；显示概率条、推理耗时和“模型看到的 28×28”。“试一个示例”绘制内置笔画，供键盘用户和自动化测试使用。不上传任何数据。

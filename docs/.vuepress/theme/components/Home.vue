@@ -33,8 +33,8 @@ const steps = computed(() => [
         <div class="wrap hero-grid">
           <div class="hero-copy">
             <p class="kicker"><span class="kicker-dot" aria-hidden="true"></span>{{ t('Ziliang Zhang · AI applications · Data · Backend', '张子良 · AI 应用 · 数据 · 后端工程') }}</p>
-            <h1 id="homepage-title"><span>{{ t('Agents write the code.', 'Agent 写代码，') }}</span><span class="glow-text">{{ t('I write the guardrails.', '我写规格、测试与护栏。') }}</span></h1>
-            <p class="lede">{{ t('I turn models into things people can use: a digit recognizer that runs in your browser, an LLM explainer backend with sign-in and quotas, and this site itself — specified by me, built by AI coding agents, merged only after automated checks.', '我把模型做成别人用得上的东西：在你浏览器里实时运行的手写识别、带登录与额度控制的大模型解释后端，还有这个网站本身——我写规格，AI 编码 agent 实现，自动校验通过才合并。') }}</p>
+            <h1 id="homepage-title"><span>{{ t('One human.', '一个人，') }}</span><span class="glow-text">{{ t('Infinite agents.', '无限 Agent。') }}</span></h1>
+            <p class="lede">{{ t('AI coding agents write the code; I write the specs, tests and guardrails that keep it honest. The results: a digit recognizer that runs in your browser, an LLM explainer backend with sign-in and quotas, and this site itself — merged only after automated checks.', 'AI 编码 agent 写代码，我写规格、测试和护栏。做出来的东西：在你浏览器里实时运行的手写识别、带登录与额度控制的大模型解释后端，还有这个网站本身——自动校验通过才合并。') }}</p>
             <div class="hero-actions">
               <a class="button solid" href="#lab">{{ t('Try the live demos', '试试现场演示') }} <LinkArrow /></a>
               <a class="button ghost" href="#engineering">{{ t('How this site is built', '看这个网站怎么造出来') }}</a>
@@ -191,10 +191,10 @@ const steps = computed(() => [
 .hero-copy { min-width: 0; }
 .kicker { display: flex; align-items: center; gap: 10px; color: var(--on-ink-muted); margin-bottom: 28px !important; }
 .kicker-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-bright); box-shadow: 0 0 12px 2px rgb(232 85 58 / 70%); }
-.hero h1 { font-size: clamp(40px, 4.3vw, 62px); line-height: 1.04; letter-spacing: -.035em; font-weight: 700; color: var(--on-ink); }
+.hero h1 { font-size: clamp(44px, 5.6vw, 84px); line-height: 1.02; letter-spacing: -.04em; font-weight: 700; color: var(--on-ink); }
 .hero h1 span { display: block; }
 .glow-text { background: linear-gradient(100deg, #ffb39c 0%, #ff6a4d 45%, #c93f27 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.chinese .hero h1 { font-size: clamp(38px, 4.3vw, 62px); line-height: 1.14; letter-spacing: -.01em; }
+.chinese .hero h1 { font-size: clamp(44px, 5.6vw, 84px); line-height: 1.12; letter-spacing: -.01em; }
 .lede { max-width: 60ch; margin-top: 28px !important; font-size: 18px; line-height: 30px; color: #c9c4b8; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
 .button { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 12px 22px; border-radius: 999px; font-weight: 600; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
@@ -267,6 +267,7 @@ footer { border-top: 1px solid var(--ink-line); }
   .band { padding: 72px 0; }
 }
 @media (max-width: 767px) {
+  .hero h1, .chinese .hero h1 { font-size: clamp(36px, 10vw, 56px); }
   .wrap { padding: 0 24px; }
   .band { padding: 56px 0; }
   .band-head { margin-bottom: 32px; }
