@@ -13,7 +13,14 @@ const height = computed(() => props.compact ? (width.value < 480 ? 160 : 192) : 
 const top = props.compact ? 32 : 94, bottom = computed(() => height.value - (props.compact ? 48 : 72));
 const bounds = computed(() => {
   const values = props.series.flatMap(s => s.points.map(p => p.value));
-  const lo = Math.min(0, ...values), hi = Math.max(0, ...values);
+  let lo = Math.min(0, ...values);
+  const hi = Math.max(0, ...values), min = Math.min(...values);
+  // Positive series far from zero (e.g. monthly payments) get a rounded baseline so their
+  // differences stay visible; the bottom tick label shows where the axis starts.
+  if (min > 0 && min > hi * 0.3 && hi - min > hi * 0.01) {
+    const span = hi - min, step = 10 ** Math.floor(Math.log10(Math.max(span, 1)));
+    lo = Math.max(0, Math.floor((min - span * 0.15) / step) * step);
+  }
   return { lo, hi: hi === lo ? lo + 1 : hi };
 });
 const x = m => 64 + (Math.max(props.start,m) - props.start) / Math.max(1, props.end - props.start) * (width.value - 80);
@@ -23,7 +30,7 @@ const ticks = computed(() => Array.from({length: 4}, (_, i) => bounds.value.lo +
 const fmt = v => new Intl.NumberFormat(props.zh ? 'zh-CN' : 'en-US', {maximumFractionDigits: 1, notation: 'compact'}).format(v);
 const amount = v => new Intl.NumberFormat('en-US', {maximumFractionDigits:0}).format(v);
 const date = m => props.compact ? (props.zh ? `第${m}期` : `Month ${m}`) : calendarMonth(props.calendarStart,m);
-const axisLabel = m => props.compact ? `${new Intl.NumberFormat(props.zh ? 'zh-CN' : 'en-US', {maximumFractionDigits: 1}).format(m / 12)}${props.zh ? '年' : 'y'}` : date(m);
+const axisLabel = m => props.compact && m === props.start ? (props.zh ? '首期' : 'Month 1') : props.compact ? `${new Intl.NumberFormat(props.zh ? 'zh-CN' : 'en-US', {maximumFractionDigits: 1}).format(m / 12)}${props.zh ? '年' : 'y'}` : date(m);
 const axisMonths = computed(() => [...new Set([props.start, Math.round((props.start+props.end)/2), props.end])]);
 const annotations = computed(() => {
   const valuesAt = m => props.series.map((s,i) => ({label:props.series.length === 1 ? 'A−B' : ['A','B'][i],value:s.points.find(p=>p.month===m)?.value ?? 0}));

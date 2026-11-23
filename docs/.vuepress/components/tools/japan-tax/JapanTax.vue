@@ -27,6 +27,13 @@ const furusatoField = { id: 'furusato', jp: '寄附金額', zh: '实际捐款额
   enWhere: 'Use donation receipts or a donation deduction certificate. The withholding slip has no dedicated furusato donation box.', source: source.furusato };
 async function addItem() { if (!selected.value) return; const id = selected.value; items.value.push(id); values[id] = ''; values['resident-' + id] = ''; selected.value = ''; await nextTick(); document.getElementById(`tax-${id}`)?.focus(); }
 async function removeItem(id) { items.value = items.value.filter(item => item !== id); delete values[id]; delete values['resident-' + id]; await nextTick(); document.getElementById('deduction-select')?.focus(); }
+// A consistent, clearly labelled example: ¥6M salary, year-end adjusted withholding, ¥60k furusato via tax return.
+function fillExample() {
+  clear();
+  Object.assign(values, { salary: '6000000', withheld: '184290', total: '1580000', residentTotal: '1330000', adjustment: '2500', furusato: '60000' });
+  procedure.value = 'return';
+  announcement.value = copy('已填入示例数据：工资收入 600 万日元、故乡税 6 万日元。', 'Example filled: ¥6M salary and ¥60k furusato donation.');
+}
 function clear() { Object.keys(values).forEach(key => values[key] = ''); items.value = []; selected.value = ''; mode.value = 'total'; procedure.value = ''; incomeAdjustment.value = false; Object.assign(housing, emptyHousing()); announcement.value = copy('全部输入已清空。', 'All inputs cleared.'); }
 const sourceGroups = [
   { zh: '票据与扣除', en: 'Records & deductions', links: [
@@ -102,7 +109,7 @@ const calculationStatus = computed(() => {
       <section class="hero"><p class="preview-note">{{ copy('2025 工资收入／2026 住民税', '2025 salary income / 2026 resident tax') }}</p><h1> {{ copy('日本税务计算器', 'Japan tax calculator') }}</h1><p class="intro">{{ copy('从源泉徴収票出发，看清所得、退税与来年住民税。', 'From your withholding slip to income, refunds and next year’s resident tax.') }}</p><p class="preview-note">{{ copy('规则核对：2026-09-06', 'Rules checked: 2026-09-06') }}</p></section>
       <details class="slip-guide"><summary>{{ copy('源泉徴収票：这几个金额在哪里？', 'Where are these amounts on the withholding slip?') }}</summary><p>{{ copy('对照票据上部金额栏的日文原名。以下为字段对应示意，非正式票据；布局以雇主提供的票据为准。', 'Match the Japanese labels in the upper amount row. This is a simplified field map, not an official slip; your employer’s layout may vary.') }}</p><div class="slip-map" lang="ja"><div><small>③ · {{ copy('输入', 'Input') }}</small>支払金額</div><div><small>④ · {{ copy('结果核对', 'Result reference') }}</small>給与所得控除後の金額<br>（調整控除後）</div><div><small>⑤ · {{ copy('输入', 'Input') }}</small>所得控除の額の合計額</div><div><small>⑥ · {{ copy('输入', 'Input') }}</small>源泉徴収税額</div></div><a :href="source.form" target="_blank" rel="noopener noreferrer">{{ copy('打开国税厅令和7年分票据样式与字段说明 ↗', 'Open the NTA 2025 slip and field guide (Japanese) ↗') }}</a><p class="small">{{ copy('本版适用 2025 年收入。医疗费、寄附金等扣除并非都在票中列出。无需上传票据。', 'This version applies to 2025 income. Medical and donation deductions are not all shown on the slip. No document upload is needed.') }}</p></details>
       <div class="calculator">
-        <section class="inputs" aria-labelledby="inputs-title"><div class="section-heading"><h2 id="inputs-title">{{ copy('输入条件', 'Your inputs') }}</h2><span>{{ copy('金额单位：日元', 'Amounts in JPY') }}</span></div>
+        <section class="inputs" aria-labelledby="inputs-title"><div class="section-heading"><h2 id="inputs-title">{{ copy('输入条件', 'Your inputs') }}</h2><span>{{ copy('金额单位：日元', 'Amounts in JPY') }}</span><button id="fill-example" type="button" class="example-button" @click="fillExample">{{ copy('填入示例', 'Fill an example') }}</button></div>
           <AmountField v-for="field in primaryFields" :key="field.id" :field="field" :zh="zh" v-model="values[field.id]" />
           <section class="deduction-group" aria-labelledby="deduction-group-title"><h3 id="deduction-group-title">{{ copy('扣除与抵税', 'Deductions & tax credits') }}</h3>
           <div class="credit-option">
@@ -155,6 +162,17 @@ const calculationStatus = computed(() => {
           </section>
           <div class="actions"><button id="clear-inputs" type="button" @click="clear">{{ copy('清空全部输入', 'Clear all inputs') }}</button></div><p class="privacy">{{ copy('输入不保存、不上传；刷新或切换语言后清空。', 'Inputs are not saved or uploaded; refreshing or changing language clears them.') }}</p><span class="sr-only" role="status">{{ announcement }}</span>
       </div>
+      <aside class="summary-rail" :aria-label="copy('实时概算摘要', 'Live estimate summary')">
+        <p class="rail-kicker">{{ copy('实时概算', 'Live estimate') }}</p>
+        <div class="rail-main"><span>{{ owesTax ? copy('预计补缴', 'Payment due') : copy('预计退税', 'Estimated refund') }}</span><strong>{{ money(owesTax ? finalNational.due : finalNational.refund) }}</strong><small>JPY</small></div>
+        <dl class="rail-list">
+          <div><dt>{{ copy('工资所得', 'Employment income') }}</dt><dd>{{ resultValue('income') }}</dd></div>
+          <div><dt>{{ copy('所得税', 'Income tax') }}</dt><dd>{{ resultValue('tax') }}</dd></div>
+          <div><dt>{{ copy('故乡税上限（概算）', 'Furusato limit (est.)') }}</dt><dd>{{ furusatoLimitValue }}</dd></div>
+          <div class="rail-monthly"><dt>{{ copy('来年住民税 / 月', 'Resident tax / month') }}</dt><dd>{{ money(finalResident.monthly) }}</dd></div>
+        </dl>
+        <p v-if="!values.salary" class="rail-empty">{{ copy('输入源泉徴収票上的金额，这里会实时更新。没有票据可以先点“填入示例”。', 'Enter the amounts from your withholding slip and this updates live. No slip at hand? Try “Fill an example”.') }}</p>
+      </aside>
       <section class="sources" aria-labelledby="sources-title">
         <h2 id="sources-title">{{ copy('规则与来源', 'Rules & sources') }}</h2>
         <p>{{ copy('规则核对日期：2026-09-06。具体适用年度见公式与来源。', 'Rules checked: 2026-09-06. See formulas and sources for applicable tax years.') }}</p>
@@ -178,12 +196,11 @@ const calculationStatus = computed(() => {
 .tax-shell a { color: var(--jt-accent); text-decoration: underline; text-underline-offset: 3px; }
 .tax-shell a:hover { text-decoration-thickness: 2px; }
 .tax-shell :is(a, button, input, select, summary):focus-visible { outline: 2px solid var(--jt-accent); outline-offset: 3px; }
-.tax-content { min-width: 0; }
+.tax-content { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); max-width: 800px; margin-inline: auto; }
 .hero { padding: 40px 0 16px; }
 .tax-shell p { margin: 0 0 12px; }
 .preview-note { font-size: 14px; color: var(--jt-accent); }
-.tax-shell h1 { margin: 0 0 16px; padding: 0; color: var(--jt-ink); font: 400 clamp(34px, 4vw, 54px)/1.2 Georgia, 'Times New Roman', serif; }
-.tax-shell[lang='zh-CN'] h1 { font-family: 'Songti SC', 'Noto Serif CJK SC', serif; line-height: 1.35; }
+.tax-shell h1 { margin: 0 0 16px; padding: 0; color: var(--jt-ink); font: 700 clamp(32px, 4vw, 48px)/1.15 system-ui, -apple-system, 'Segoe UI', 'PingFang SC', sans-serif; letter-spacing: -.025em; }
 .intro { font-size: 18px; }
 .slip-guide { margin-top: 16px; background: #efeae0; padding: 0 16px; }
 .tax-shell summary { cursor: pointer; min-height: 44px; align-content: center; font-size: 14px; }
@@ -192,7 +209,7 @@ const calculationStatus = computed(() => {
 .slip-map { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #797b71; font-size: 14px; background: #fffdf8; }
 .slip-map div { padding: 16px 12px; border-right: 1px solid var(--jt-line); }
 .slip-map small { display: block; color: var(--jt-accent); margin-bottom: 8px; }
-.calculator { display: flex; flex-direction: column; gap: 32px; padding: 32px 0; max-width: 800px; margin-inline: auto; }
+.calculator { display: flex; flex-direction: column; gap: 32px; padding: 32px 0; min-width: 0; }
 .inputs, .results { min-width: 0; }
 .tax-shell h2 { font: 600 24px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0 0 24px; border: 0; padding: 0; color: var(--jt-ink); }
 .tax-shell h3 { padding: 0; font-size: 20px; color: var(--jt-ink); margin: 0 0 12px; line-height: 1.4; }
@@ -277,4 +294,33 @@ const calculationStatus = computed(() => {
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 850px) { .calculator { grid-template-columns: 1fr; gap: 24px; } .results { border-left: 0; border-top: 1px solid var(--jt-line); padding: 28px 0 0; } .slip-map { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) { .result-list dd { font-size: 18px; } .tax-shell { padding: 12px; } .hero { padding-top: 28px; } .tax-shell h1 { font-size: 34px; } .intro { font-size: 16px; } .calculator { padding-top: 28px; } .tax-shell h2 { font-size: 22px; } .refund { padding: 20px; } .source-grid { grid-template-columns: 1fr; } .mode-switch label { padding-inline: 8px; } }
+/* 2026-11 refresh: one left edge, a live summary rail on wide screens and a sticky refund bar on narrow ones. */
+.hero > .preview-note:first-child { font: 600 12px/16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .06em; }
+.slip-guide { border-radius: 10px; }
+.example-button { margin-left: auto; padding: 6px 14px !important; min-height: 36px !important; border-radius: 999px !important; }
+.section-heading:has(.example-button) { align-items: center; flex-wrap: wrap; }
+.summary-rail { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 4px 16px; flex-wrap: wrap; margin: 0 0 12px; padding: 10px 16px; border-radius: 14px; background: #12110f; color: #efeae0; box-shadow: 0 12px 32px -12px rgb(32 35 31 / 55%); }
+.rail-kicker, .rail-list dt:not(.rail-monthly dt), .rail-empty { display: none; }
+.rail-list { display: flex; gap: 16px; margin: 0; }
+.rail-list > div:not(.rail-monthly) { display: none; }
+.rail-monthly { display: flex; gap: 8px; align-items: baseline; font-size: 13px; color: #c9c4b8; }
+.rail-monthly dd { margin: 0; color: #efeae0; font-variant-numeric: tabular-nums; }
+.rail-main { display: flex; align-items: baseline; gap: 8px; }
+.rail-main span { font-size: 13px; color: #c9c4b8; }
+.rail-main strong { font-size: 22px; line-height: 1.3; color: #ff8a6e; font-variant-numeric: tabular-nums; }
+.rail-main small { font-size: 12px; color: #a8a397; }
+@media (max-width: 1179px) { :global(.japan-tax-page .vp-back-to-top-button) { bottom: 6rem; } }
+@media (min-width: 1180px) {
+  .tax-content { max-width: 1140px; grid-template-columns: minmax(0, 800px) 300px; column-gap: 40px; justify-content: center; }
+  .tax-content > * { grid-column: 1; }
+  .tax-content > .summary-rail { grid-column: 2; grid-row: 3; align-self: start; top: calc(var(--navbar-height, 64px) + 24px); bottom: auto; display: block; margin: 32px 0 0; padding: 22px; border-radius: 14px; background: radial-gradient(90% 70% at 100% 0, rgb(182 56 36 / 30%), transparent 60%), #12110f; box-shadow: 0 24px 48px -28px rgb(32 35 31 / 55%); }
+  .rail-kicker { display: block; margin: 0 0 12px; font: 600 12px/16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .1em; text-transform: uppercase; color: #f08d77; }
+  .rail-main { flex-direction: column; gap: 2px; padding-bottom: 16px; border-bottom: 1px solid rgb(239 234 224 / 12%); }
+  .rail-main strong { font-size: 36px; }
+  .rail-list { display: grid; gap: 0; margin-top: 4px; }
+  .rail-list > div, .rail-list > div:not(.rail-monthly) { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgb(239 234 224 / 8%); font-size: 13px; }
+  .rail-list dt, .rail-list dt:not(.rail-monthly dt) { display: block; color: #a8a397; }
+  .rail-list dd { margin: 0; color: #efeae0; font-variant-numeric: tabular-nums; }
+  .rail-empty { display: block; margin: 14px 0 0; font-size: 13px; line-height: 1.6; color: #a8a397; }
+}
 </style>

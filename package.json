@@ -18,7 +18,7 @@
     "check:ai": "node --test services/ai-interpreter/test/*.test.mjs",
     "check:tax": "node --test scripts/japan-tax/*.test.mjs",
     "check:mortgage": "node scripts/check-mortgage-model.mjs",
-    "check:home": "node scripts/check-logo-geometry.mjs && node scripts/check-homepage-loan.mjs && node scripts/check-loan-handoff.mjs && node scripts/check-homepage.mjs --ci"
+    "check:home": "node scripts/check-logo-geometry.mjs && node scripts/digits/check-model.mjs && node scripts/check-homepage-loan.mjs && node scripts/check-loan-handoff.mjs && node scripts/check-homepage.mjs --ci"
   },
   "repository": {
     "type": "git",
