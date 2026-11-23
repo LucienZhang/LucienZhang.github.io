@@ -43,3 +43,8 @@ D. **可延后独立任务**：税务新收入年度及适用范围、房贷变�
 - 手写模型如需更新：`python3 -I scripts/digits/train.py <MNIST目录> docs/.vuepress/public/static/models/digits-mlp.bin`，同时更新 `lib/digits/meta.json`，再跑 `node scripts/digits/check-model.mjs`。
 - 既有问题（main 上同样存在）：`check-japan-tax-browser.mjs` 第 405 行仍按旧文案断言首个 `.preview-note` 不含“2025”；筛股器专项需 `PREVIEW_ORIGIN` 预启动服务器。
 - Safari、实体手机触控书写和 VoiceOver 仍待人工检查。
+
+## 2026-11-23 改用 Claude API
+
+- 后端 bitinker/aws_sam PR #26：Bedrock → Claude API（Opus 5.5）+ Workload Identity Federation，无 API key。合并前在 AWS 开启 Outbound web identity federation，在 Anthropic Console 创建 AWS 联邦（规则匹配 `AiRoleArn` 输出），把组织 ID 与规则 ID 写入 samconfig `parameter_overrides`。
+- 部署后用 `?ai-preview=1` 做真实登录、解释、额度与日志验收；通过后把 `aiExplanationLive` 改为 true，并把首页 AI 链路的 Claude 站去掉“接入中”。

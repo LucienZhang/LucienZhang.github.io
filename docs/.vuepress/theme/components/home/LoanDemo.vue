@@ -107,7 +107,7 @@ onBeforeUnmount(cancel);
       <a class="primary full-comparison" :href="toolHref">{{ t('Open full comparison', '打开完整房贷比较') }} <LinkArrow /></a>
       <button v-if="aiEnabled" ref="trigger" type="button" class="explain-action" :disabled="!ready" :aria-expanded="explanationOpen" aria-controls="explanation" @click="openExplanation"><span>{{ t('AI explanation', 'AI 解释') }}</span><small>{{ t('Sign-in required', '需登录') }}</small></button>
     </div>
-    <p v-if="!aiEnabled" class="ai-status"><span class="pending-dot" aria-hidden="true"></span>{{ t('AI explanation: backend deployed, model access pending.', 'AI 解释：后端已部署，模型权限开通中。') }} <a href="#ai-service">{{ t('See how it works', '看看它怎么工作') }}</a></p>
+    <p v-if="!aiEnabled" class="ai-status"><span class="pending-dot" aria-hidden="true"></span>{{ t('AI explanation: switching to the Claude API, coming soon.', 'AI 解释：正在接入 Claude API，即将上线。') }} <a href="#ai-service">{{ t('See how it works', '看看它怎么工作') }}</a></p>
     <AiExplanationPanel v-if="aiEnabled && explanationOpen" ref="aiPanel" :input="{ currency: 'JPY', amount: draft.amount, annualRatePct: draft.rate, months: draft.years * 12 }" :invalid="invalid" :locale="locale" :client="aiClient" @close="closeExplanation" />
   </article>
 </template>
